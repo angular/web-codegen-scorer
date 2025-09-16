@@ -1,0 +1,6 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>angular/dev-infra//renovate-presets/default.json5"],
+  "baseBranchPatterns": ["main"],
+  "postUpgradeTasks": {}
+}
