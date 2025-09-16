@@ -119,7 +119,12 @@ function builder(argv: Argv): Argv<Options> {
     })
     .option('logging', {
       type: 'string',
-      default: 'dynamic' as const,
+      default:
+        process.env['CI'] === '1'
+          ? ('text-only' as const)
+          : ('dynamic' as const),
+      defaultDescription: '`dynamic` (or `text-only` when `CI=1`)',
+      requiresArg: true,
       choices: ['text-only', 'dynamic'] as const,
       description: 'Type of logging to use during the evaluation process',
     })

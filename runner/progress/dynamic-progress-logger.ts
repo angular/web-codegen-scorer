@@ -6,6 +6,7 @@ import {
   ProgressType,
   progressTypeToIcon,
 } from './progress-logger.js';
+import { redX } from '../reporting/format.js';
 
 const PREFIX_WIDTH = 20;
 
@@ -17,6 +18,11 @@ export class DynamicProgressLogger implements ProgressLogger {
   private spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   private currentSpinnerFrame = 0;
   private spinnerInterval: ReturnType<typeof setInterval> | undefined;
+  private errors: {
+    prompt: RootPromptDefinition;
+    message: string;
+    details?: string;
+  }[] = [];
 
   initialize(total: number): void {
     this.finalize();
@@ -72,9 +78,22 @@ export class DynamicProgressLogger implements ProgressLogger {
     this.wrapper?.stop();
     this.pendingBars.clear();
     this.wrapper = this.totalBar = this.spinnerInterval = undefined;
+
+    for (const error of this.errors) {
+      let message = `${redX()} [${error.prompt.name}] ${error.message}`;
+      if (error.details) {
+        message += `\n  ${error.details}`;
+      }
+      console.error(message);
+    }
   }
 
-  log(prompt: RootPromptDefinition, type: ProgressType, message: string): void {
+  log(
+    prompt: RootPromptDefinition,
+    type: ProgressType,
+    message: string,
+    details?: string
+  ): void {
     if (!this.wrapper || !this.totalBar) {
       return;
     }
@@ -90,6 +109,11 @@ export class DynamicProgressLogger implements ProgressLogger {
         this.wrapper.remove(bar);
       }
       return;
+    }
+
+    // Capture errors for static printing once the dynamic progress is hidden.
+    if (type === 'error') {
+      this.errors.push({ prompt, message, details });
     }
 
     // Pad/trim the name so they're all the same length.

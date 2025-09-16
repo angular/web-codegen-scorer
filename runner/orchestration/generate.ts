@@ -175,9 +175,9 @@ export async function generateCodeAndAssess(options: {
               stack: e instanceof Error ? e.stack : undefined,
             });
 
-            let details = `  Error: ${e}`;
+            let details = `Error: ${e}`;
             if (e instanceof Error && e.stack) {
-              details += e.stack;
+              details += `\nStack: ${e.stack}`;
             }
 
             progress.log(
