@@ -74,7 +74,7 @@
     "sass": "^1.89.2",
     "stylelint": "^16.21.1",
     "strict-csp": "^1.1.1",
-    "stylelint-config-recommended-scss": "^15.0.1",
+    "stylelint-config-recommended-scss": "^16.0.0",
     "tinyglobby": "^0.2.14",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
