@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
+        with:
+          with_install: false
       - uses: actions/setup-node@d7a11313b581b306c961b506cfc8971208bb03f6
         with:
           node-version: 24
-      - uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
-        with:
-          version: 9
       - run: pnpm i --frozen-lockfile
       - run: pnpm check-format
       - run: pnpm release-build
