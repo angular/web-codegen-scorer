@@ -105,13 +105,16 @@ export async function writeReportToDisk(
 
       // Write screenshot to fs first, since we'll remove this info
       // from JSON later in this function.
-      if (attempt.buildResult.screenshotBase64) {
+      if (attempt.buildResult.screenshotPngUrl) {
         const screenshotFilePath = join(attemptPath, 'screenshot.png');
-        await safeWriteFile(
-          screenshotFilePath,
-          attempt.buildResult.screenshotBase64,
-          'base64'
-        );
+
+        // Note: In practice this is a base64 data URL, but `fetch` conveniently
+        // allows us to extract the content for writing a PNG to disk.
+        const screenshotContent = await (
+          await fetch(attempt.buildResult.screenshotPngUrl)
+        ).arrayBuffer();
+
+        await safeWriteFile(screenshotFilePath, Buffer.from(screenshotContent));
       }
 
       // Write the safety web report if it exists.

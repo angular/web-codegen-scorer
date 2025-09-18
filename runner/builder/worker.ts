@@ -156,7 +156,7 @@ process.on('message', async (message: BuildWorkerMessage) => {
     result = {
       status: BuildResultStatus.SUCCESS,
       message: 'Application built successfully!',
-      screenshotBase64: screenshotBase64Data,
+      screenshotPngUrl: `data:image/png;base64,${screenshotBase64Data}`,
       runtimeErrors: runtimeErrors.join('\n'),
       axeViolations,
       safetyWebReportJson,

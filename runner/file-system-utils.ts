@@ -65,7 +65,7 @@ export async function removeFolderWithSymlinks(dir: string) {
 /** Write a file and creates the necessary directory structure. */
 export async function safeWriteFile(
   filePath: string,
-  content: string,
+  content: string | Buffer,
   encoding?: BufferEncoding
 ): Promise<void> {
   const directory = dirname(filePath);

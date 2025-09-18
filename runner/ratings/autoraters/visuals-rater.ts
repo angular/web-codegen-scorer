@@ -8,6 +8,7 @@ import {
 import { GenkitRunner } from '../../codegen/genkit/genkit-runner.js';
 import defaultVisualRaterPrompt from './visual-rating-prompt.js';
 import { Environment } from '../../configuration/environment.js';
+import { screenshotUrlToPngBuffer } from '../../utils/screenshots.js';
 
 /**
  * Automatically rate the appearance of a screenshot using an LLM.
@@ -16,7 +17,7 @@ import { Environment } from '../../configuration/environment.js';
  * @param model Model to use for the rating.
  * @param environment Environment in which the rating is running.
  * @param appPrompt Prompt to be used for the rating.
- * @param screenshotBase64 Screenshot to be rated.
+ * @param screenshotPngUrl Screenshot PNG URL to be rated.
  * @param label Label for the rating, used for logging.
  */
 export async function autoRateAppearance(
@@ -25,7 +26,7 @@ export async function autoRateAppearance(
   model: string,
   environment: Environment,
   appPrompt: string,
-  screenshotBase64: string,
+  screenshotPngUrl: string,
   label: string
 ): Promise<AutoRateResult> {
   const prompt = environment.renderPrompt(defaultVisualRaterPrompt, null, {
@@ -38,8 +39,10 @@ export async function autoRateAppearance(
       content: [
         {
           media: {
-            base64PngImage: screenshotBase64,
-            url: `data:image/png;base64,${screenshotBase64}`,
+            base64PngImage: (
+              await screenshotUrlToPngBuffer(screenshotPngUrl)
+            ).toString('base64'),
+            url: screenshotPngUrl,
           },
         },
       ],

@@ -56,7 +56,7 @@ export interface BuildResult {
   status: BuildResultStatus;
   message: string;
   errorType?: BuildErrorType;
-  screenshotBase64?: string; // Base64 encoded PNG screenshot
+  screenshotPngUrl?: string;
   missingDependency?: string;
   runtimeErrors?: string;
   /** JSON report from the Safety Web runner, if available. */

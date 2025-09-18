@@ -21,7 +21,7 @@ export async function autoRateFiles(
   environment: Environment,
   files: LlmResponseFile[],
   appPrompt: string,
-  screenshotBase64: string | null
+  screenshotPngUrl: string | null
 ): Promise<AutoraterRunInfo> {
   console.log(`Autorater is using '${model}' model. \n`);
 
@@ -39,7 +39,7 @@ export async function autoRateFiles(
 
   // Visual (screenshot) scoring...
   let visualRating = undefined;
-  if (screenshotBase64) {
+  if (screenshotPngUrl) {
     console.log('⏳ Awaiting visual scoring results...');
     visualRating = await autoRateAppearance(
       llm,
@@ -47,7 +47,7 @@ export async function autoRateFiles(
       model,
       environment,
       appPrompt,
-      screenshotBase64,
+      screenshotPngUrl,
       'command-line'
     );
     console.log(`${greenCheckmark()} Visual scoring is successful.`);

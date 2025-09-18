@@ -236,10 +236,10 @@ export class ReportViewer {
 
   protected getScreenshotUrl(result: AssessmentResult): string | null {
     for (let i = result.attemptDetails.length - 1; i > -1; i--) {
-      const screenshot = result.attemptDetails[i].buildResult.screenshotBase64;
-
-      if (screenshot) {
-        return `data:image/png;base64,${screenshot}`;
+      const screenshotUrl =
+        result.attemptDetails[i].buildResult.screenshotPngUrl;
+      if (screenshotUrl) {
+        return screenshotUrl;
       }
     }
     return null;
