@@ -4,11 +4,13 @@ import {
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
-import { glob } from 'tinyglobby';
 import express from 'express';
-import { readFile } from 'node:fs/promises';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  FetchedLocalReports,
+  fetchReportsFromDisk,
+} from '../runner/reporting/report-local-disk';
 
 const app = express();
 const reportsLoaderPromise = getReportLoader();
@@ -16,7 +18,7 @@ const options = getOptions();
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 const angularApp = new AngularNodeAppEngine();
-let localDataPromise: Promise<LocalData> | null = null;
+let localDataPromise: Promise<FetchedLocalReports> | null = null;
 
 // Endpoint for fetching all available report groups.
 app.get('/api/reports', async (_, res) => {
@@ -26,8 +28,8 @@ app.get('/api/reports', async (_, res) => {
   ]);
   const results = remoteGroups.slice();
 
-  for (const [, group] of localData) {
-    results.unshift(group.overview);
+  for (const [, data] of localData) {
+    results.unshift(data.group);
   }
 
   res.json(results);
@@ -76,14 +78,6 @@ interface ReportLoader {
   getGroupedReports: (groupId: string) => Promise<{ group: string }[]>;
   getGroupsList: () => Promise<{ id: string }[]>;
 }
-
-type LocalData = Map<
-  string,
-  {
-    overview: { id: string };
-    run: { group: string };
-  }
->;
 
 /** Gets the server options from the command line. */
 function getOptions() {
@@ -135,37 +129,9 @@ async function getReportLoader() {
 async function resolveLocalData(directory: string) {
   // Reuse the same promise so that concurrent requests get the same response.
   if (!localDataPromise) {
-    let resolveFn: (data: LocalData) => void;
+    let resolveFn: (data: FetchedLocalReports) => void;
     localDataPromise = new Promise((resolve) => (resolveFn = resolve));
-
-    const data: LocalData = new Map();
-    const groupFiles = await glob('**/groups.json', {
-      cwd: directory,
-      absolute: true,
-    });
-
-    await Promise.all(
-      // Note: sort the groups so that the indexes stay consistent no matter how the files
-      // appear on disk. It appears to be non-deterministic when using the async glob.
-      groupFiles.sort().map(async (configPath, index) => {
-        const [groupContent, runContent] = await Promise.all([
-          readFile(configPath, 'utf8'),
-          readFile(join(dirname(configPath), 'summary.json'), 'utf8'),
-        ]);
-
-        // Note: Local reports only have one group.
-        const overview = (JSON.parse(groupContent) as { id: string }[])[0];
-        const run = JSON.parse(runContent) as { group: string };
-
-        // Local runs should not be grouped by their group ID, but rather if they
-        // were part of the same invocation. Add a unique suffix to the ID to
-        // prevent further grouping.
-        run.group = overview.id = `${overview.id}-l${index}`;
-        data.set(overview.id, { overview, run });
-      })
-    );
-
-    resolveFn!(data);
+    resolveFn!(await fetchReportsFromDisk(directory));
   }
 
   return localDataPromise;

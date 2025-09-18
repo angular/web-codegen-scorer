@@ -29,3 +29,4 @@ export { getRunnerByName, type RunnerName } from './codegen/runner-creation.js';
 export { getEnvironmentByPath } from './configuration/environment-resolution.js';
 export { type Environment } from './configuration/environment.js';
 export { autoRateFiles } from './ratings/autoraters/rate-files.js';
+export { fetchReportsFromDisk } from './reporting/report-local-disk.js';
