@@ -1,7 +1,6 @@
 <div class="report-container">
   <header class="report-header">
     <a routerLink="/" class="report-header-logo-wrapper">
-      <img src="wcs.svg" alt="Web Codegen Scorer Logo" />
       <h1>Web Codegen Scorer</h1>
     </a>
 
@@ -27,12 +26,6 @@
   @if (isLoading() || !groups().length) {
     <div class="loading-overlay">
       @if (!isServer && !isLoading() && !groups().length) {
-        <img
-          src="wcs.svg"
-          alt="Loading Web Codegen Scorer Logo"
-          class="loading-logo no-animation"
-        />
-
         @if (groupsError()) {
           <pre class="callout error code">{{groupsError()}}</pre>
         } @else {
