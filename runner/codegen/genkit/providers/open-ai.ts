@@ -3,14 +3,15 @@ import { GenkitPluginV2 } from 'genkit/plugin';
 import { openAI } from '@genkit-ai/compat-oai/openai';
 import { RateLimiter } from 'limiter';
 import {
-  GenkitModelProvider,
+  GenkitCloudModelProvider,
   PromptDataForCounting,
   RateLimitConfig,
 } from '../model-provider.js';
 import o3 from 'gpt-tokenizer/model/o3';
 import o4Mini from 'gpt-tokenizer/model/o4-mini';
 
-export class OpenAiModelProvider extends GenkitModelProvider {
+export class OpenAiModelProvider extends GenkitCloudModelProvider {
+  readonly userFacingName = 'Open AI';
   readonly apiKeyVariableName = 'OPENAI_API_KEY';
 
   protected readonly models = {
@@ -65,11 +66,6 @@ export class OpenAiModelProvider extends GenkitModelProvider {
 
   protected pluginFactory(apiKey: string): GenkitPluginV2 {
     return openAI({ apiKey, maxRetries: 0 });
-  }
-
-  getModelSpecificConfig(): object {
-    // TODO: Add thinking output for OpenAI
-    return {};
   }
 
   private genkitPromptToOpenAi(prompt: PromptDataForCounting): ChatMessage[] {

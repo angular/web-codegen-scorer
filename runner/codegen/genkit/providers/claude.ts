@@ -1,7 +1,7 @@
 import { Anthropic } from '@anthropic-ai/sdk';
 import { GenkitPlugin } from 'genkit/plugin';
 import {
-  GenkitModelProvider,
+  GenkitCloudModelProvider,
   PromptDataForCounting,
   RateLimitConfig,
 } from '../model-provider.js';
@@ -10,7 +10,8 @@ import { claude35Haiku, claude4Sonnet } from 'genkitx-anthropic';
 import { lazy } from '../../../utils/lazy-creation.js';
 import { RateLimiter } from 'limiter';
 
-export class ClaudeModelProvider extends GenkitModelProvider {
+export class ClaudeModelProvider extends GenkitCloudModelProvider {
+  readonly userFacingName = 'Anthropic Claude';
   readonly apiKeyVariableName = 'ANTHROPIC_API_KEY';
 
   protected readonly models = {
@@ -32,11 +33,6 @@ export class ClaudeModelProvider extends GenkitModelProvider {
       countTokens: (prompt) => this.countClaudeTokens(prompt),
     },
   };
-
-  getModelSpecificConfig(): object {
-    // TODO: Add thinking output for Claude.
-    return {};
-  }
 
   private anthropicApi = lazy(() => {
     return new Anthropic({ apiKey: this.getApiKey() || undefined });

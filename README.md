@@ -40,6 +40,13 @@ export OPENAI_API_KEY="YOUR_API_KEY_HERE" # If you're using OpenAI models
 export ANTHROPIC_API_KEY="YOUR_API_KEY_HERE" # If you're using Anthropic models
 ```
 
+> [!NOTE]
+> Web Codegen Scorer supports locals models via Ollama as well. In order to use them, you must have a running Ollama server with the respective model(s) installed. By default, the tool is listening on port `11434` for the server. However, you can change that port by setting the `OLLAMA_PORT` environment variable.
+>
+> Be aware that using local models might sometimes lead to execution errors due to the output not conforming to our desired format. Unfortunately, this is a present-day limitation of these models. That being said, you can treat the feature as experimental.
+>
+> Currently supported models: `gemma3:4b`, `gemma3:12b`, `codegemma:7b`
+
 3. **Run an eval:**
 
    You can run your first eval using our Angular example with the following command:
