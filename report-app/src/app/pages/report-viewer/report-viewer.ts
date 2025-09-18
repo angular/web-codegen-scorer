@@ -75,6 +75,7 @@ export class ReportViewer {
   protected reportGroupId = input.required<string>({ alias: 'id' });
   protected formatted = signal<Map<LlmResponseFile, string>>(new Map());
   protected formatScore = formatScore;
+  protected error = computed(() => this.selectedReport.error());
 
   private selectedReport = resource({
     params: () => ({ groupId: this.reportGroupId() }),

@@ -19,21 +19,27 @@ export class ReportsFetcher {
       if (!isPlatformBrowser(this.platformId)) {
         return [];
       }
-      return fetch('/api/reports')
-        .then((r) => r.json() as Promise<RunGroup[]>)
-        .then((groups) =>
-          groups.sort((a, b) => {
-            return (
-              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-            );
-          })
-        );
+
+      const response = await fetch('/api/reports');
+
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      const groups = (await response.json()) as RunGroup[];
+
+      return groups.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
     },
   });
 
   readonly reportGroups = computed(() => {
     return this.groupsResource.hasValue() ? this.groupsResource.value() : [];
   });
+
+  readonly reportGroupsError = computed(() => this.groupsResource.error());
 
   readonly isLoadingSingleReport = computed(() => this.pendingFetches() > 0);
   readonly isLoadingReportsList = computed(() =>
@@ -44,19 +50,31 @@ export class ReportsFetcher {
     if (!this.runCache.has(groupId)) {
       this.pendingFetches.update((current) => current + 1);
 
-      const allRuns = await fetch(`/api/reports/${groupId}`).then(
-        (r) => r.json() as Promise<RunInfo[]>
-      );
-      const firstRun = allRuns[0];
-      const combined = {
-        id: firstRun.id,
-        group: firstRun.group,
-        details: firstRun.details,
-        results: allRuns.flatMap((run) => run.results),
-      } satisfies RunInfo;
+      try {
+        const response = await fetch(`/api/reports/${groupId}`);
 
-      this.runCache.set(groupId, combined);
-      this.pendingFetches.update((current) => current - 1);
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+        }
+
+        const allRuns = (await response.json()) as RunInfo[];
+
+        if (!Array.isArray(allRuns) || allRuns.length === 0) {
+          throw new Error(`Could not find report with id: ${groupId}`);
+        }
+
+        const firstRun = allRuns[0];
+        const combined = {
+          id: firstRun.id,
+          group: firstRun.group,
+          details: firstRun.details,
+          results: allRuns.flatMap((run) => run.results),
+        } satisfies RunInfo;
+
+        this.runCache.set(groupId, combined);
+      } finally {
+        this.pendingFetches.update((current) => current - 1);
+      }
     }
 
     return this.runCache.get(groupId)!;

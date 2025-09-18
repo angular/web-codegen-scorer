@@ -18,6 +18,7 @@ export class App {
   protected isLoading = this.reportsFetcher.isLoadingReportsList;
   protected isServer = isPlatformServer(inject(PLATFORM_ID));
   protected colorMode = this.colorModeService.colorMode;
+  protected groupsError = this.reportsFetcher.reportGroupsError;
 
   protected toggleColorMode() {
     this.colorModeService.setColorMode(

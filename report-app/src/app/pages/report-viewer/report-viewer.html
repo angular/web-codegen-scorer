@@ -137,6 +137,8 @@
 
   @if (isLoading()) {
     <message-spinner message="Loading full report"/>
+  } @else if (error()) {
+    <pre class="callout error code">{{error()?.stack}}</pre>
   } @else if (report) {
     @let details = report.details;
 

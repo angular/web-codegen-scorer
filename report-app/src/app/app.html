@@ -32,8 +32,13 @@
           alt="Loading Web Codegen Scorer Logo"
           class="loading-logo no-animation"
         />
-        <div>No reports available</div>
-        <div>Run <code>web-codegen-scorer eval</code> to generate a report</div>
+
+        @if (groupsError()) {
+          <pre class="callout error code">{{groupsError()}}</pre>
+        } @else {
+          <div>No reports available</div>
+          <div>Run <code>web-codegen-scorer eval</code> to generate a report</div>
+        }
       }
     </div>
   }

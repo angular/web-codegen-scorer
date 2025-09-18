@@ -24,5 +24,11 @@
       background-color: #fffbeb;
       border-color: #fef3c7;
     }
+
+    &.error {
+      color: #cd0000;
+      background-color: #ffe7e7;
+      border-color: #df9e9e;
+    }
   }
 }
