@@ -23,6 +23,10 @@ const exactMatches: Record<string, string> = {
       width: 24px;
       height: 24px;
     }
+
+    :host-context(.dark-mode) :host(.genkit) .logo {
+      filter: invert(1);
+    }
   `,
   template: `
     @let logo = this.logo();
@@ -33,6 +37,9 @@ const exactMatches: Record<string, string> = {
 
     {{ label() }}
   `,
+  host: {
+    '[class]': 'id()',
+  },
 })
 export class ProviderLabel {
   readonly id = input<string>();
