@@ -15,7 +15,7 @@ export const validCssRating: PerFileRating = {
   kind: RatingKind.PER_FILE,
   id: 'common-valid-css',
   filter: PerFileRatingContentType.CSS,
-  rate: async (code, _filePath) => {
+  rate: async (code) => {
     const linterResult = await stylelint.lint({
       code: code,
       cwd: import.meta.dirname,

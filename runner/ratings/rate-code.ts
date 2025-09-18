@@ -84,19 +84,19 @@ export async function rateGeneratedCode(
   for (const current of currentPromptDef.ratings) {
     let result: IndividualAssessment | SkippedIndividualAssessment;
 
-    if (current.kind === RatingKind.PER_BUILD) {
-      result = runPerBuildRating(
-        current,
-        buildResult,
-        repairAttempts,
-        outputFiles.length,
-        axeRepairAttempts
-      );
-    } else if (current.kind === RatingKind.PER_FILE) {
-      categorizedFiles ??= splitFilesIntoCategories(outputFiles);
-      result = await runPerFileRating(current, categorizedFiles);
-    } else if (current.kind === RatingKind.LLM_BASED) {
-      try {
+    try {
+      if (current.kind === RatingKind.PER_BUILD) {
+        result = runPerBuildRating(
+          current,
+          buildResult,
+          repairAttempts,
+          outputFiles.length,
+          axeRepairAttempts
+        );
+      } else if (current.kind === RatingKind.PER_FILE) {
+        categorizedFiles ??= splitFilesIntoCategories(outputFiles);
+        result = await runPerFileRating(current, categorizedFiles);
+      } else if (current.kind === RatingKind.LLM_BASED) {
         result = await runLlmBasedRating(
           environment,
           current,
@@ -109,14 +109,14 @@ export async function rateGeneratedCode(
           axeRepairAttempts,
           abortSignal
         );
-      } catch (error) {
-        result = getSkippedAssessment(
-          current,
-          `Error during execution:\n${error}`
-        );
+      } else {
+        throw new UserFacingError(`Unsupported rating type ${current}`);
       }
-    } else {
-      throw new UserFacingError(`Unsupported rating type ${current}`);
+    } catch (error) {
+      result = getSkippedAssessment(
+        current,
+        `Error during execution:\n${error}`
+      );
     }
 
     if (result.state === IndividualAssessmentState.EXECUTED && result.usage) {
