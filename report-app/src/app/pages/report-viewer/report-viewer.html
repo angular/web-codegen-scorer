@@ -319,14 +319,22 @@
                 <h4>Additional info</h4>
                 @for (attempt of result.attemptDetails; track attempt) {
                   @let isBuilt = attempt.buildResult.status === 'success';
+                  @let axeViolations = attempt.buildResult.axeViolations;
+                  @let hasAxeViolations = axeViolations && axeViolations.length > 0;
 
                   <expansion-panel #expansionPanel>
                     <expansion-panel-header>
                       {{ $index === 0 ? 'Initial response' : `Repair attempt #${$index}` }}
+                      @if (!isBuilt) {
                       <span
                         class="status-badge"
-                        [class.success]="isBuilt"
                         [class.error]="!isBuilt">Build</span>
+                      }
+                      @if (hasAxeViolations) {
+                      <span
+                        class="status-badge"
+                        [class.error]="hasAxeViolations">A11y</span>
+                      }
                     </expansion-panel-header>
 
                     @if (expansionPanel.opened()) {
@@ -336,10 +344,31 @@
                           <pre class="callout neutral code">{{ attempt.reasoning }}</pre>
                         </details>
                       }
-                      <h4>Build Message</h4>
-                      <pre class="callout warn code">{{ attempt.buildResult.message }}</pre>
-                      <h4>Generated Code</h4>
+                      @if (!isBuilt) {
+                        <h4>Build Message</h4>
+                        <pre class="callout warn code">{{ attempt.buildResult.message }}</pre>
+                      }
 
+                      @if (hasAxeViolations) {
+                        <h4>A11y Violations</h4>
+                        <pre class="callout neutral axe-violations">
+                          <ul>
+                            @for (violation of axeViolations; track violation.id) {
+                              <li>
+                                <strong>{{ violation.id }} ({{violation.impact}})</strong>
+                                <p>{{ violation.description }} <a [href]="violation.helpUrl" target="_blank">Learn more</a></p>
+                                <div>Failing Elements:</div>
+                                @for (node of violation.nodes; track $index) {
+                                  <app-code-viewer [code]="node.html" />
+                                }
+                              </li>
+                            }
+                          </ul>
+                        </pre>
+                      }
+
+                      <h4>Generated Code</h4>
+                      
                       @for (file of attempt.outputFiles; track file) {
                         <strong>{{ file.filePath }}</strong>
                         <div class="util-buttons button-group">
@@ -354,7 +383,7 @@
                       }
                     }
                   </expansion-panel>
-                }
+                                      }
 
                 @if (result.userJourneys && result.userJourneys.result.length > 0) {
                   <expansion-panel>
