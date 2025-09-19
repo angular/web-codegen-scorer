@@ -24,6 +24,7 @@ import { GenkitLogger } from './genkit-logger.js';
 import { MODEL_PROVIDERS } from './models.js';
 import { UserFacingError } from '../../utils/errors.js';
 import {
+  GenkitCloudModelProvider,
   GenkitModelProvider,
   PromptDataForCounting,
 } from './model-provider.js';
@@ -36,7 +37,6 @@ export class GenkitRunner implements LlmRunner {
   readonly id = 'genkit';
   readonly displayName = 'Genkit';
   readonly hasBuiltInRepairLoop = false;
-  private readonly genkitInstance = this.getGenkitInstance();
   private mcpHost: GenkitMcpHost | null = null;
 
   async generateConstrained<T extends z.ZodTypeAny = z.ZodTypeAny>(
@@ -100,62 +100,55 @@ export class GenkitRunner implements LlmRunner {
       | LlmConstrainedOutputGenerateRequestOptions
   ) {
     const { provider, model } = this.resolveModel(options.model);
+    const genkitInstance = await this.getGenkitInstance();
 
-    return await rateLimitLLMRequest(
-      provider,
-      model,
-      { messages: options.messages || [], prompt: options.prompt },
-      () => {
-        const schema = (
-          options as Partial<LlmConstrainedOutputGenerateRequestOptions>
-        ).schema;
-        const performRequest = async () => {
-          let tools: ToolAction[] | undefined;
-          let resources: DynamicResourceAction[] | undefined;
+    const requestFn = () => {
+      const performRequest = async () => {
+        let tools: ToolAction[] | undefined;
+        let resources: DynamicResourceAction[] | undefined;
 
-          if (!options.skipMcp && this.mcpHost) {
-            [tools, resources] = await Promise.all([
-              this.mcpHost.getActiveTools(this.genkitInstance),
-              this.mcpHost.getActiveResources(this.genkitInstance),
-            ]);
-          }
+        if (!options.skipMcp && this.mcpHost) {
+          [tools, resources] = await Promise.all([
+            this.mcpHost.getActiveTools(genkitInstance),
+            this.mcpHost.getActiveResources(genkitInstance),
+          ]);
+        }
 
-          return this.genkitInstance.generate({
-            prompt: options.prompt,
-            model,
-            output: schema
-              ? {
-                  // Note that the schema needs to be cast to `any`, because allowing its type to
-                  // be inferred ends up causing `TS2589: Type instantiation is excessively deep and possibly infinite.`,
-                  // most likely due to how the Genkit type inferrence is set up. This doesn't affect
-                  // the return type since it was already `ZodTypeAny` which coerces to `any`.
-                  schema: schema as any,
-                  constrained: true,
-                }
-              : undefined,
-            config: provider.getModelSpecificConfig(
-              {
-                includeThoughts:
-                  options.thinkingConfig?.includeThoughts ?? false,
-              },
-              options.model
-            ),
-            messages: options.messages,
-            tools,
-            resources,
-            abortSignal: options.abortSignal,
-          });
-        };
+        const genOpts = provider.getDefaultGenkitGenerateOptions(
+          model,
+          options
+        );
 
-        return options.timeout
-          ? callWithTimeout(
-              options.timeout.description,
-              performRequest,
-              options.timeout.durationInMins
-            )
-          : performRequest();
-      }
-    );
+        return genkitInstance.generate({
+          ...genOpts,
+          tools,
+          resources,
+        });
+      };
+
+      return options.timeout
+        ? callWithTimeout(
+            options.timeout.description,
+            performRequest,
+            options.timeout.durationInMins
+          )
+        : performRequest();
+    };
+
+    // We rate-limit only cloud-based LLM providers.
+    if (provider instanceof GenkitCloudModelProvider) {
+      return await rateLimitLLMRequest(
+        provider,
+        model,
+        {
+          messages: options.messages || [],
+          prompt: options.prompt,
+        },
+        requestFn
+      );
+    }
+
+    return await requestFn();
   }
 
   startMcpServerHost(hostName: string, servers: McpServerOptions[]): void {
@@ -211,13 +204,13 @@ export class GenkitRunner implements LlmRunner {
   }
 
   /** Gets a Genkit instance configured with the currently-available providers. */
-  private getGenkitInstance() {
+  private async getGenkitInstance() {
     const plugins: (GenkitPlugin | GenkitPluginV2)[] = [];
-    const environmentVars: string[] = [];
+    const names: string[] = [];
 
     for (const provider of MODEL_PROVIDERS) {
-      const plugin = provider.getPlugin();
-      environmentVars.push(provider.apiKeyVariableName);
+      const plugin = await provider.getPlugin();
+      names.push(provider.userFacingName);
 
       if (plugin) {
         plugins.push(plugin);
@@ -226,9 +219,9 @@ export class GenkitRunner implements LlmRunner {
 
     if (plugins.length === 0) {
       throw new UserFacingError(
-        `No LLM providers have been configured. You must set at least one of the ` +
-          `following environment variables:\n` +
-          environmentVars.map((e) => `- ${e}`).join('\n')
+        `No LLM providers have been configured. You must set up at least one of the ` +
+          `following models:\n` +
+          names.map((e) => `- ${e}`).join('\n')
       );
     }
 
@@ -240,7 +233,7 @@ export class GenkitRunner implements LlmRunner {
  * Invokes the LLM request function with respect to potential model rate limits.
  */
 async function rateLimitLLMRequest<T>(
-  provider: GenkitModelProvider,
+  provider: GenkitCloudModelProvider,
   model: ModelReference<any>,
   prompt: string | PromptDataForCounting,
   requestFn: () => Promise<T>,

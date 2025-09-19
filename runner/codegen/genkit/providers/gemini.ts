@@ -1,15 +1,21 @@
 import { GenkitPlugin } from 'genkit/plugin';
 import { googleAI } from '@genkit-ai/googleai';
 import {
-  GenkitModelProvider,
+  GenkitCloudModelProvider,
   PromptDataForCounting,
   RateLimitConfig,
 } from '../model-provider.js';
 import { lazy } from '../../../utils/lazy-creation.js';
 import { GoogleGenAI, Part } from '@google/genai';
 import { RateLimiter } from 'limiter';
+import { ModelReference, GenerateOptions } from 'genkit';
+import {
+  LlmGenerateTextRequestOptions,
+  LlmConstrainedOutputGenerateRequestOptions,
+} from '../../llm-runner.js';
 
-export class GeminiModelProvider extends GenkitModelProvider {
+export class GeminiModelProvider extends GenkitCloudModelProvider {
+  readonly userFacingName = 'Google Gemini';
   readonly apiKeyVariableName = 'GEMINI_API_KEY';
 
   private geminiAPI = lazy(
@@ -70,8 +76,22 @@ export class GeminiModelProvider extends GenkitModelProvider {
     return googleAI({ apiKey });
   }
 
-  getModelSpecificConfig(opts: { includeThoughts?: boolean }): object {
-    return { thinkingConfig: { includeThoughts: opts.includeThoughts } };
+  override getDefaultGenkitGenerateOptions(
+    model: ModelReference<any>,
+    options:
+      | LlmGenerateTextRequestOptions
+      | LlmConstrainedOutputGenerateRequestOptions
+  ): GenerateOptions {
+    const baseOptions = super.getDefaultGenkitGenerateOptions(model, options);
+
+    return {
+      ...baseOptions,
+      config: {
+        thinkingConfig: {
+          includeThoughts: options.thinkingConfig?.includeThoughts ?? false,
+        },
+      },
+    };
   }
 
   private async countGeminiTokens(

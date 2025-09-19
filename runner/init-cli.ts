@@ -7,6 +7,7 @@ import { formatTitleCard } from './reporting/format.js';
 import { generateId } from './utils/id-generation.js';
 import { safeWriteFile, toProcessAbsolutePath } from './file-system-utils.js';
 import { MODEL_PROVIDERS } from './codegen/genkit/models.js';
+import { GenkitCloudModelProvider } from './codegen/genkit/model-provider.js';
 
 export const InitModule = {
   builder,
@@ -56,7 +57,9 @@ async function getAnswers(): Promise<InitOptions | null> {
 
   // Add some spaces at the end to align to the text of the line above.
   const newLineSeparator = '\n  ';
-  const apiKeyVariables = MODEL_PROVIDERS.map((p) => p.apiKeyVariableName);
+  const apiKeyVariables = MODEL_PROVIDERS.filter(
+    (p) => p instanceof GenkitCloudModelProvider
+  ).map((p) => p.apiKeyVariableName);
 
   if (!apiKeyVariables.some((name) => process.env[name])) {
     const hasConfirmed = await confirm({
