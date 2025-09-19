@@ -289,7 +289,7 @@ export function logReportToConsole(runInfo: RunInfo): void {
     boxen(summaryLines.join('\n'), {
       padding: 1,
       margin: { top: 2 },
-      width: 80,
+      width: Math.min(80, process.stdout.columns),
       borderColor: 'cyan',
       borderStyle: 'double',
       title: 'Assessment Summary',

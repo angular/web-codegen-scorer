@@ -14,7 +14,7 @@ export function formatTitleCard(text: string, width = 80): string {
     borderStyle: 'double',
     borderColor: 'cyan',
     padding: 1,
-    width,
+    width: Math.min(width, process.stdout.columns),
   });
 }
 

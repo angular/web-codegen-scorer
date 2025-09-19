@@ -1,5 +1,5 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
-import { join } from 'path';
+import { join, relative } from 'path';
 import { executeCommand } from './utils/exec.js';
 import { REPORTS_ROOT_DIR } from './configuration/constants.js';
 import { toProcessAbsolutePath } from './file-system-utils.js';
@@ -63,9 +63,8 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
     formatTitleCard(
       [
         `View your reports at http://localhost:${cliArgs.port}`,
-        `Reports are served from ${reportsDir}`,
-      ].join('\n'),
-      120 // Use a wider box since file paths can be long.
+        `Reports are served from ${relative(process.cwd(), reportsDir)}`,
+      ].join('\n')
     )
   );
 
