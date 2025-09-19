@@ -6,7 +6,11 @@ import PQueue from 'p-queue';
 import { basename, join } from 'path';
 import { existsSync, readdirSync } from 'fs';
 import { LlmGenerateFilesContext, LlmRunner } from '../codegen/llm-runner.js';
-import { LLM_OUTPUT_DIR, REPORT_VERSION } from '../configuration/constants.js';
+import {
+  DEFAULT_AUTORATER_MODEL_NAME,
+  LLM_OUTPUT_DIR,
+  REPORT_VERSION,
+} from '../configuration/constants.js';
 import { Environment } from '../configuration/environment.js';
 import { rateGeneratedCode } from '../ratings/rate-code.js';
 import { summarizeReportWithAI } from '../reporting/ai-summarize.js';
@@ -77,6 +81,7 @@ export async function generateCodeAndAssess(options: {
   enableUserJourneyTesting?: boolean;
   enableAutoCsp?: boolean;
   logging?: 'text-only' | 'dynamic';
+  autoraterModel?: string;
 }): Promise<RunInfo> {
   const env = await getEnvironmentByPath(options.environmentConfigPath);
   const promptsToProcess = getCandidateExecutablePrompts(
@@ -163,7 +168,8 @@ export async function generateCodeAndAssess(options: {
                   !!options.enableUserJourneyTesting,
                   !!options.enableAutoCsp,
                   workerConcurrencyQueue,
-                  progress
+                  progress,
+                  options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME
                 ),
               // 10min max per app evaluation.  We just want to make sure it never gets stuck.
               10
@@ -291,7 +297,8 @@ async function startEvaluationTask(
   enableUserJourneyTesting: boolean,
   enableAutoCsp: boolean,
   workerConcurrencyQueue: PQueue,
-  progress: ProgressLogger
+  progress: ProgressLogger,
+  autoraterModel: string
 ): Promise<AssessmentResult[]> {
   // Set up the project structure once for the root project.
   const { directory, cleanup } = await setupProjectStructure(
@@ -444,7 +451,8 @@ async function startEvaluationTask(
       attempt.repairAttempts,
       attempt.axeRepairAttempts,
       abortSignal,
-      progress
+      progress,
+      autoraterModel
     );
 
     results.push({

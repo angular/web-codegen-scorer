@@ -6,7 +6,10 @@ import {
   RunInfo,
   ScoreBucket,
 } from '../shared-interfaces.js';
-import { REPORTS_ROOT_DIR } from '../configuration/constants.js';
+import {
+  DEFAULT_AUTORATER_MODEL_NAME,
+  REPORTS_ROOT_DIR,
+} from '../configuration/constants.js';
 import { calculateBuildAndCheckStats } from '../ratings/stats.js';
 import { safeWriteFile } from '../file-system-utils.js';
 import { BuildResultStatus } from '../builder/builder-types.js';
@@ -160,6 +163,7 @@ export function logReportHeader(
     llm: LlmRunner;
     labels: string[];
     startMcp?: boolean;
+    autoraterModel?: string;
   }
 ): void {
   const titleCardText = [
@@ -167,6 +171,10 @@ export function logReportHeader(
     '',
     ` - Environment: ${env.displayName}`,
     ` - Model: ${options.model}`,
+    options.autoraterModel &&
+    options.autoraterModel !== DEFAULT_AUTORATER_MODEL_NAME
+      ? ` - Autorater model: ${options.autoraterModel}`
+      : null,
     ` - Runner: ${options.llm.displayName}`,
     ` - MCP servers: ${options.startMcp && env.mcpServerOptions.length ? env.mcpServerOptions.length : 'none'}`,
     options.labels.length ? ` - Labels: ${options.labels.join(', ')}` : null,

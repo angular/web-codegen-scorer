@@ -1,4 +1,3 @@
-import { DEFAULT_AUTORATER_MODEL_NAME } from '../../configuration/constants.js';
 import { autoRateCode } from '../autoraters/code-rater.js';
 import {
   LLMBasedRating,
@@ -12,7 +11,6 @@ export const codeQualityRating: LLMBasedRating = {
   kind: RatingKind.LLM_BASED,
   name: 'Code Quality (LLM-rated)',
   description: `Rates the app's source code via LLM`,
-  model: DEFAULT_AUTORATER_MODEL_NAME,
   category: RatingCategory.MEDIUM_IMPACT,
   id: 'common-autorater-code-quality',
   scoreReduction: '30%',

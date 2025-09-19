@@ -2,7 +2,10 @@ import { Arguments, Argv, CommandModule } from 'yargs';
 import chalk from 'chalk';
 import { join } from 'path';
 import { assertValidModelName, LlmRunner } from './codegen/llm-runner.js';
-import { DEFAULT_MODEL_NAME } from './configuration/constants.js';
+import {
+  DEFAULT_AUTORATER_MODEL_NAME,
+  DEFAULT_MODEL_NAME,
+} from './configuration/constants.js';
 import { generateCodeAndAssess } from './orchestration/generate.js';
 import {
   logReportToConsole,
@@ -48,6 +51,7 @@ interface Options {
   skipAxeTesting?: boolean;
   enableUserJourneyTesting?: boolean;
   enableAutoCsp?: boolean;
+  autoraterModel?: string;
   logging?: 'text-only' | 'dynamic';
 }
 
@@ -156,6 +160,11 @@ function builder(argv: Argv): Argv<Options> {
       description:
         'Whether to include a automatic hash-based Content-Security-Policy and Trusted Types to find incompatibilities.',
     })
+    .option('autorater-model', {
+      type: 'string',
+      default: DEFAULT_AUTORATER_MODEL_NAME,
+      descript: 'Model to use when automatically rating generated code',
+    })
     .strict()
     .version(false)
     .help()
@@ -204,6 +213,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
       enableUserJourneyTesting: cliArgs.enableUserJourneyTesting,
       enableAutoCsp: cliArgs.enableAutoCsp,
       logging: cliArgs.logging,
+      autoraterModel: cliArgs.autoraterModel,
     });
 
     logReportToConsole(runInfo);

@@ -99,7 +99,6 @@ const llmBasedRatingSchema = z
   .object({
     ...ratingSchemaCommonFields,
     kind: z.literal(RatingKind.LLM_BASED),
-    model: z.string(),
     rate: z
       .function()
       .args(z.custom<LLMBasedRatingContext>())

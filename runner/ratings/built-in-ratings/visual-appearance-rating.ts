@@ -1,5 +1,4 @@
 import { TimeoutError } from 'puppeteer';
-import { DEFAULT_AUTORATER_MODEL_NAME } from '../../configuration/constants.js';
 import { AutoRateResult } from '../autoraters/auto-rate-shared.js';
 import { autoRateAppearance } from '../autoraters/visuals-rater.js';
 import {
@@ -18,7 +17,6 @@ export const visualAppearanceRating: LLMBasedRating = {
   category: RatingCategory.MEDIUM_IMPACT,
   scoreReduction: '30%',
   id: 'common-autorater-visuals',
-  model: DEFAULT_AUTORATER_MODEL_NAME,
   rate: async (ctx) => {
     if (ctx.buildResult.screenshotPngUrl === undefined) {
       return {

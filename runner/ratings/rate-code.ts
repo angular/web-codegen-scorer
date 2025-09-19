@@ -54,7 +54,8 @@ export async function rateGeneratedCode(
   repairAttempts: number,
   axeRepairAttempts: number,
   abortSignal: AbortSignal,
-  progress: ProgressLogger
+  progress: ProgressLogger,
+  autoraterModel: string
 ): Promise<CodeAssessmentScore> {
   let categorizedFiles: CategorizedFiles | null = null;
   let totalPoints = 0;
@@ -107,7 +108,8 @@ export async function rateGeneratedCode(
           buildResult,
           repairAttempts,
           axeRepairAttempts,
-          abortSignal
+          abortSignal,
+          autoraterModel
         );
       } else {
         throw new UserFacingError(`Unsupported rating type ${current}`);
@@ -269,14 +271,15 @@ async function runLlmBasedRating(
   buildResult: BuildResult,
   repairAttempts: number,
   axeRepairAttempts: number,
-  abortSignal: AbortSignal
+  abortSignal: AbortSignal,
+  autoraterModel: string
 ): Promise<IndividualAssessment | SkippedIndividualAssessment> {
   const result = await rating.rate({
     environment,
     fullPromptText,
     currentPromptDef,
     llm,
-    model: rating.model,
+    model: autoraterModel,
     outputFiles,
     buildResult,
     repairAttempts,
