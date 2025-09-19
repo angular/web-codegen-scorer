@@ -1,12 +1,11 @@
-/// <reference types="node"/>
 import { join } from 'path';
 import { rm, cp, readFile, writeFile } from 'fs/promises';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { globSync as glob } from 'tinyglobby';
-import { executeCommand } from './runner/utils/exec.js';
+import { executeCommand } from '../runner/utils/exec.js';
 
-const root = import.meta.dirname;
+const root = join(import.meta.dirname, '..');
 const runnerSource = join(root, 'runner');
 const targetDirectory = join(root, 'dist');
 const reportAppSource = join(root, 'report-app');
@@ -14,9 +13,14 @@ const reportAppDist = join(reportAppSource, 'dist');
 const browserAgentRelativePath = 'runner/testing/browser-agent';
 
 const args = yargs(hideBin(process.argv))
+  .version(false)
   .option('runner-only', {
     type: 'boolean',
     default: false,
+  })
+  .option('version', {
+    type: 'string',
+    default: null,
   })
   .parseSync();
 
@@ -34,7 +38,7 @@ const args = yargs(hideBin(process.argv))
   // Generate the package.json.
   await writeFile(
     join(targetDirectory, 'package.json'),
-    await getPackageJson(join(root, 'package.json'))
+    await getPackageJson(join(root, 'package.json'), args.version)
   );
 
   // Copy the readme and license.
@@ -86,16 +90,28 @@ const args = yargs(hideBin(process.argv))
   }
 
   console.log(`Release output has been built in ${targetDirectory}`);
-
-  // TODO: also have `npm publish` here?
 })();
 
-async function getPackageJson(path: string): Promise<string> {
+async function getPackageJson(
+  path: string,
+  version: string | null
+): Promise<string> {
   const content = await readFile(path, 'utf8');
   const parsed = JSON.parse(content) as {
+    version: string;
     scripts?: unknown;
     devDependencies?: unknown;
   };
+
+  if (version) {
+    if (version === parsed.version) {
+      throw new Error(
+        `Specified version is the same version as the current one.`
+      );
+    } else {
+      parsed.version = version;
+    }
+  }
 
   // Delete some fields that aren't relevant for end users.
   delete parsed.scripts;

@@ -3,7 +3,8 @@
   "version": "0.0.5",
   "scripts": {
     "build-runner": "tsc",
-    "release-build": "tsx release-build.ts",
+    "release-build": "tsx ./scripts/release-build.ts",
+    "npm-publish": "tsx ./scripts/npm-publish.ts",
     "web-codegen-scorer": "tsx ./runner/bin/cli.ts",
     "wcs": "pnpm -s web-codegen-scorer",
     "eval": "pnpm web-codegen-scorer eval",

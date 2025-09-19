@@ -13,5 +13,5 @@
     "types": ["node"]
   },
   "include": ["runner/**/*.ts"],
-  "exclude": ["node_modules", "examples"]
+  "exclude": ["node_modules", "examples", "scripts"]
 }

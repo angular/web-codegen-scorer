@@ -132,7 +132,8 @@ If you've cloned this repo and want to work on the tool, you have to install its
 running `pnpm install`.
 Once they're installed, you can run the following commands:
 
-* `pnpm run release-build` - Builds the package in the `dist` directory for publishing to npm.
+* `pnpm run release-build` - Creates a release build of the package in `dist` directory.
+* `pnpm run npm-publish` - Builds the package and publishes it to npm.
 * `pnpm run eval` - Runs an eval from source.
 * `pnpm run report` - Runs the report app from source.
 * `pnpm run init` - Runs the init script from source.
