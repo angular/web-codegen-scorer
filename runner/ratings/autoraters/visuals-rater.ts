@@ -31,7 +31,7 @@ export async function autoRateAppearance(
 ): Promise<AutoRateResult> {
   const prompt = environment.renderPrompt(defaultVisualRaterPrompt, null, {
     APP_PROMPT: appPrompt,
-  });
+  }).result;
 
   const messages: PromptDataMessage[] = [
     {

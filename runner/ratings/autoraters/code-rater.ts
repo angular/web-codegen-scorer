@@ -64,7 +64,7 @@ export async function autoRateCode(
   const prompt = environment.renderPrompt(promptText, null, {
     APP_PROMPT: appPrompt,
     FRAMEWORK_SPECIFIC_HINTS: FW_HINTS[environment.fullStackFramework.id] ?? '',
-  });
+  }).result;
 
   const result = await llm.generateConstrained({
     abortSignal,

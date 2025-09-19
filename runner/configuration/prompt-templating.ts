@@ -35,21 +35,10 @@ initializeHandlebars();
 export function renderHandlebarsTemplate<T extends { rootDir: string | null }>(
   content: string,
   ctx: T
-): string {
+) {
   const template = Handlebars.compile(content, { strict: true });
-  return template(ctx);
-}
-
-/**
- * Extracts the context file patterns from a prompt's text. Returns the prompt's text without
- * any special context file syntax and the context file patterns.
- * @param initialPromptText Initial text of the prompt.
- */
-export function extractPromptContextFilePatterns(initialPromptText: string) {
   const contextFiles: string[] = [];
-  const promptText = Handlebars.compile(initialPromptText, {
-    strict: true,
-  })(null, {
+  const result = template(ctx, {
     partials: {
       contextFiles: (ctx) => {
         if (typeof ctx !== 'string') {
@@ -84,7 +73,7 @@ export function extractPromptContextFilePatterns(initialPromptText: string) {
   });
 
   return {
-    promptText,
+    result,
     contextFiles,
   };
 }

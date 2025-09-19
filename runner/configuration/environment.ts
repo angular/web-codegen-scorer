@@ -7,10 +7,7 @@ import {
   RootPromptDefinition,
 } from '../shared-interfaces.js';
 import { Rating } from '../ratings/rating-types.js';
-import {
-  extractPromptContextFilePatterns,
-  renderHandlebarsTemplate,
-} from './prompt-templating.js';
+import { renderHandlebarsTemplate } from './prompt-templating.js';
 import { McpServerOptions } from '../codegen/llm-runner.js';
 import { lazy } from '../utils/lazy-creation.js';
 import { EnvironmentConfig } from './environment-config.js';
@@ -120,21 +117,21 @@ export class Environment {
   }
 
   systemPromptGeneration = lazy(() => {
-    return this.renderRelativePrompt(this.config.generationSystemPrompt);
+    return this.renderRelativePrompt(this.config.generationSystemPrompt).result;
   });
 
   systemPromptRepair = lazy(() => {
     if (!this.config.repairSystemPrompt) {
       return 'Please fix the given errors and return the corrected code.';
     }
-    return this.renderRelativePrompt(this.config.repairSystemPrompt);
+    return this.renderRelativePrompt(this.config.repairSystemPrompt).result;
   });
 
   systemPromptEditing = lazy(() => {
     if (!this.config.editingSystemPrompt) {
       return this.systemPromptGeneration();
     }
-    return this.renderRelativePrompt(this.config.editingSystemPrompt);
+    return this.renderRelativePrompt(this.config.editingSystemPrompt).result;
   });
 
   /**
@@ -275,14 +272,12 @@ export class Environment {
     ratings: Rating[],
     isEditing: boolean
   ): PromptDefinition {
-    const { promptText, contextFiles } = extractPromptContextFilePatterns(
-      this.renderRelativePrompt(relativePath)
-    );
+    const { result, contextFiles } = this.renderRelativePrompt(relativePath);
 
     return {
       name: name,
       kind: 'single',
-      prompt: promptText,
+      prompt: result,
       ratings,
       systemPromptType: isEditing ? 'editing' : 'generation',
       contextFilePatterns: contextFiles,
@@ -387,7 +382,7 @@ export class Environment {
   }
 
   /** Renders a prompt from a path relative to the environment config. */
-  private renderRelativePrompt(relativePath: string): string {
+  private renderRelativePrompt(relativePath: string) {
     const path = resolve(this.rootPath, relativePath);
     return this.renderPrompt(readFileSync(path, 'utf8'), path);
   }
