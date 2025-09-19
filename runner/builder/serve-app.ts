@@ -13,10 +13,12 @@ export async function serveApp(
   let serveProcess: ChildProcess | null = null;
 
   try {
-    const launchMessage = 'Launching app inside a browser';
-    progressLog('eval', launchMessage);
     serveProcess = exec(serveCommand, { cwd: tempDir });
-    progressLog('eval', launchMessage, `(PID: ${serveProcess.pid})`);
+    progressLog(
+      'eval',
+      'Launching app inside a browser',
+      `(PID: ${serveProcess.pid})`
+    );
 
     const actualPort = await new Promise<number>((resolvePort, rejectPort) => {
       const serveStartTimeout = 45000; // 45s for serve to start

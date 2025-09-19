@@ -57,6 +57,14 @@ web-codegen-scorer eval --env=angular-example
 web-codegen-scorer init
 ```
 
+5. (Optional) **Run an evaluated app locally:**
+
+   Once you've evaluated an app, you can run it locally with the following command:
+
+```bash
+web-codegen-scorer run --env=angular-example --prompt=<name of the prompt you want to run>
+```
+
 ## Command-line flags
 
 You can customize the `web-codegen-scorer eval` script with the following flags:

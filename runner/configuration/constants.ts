@@ -34,3 +34,15 @@ export const REPORTS_ROOT_DIR = join(rootDir, 'reports');
  * MUST be kept in sync with `RunInfo.version`.
  */
 export const REPORT_VERSION = 2;
+
+/** Environments that are shipped together with the eval tool. */
+export const BUILT_IN_ENVIRONMENTS = new Map<string, string>([
+  [
+    'angular-example',
+    join(import.meta.dirname, '../../examples/environments/angular/config.js'),
+  ],
+  [
+    'solid-example',
+    join(import.meta.dirname, '../../examples/environments/solid/config.js'),
+  ],
+]);

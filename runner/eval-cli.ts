@@ -1,8 +1,8 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import chalk from 'chalk';
-import { join } from 'path';
 import { assertValidModelName, LlmRunner } from './codegen/llm-runner.js';
 import {
+  BUILT_IN_ENVIRONMENTS,
   DEFAULT_AUTORATER_MODEL_NAME,
   DEFAULT_MODEL_NAME,
 } from './configuration/constants.js';
@@ -21,17 +21,6 @@ export const EvalModule = {
   command: 'eval',
   describe: 'Evaluate code using an LLM',
 } satisfies CommandModule<{}, Options>;
-
-const builtInEnvironments = new Map<string, string>([
-  [
-    'angular-example',
-    join(import.meta.dirname, '../examples/environments/angular/config.js'),
-  ],
-  [
-    'solid-example',
-    join(import.meta.dirname, '../examples/environments/solid/config.js'),
-  ],
-]);
 
 interface Options {
   environment?: string;
@@ -198,7 +187,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
       ratingLlm,
       model: cliArgs.model,
       environmentConfigPath:
-        builtInEnvironments.get(cliArgs.environment) || cliArgs.environment,
+        BUILT_IN_ENVIRONMENTS.get(cliArgs.environment) || cliArgs.environment,
       localMode: cliArgs.local,
       limit: cliArgs.limit,
       concurrency: cliArgs.concurrency as number,
