@@ -235,14 +235,7 @@ export class ReportViewer {
   });
 
   protected getScreenshotUrl(result: AssessmentResult): string | null {
-    for (let i = result.attemptDetails.length - 1; i > -1; i--) {
-      const screenshotUrl =
-        result.attemptDetails[i].buildResult.screenshotPngUrl;
-      if (screenshotUrl) {
-        return screenshotUrl;
-      }
-    }
-    return null;
+    return result.build.screenshotPngUrl ?? null;
   }
 
   protected isLoading = this.reportsFetcher.isLoadingSingleReport;

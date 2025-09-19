@@ -13,6 +13,7 @@ export function executeCommand(
   opts: {
     forwardStderrToParent?: boolean;
     forwardStdoutToParent?: boolean;
+    notifyWhenMatchingStdout?: { notifyFn: () => void; pattern: RegExp };
     abortSignal?: AbortSignal;
   } = {}
 ): Promise<string> {
@@ -28,6 +29,7 @@ export function executeCommand(
 
     let stdout = '';
     let stderr = '';
+    let notifyWhenMatchingStdout = opts.notifyWhenMatchingStdout;
 
     proc.on('error', (err) => {
       reject(err);
@@ -37,6 +39,13 @@ export function executeCommand(
       stdout += c;
       if (opts.forwardStdoutToParent) {
         process.stdout.write(c);
+      }
+      if (
+        notifyWhenMatchingStdout &&
+        notifyWhenMatchingStdout.pattern.test(stdout)
+      ) {
+        notifyWhenMatchingStdout.notifyFn();
+        notifyWhenMatchingStdout = undefined;
       }
     });
     proc.stderr!.on('data', (c) => {

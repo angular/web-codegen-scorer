@@ -59,19 +59,26 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
     );
   }
 
-  console.log(
-    formatTitleCard(
-      [
-        `View your reports at http://localhost:${cliArgs.port}`,
-        `Reports are served from ${relative(process.cwd(), reportsDir)}`,
-      ].join('\n')
-    )
-  );
-
   await executeCommand(
     'node report-app/server/server.mjs',
     join(import.meta.dirname, '..'),
     environmentVariables,
-    { forwardStderrToParent: true, forwardStdoutToParent: true }
+    {
+      forwardStderrToParent: true,
+      forwardStdoutToParent: true,
+      notifyWhenMatchingStdout: {
+        pattern: /Server listening on port:/,
+        notifyFn: () => {
+          console.log(
+            formatTitleCard(
+              [
+                `View your reports at http://localhost:${cliArgs.port}`,
+                `Reports are served from ${relative(process.cwd(), reportsDir)}`,
+              ].join('\n')
+            )
+          );
+        },
+      },
+    }
   );
 }

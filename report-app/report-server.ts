@@ -13,7 +13,7 @@ import {
 } from '../runner/reporting/report-local-disk';
 
 const app = express();
-const reportsLoaderPromise = getReportLoader();
+const reportsLoader = await getReportLoader();
 const options = getOptions();
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -23,7 +23,7 @@ let localDataPromise: Promise<FetchedLocalReports> | null = null;
 // Endpoint for fetching all available report groups.
 app.get('/api/reports', async (_, res) => {
   const [remoteGroups, localData] = await Promise.all([
-    reportsLoaderPromise.then((loader) => loader.getGroupsList()),
+    reportsLoader.getGroupsList(),
     resolveLocalData(options.reportsRoot),
   ]);
   const results = remoteGroups.slice();
@@ -44,8 +44,7 @@ app.get('/api/reports/:id', async (req, res) => {
   if (localData.has(id)) {
     result = [localData.get(id)!.run];
   } else {
-    const loader = await reportsLoaderPromise;
-    result = await loader.getGroupedReports(id);
+    result = await reportsLoader.getGroupedReports(id);
   }
 
   res.json(result);
@@ -68,8 +67,13 @@ app.use('/**', (req, res, next) => {
     .catch(next);
 });
 
+// Support custom endpoints by advanced users.
+await reportsLoader.configureEndpoints?.(app);
+
 if (isMainModule(import.meta.url)) {
-  app.listen(options.port);
+  app.listen(options.port, () => {
+    console.log(`Server listening on port: ${options.port}`);
+  });
 }
 
 export const reqHandler = createNodeRequestHandler(app);
@@ -77,6 +81,7 @@ export const reqHandler = createNodeRequestHandler(app);
 interface ReportLoader {
   getGroupedReports: (groupId: string) => Promise<{ group: string }[]>;
   getGroupsList: () => Promise<{ id: string }[]>;
+  configureEndpoints?: (expressApp: typeof app) => Promise<void>;
 }
 
 /** Gets the server options from the command line. */
