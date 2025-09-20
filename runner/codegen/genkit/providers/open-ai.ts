@@ -1,4 +1,3 @@
-import { ChatMessage } from 'gpt-tokenizer/GptEncoding';
 import { GenkitPluginV2 } from 'genkit/plugin';
 import { openAI } from '@genkit-ai/compat-oai/openai';
 import { RateLimiter } from 'limiter';
@@ -7,8 +6,7 @@ import {
   PromptDataForCounting,
   RateLimitConfig,
 } from '../model-provider.js';
-import o3 from 'gpt-tokenizer/model/o3';
-import o4Mini from 'gpt-tokenizer/model/o4-mini';
+import { encoding_for_model } from 'tiktoken';
 
 export class OpenAiModelProvider extends GenkitModelProvider {
   readonly apiKeyVariableName = 'OPENAI_API_KEY';
@@ -18,6 +16,21 @@ export class OpenAiModelProvider extends GenkitModelProvider {
     'openai-o4-mini': () => openAI.model('o4-mini'),
     'openai-gpt-5': () => openAI.model('gpt-5'),
   };
+
+  private countTokensForModel(
+    modelName: Parameters<typeof encoding_for_model>[0],
+    prompt: PromptDataForCounting
+  ): number {
+    const encoding = encoding_for_model(modelName);
+    try {
+      const messages = this.genkitPromptToOpenAi(prompt);
+      const text = messages.map((m) => `${m.role}: ${m.content}`).join('\n');
+      const tokens = encoding.encode(text);
+      return tokens.length;
+    } finally {
+      encoding.free();
+    }
+  }
 
   protected rateLimitConfig: Record<string, RateLimitConfig> = {
     // See: https://platform.openai.com/docs/models/o3
@@ -30,8 +43,7 @@ export class OpenAiModelProvider extends GenkitModelProvider {
         tokensPerInterval: 30_000 * 0.75, // *0.75 to be more resilient to token count deviations
         interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side.
       }),
-      countTokens: async (prompt) =>
-        o3.countTokens(this.genkitPromptToOpenAi(prompt)),
+      countTokens: async (prompt) => this.countTokensForModel('gpt-4o', prompt),
     },
     // See https://platform.openai.com/docs/models/o4-mini
     'openai/o4-mini': {
@@ -44,7 +56,7 @@ export class OpenAiModelProvider extends GenkitModelProvider {
         interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side.
       }),
       countTokens: async (prompt) =>
-        o4Mini.countTokens(this.genkitPromptToOpenAi(prompt)),
+        this.countTokensForModel('gpt-4o-mini', prompt),
     },
     // See: https://platform.openai.com/docs/models/gpt-5
     'openai/gpt-5': {
@@ -56,10 +68,7 @@ export class OpenAiModelProvider extends GenkitModelProvider {
         tokensPerInterval: 30_000 * 0.75, // *0.75 to be more resilient to token count deviations
         interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side.
       }),
-      // TODO: at the time of writing, the `gpt-tokenizer` doesn't support gpt-5.
-      // See https://github.com/niieani/gpt-tokenizer/issues/73
-      countTokens: async (prompt) =>
-        o3.countTokens(this.genkitPromptToOpenAi(prompt)),
+      countTokens: async (prompt) => this.countTokensForModel('gpt-5', prompt),
     },
   };
 
@@ -72,8 +81,10 @@ export class OpenAiModelProvider extends GenkitModelProvider {
     return {};
   }
 
-  private genkitPromptToOpenAi(prompt: PromptDataForCounting): ChatMessage[] {
-    const openAiPrompt: string | ChatMessage[] = [];
+  private genkitPromptToOpenAi(
+    prompt: PromptDataForCounting
+  ): Array<{ role: string; content: string }> {
+    const openAiPrompt: Array<{ role: string; content: string }> = [];
     for (const part of prompt.messages) {
       for (const c of part.content) {
         openAiPrompt.push({
@@ -82,6 +93,6 @@ export class OpenAiModelProvider extends GenkitModelProvider {
         });
       }
     }
-    return [...openAiPrompt, { content: prompt.prompt }];
+    return [...openAiPrompt, { role: 'user', content: prompt.prompt }];
   }
 }

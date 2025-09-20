@@ -68,9 +68,6 @@ importers:
       genkitx-anthropic:
         specifier: 0.23.1
         version: 0.23.1(encoding@0.1.13)(genkit@1.19.1(@google-cloud/firestore@7.11.3(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
-      gpt-tokenizer:
-        specifier: ^3.0.1
-        version: 3.0.1
       handlebars:
         specifier: ^4.7.8
         version: 4.7.8
@@ -101,6 +98,9 @@ importers:
       stylelint-config-recommended-scss:
         specifier: ^16.0.0
         version: 16.0.1(postcss@8.5.6)(stylelint@16.24.0(typescript@5.9.2))
+      tiktoken:
+        specifier: ^1.0.22
+        version: 1.0.22
       tinyglobby:
         specifier: ^0.2.14
         version: 0.2.15
@@ -3817,9 +3817,6 @@ packages:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
 
-  gpt-tokenizer@3.0.1:
-    resolution: {integrity: sha512-5jdaspBq/w4sWw322SvQj1Fku+CN4OAfYZeeEg8U7CWtxBz+zkxZ3h0YOHD43ee+nZYZ5Ud70HRN0ANcdIj4qg==}
-
   graceful-fs@4.2.10:
     resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
 
@@ -5732,6 +5729,9 @@ packages:
     resolution: {integrity: sha512-UcuBd3eanB3T10nXWRRMwfwoaC6VMk7qe3/5YIWP2Jtw+EbHqJ0p1/K3x8ixiR5dozKSSfcg1W+0e33G1Di3XA==}
     engines: {node: '>= 0.10.x'}
     hasBin: true
+
+  tiktoken@1.0.22:
+    resolution: {integrity: sha512-PKvy1rVF1RibfF3JlXBSP0Jrcw2uq3yXdgcEXtKTYn3QJ/cBRBHDnrJ5jHky+MENZ6DIPwNUGWpkVx+7joCpNA==}
 
   tinycolor2@1.6.0:
     resolution: {integrity: sha512-XPaBkWQJdsf3pLKJV9p4qN/S+fm2Oj8AIPo1BTUhg5oxkvm9+SVEGFdhyOz7tTdUTfvxMiAs4sp6/eZO2Ew+pw==}
@@ -10646,8 +10646,6 @@ snapshots:
 
   gopd@1.2.0: {}
 
-  gpt-tokenizer@3.0.1: {}
-
   graceful-fs@4.2.10: {}
 
   graceful-fs@4.2.11: {}
@@ -12939,6 +12937,8 @@ snapshots:
       bufrw: 1.4.0
       error: 7.0.2
       long: 2.4.0
+
+  tiktoken@1.0.22: {}
 
   tinycolor2@1.6.0: {}
 
