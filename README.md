@@ -77,6 +77,10 @@ You can customize the `web-codegen-scorer eval` script with the following flags:
   `DEFAULT_MODEL_NAME`.
     - Example: `web-codegen-scorer eval --model=gemini-2.5-flash --env=<config path>`
 
+- `--autorater-model=<name>`: Specifies the model to use when automatically rating generated code. Defaults to the value of
+  `DEFAULT_AUTORATER_MODEL_NAME`.
+    - Example: `web-codegen-scorer eval --model=gemini-2.5-flash --autorater-model=gemini-2.5-flash --env=<config path>`
+
 - `--runner=<name>`: Specifies the runner to use to execute the eval. Supported runners are
   `genkit` (default) or `gemini-cli`.
 

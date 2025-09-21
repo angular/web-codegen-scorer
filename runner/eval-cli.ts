@@ -152,7 +152,7 @@ function builder(argv: Argv): Argv<Options> {
     .option('autorater-model', {
       type: 'string',
       default: DEFAULT_AUTORATER_MODEL_NAME,
-      descript: 'Model to use when automatically rating generated code',
+      description: 'Model to use when automatically rating generated code',
     })
     .strict()
     .version(false)
