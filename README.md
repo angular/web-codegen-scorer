@@ -38,6 +38,7 @@ npm install -g web-codegen-scorer
 export GEMINI_API_KEY="YOUR_API_KEY_HERE" # If you're using Gemini models
 export OPENAI_API_KEY="YOUR_API_KEY_HERE" # If you're using OpenAI models
 export ANTHROPIC_API_KEY="YOUR_API_KEY_HERE" # If you're using Anthropic models
+export XAI_API_KEY="YOUR_API_KEY_HERE" # If you're using xAI Grok models
 ```
 
 3. **Run an eval:**
