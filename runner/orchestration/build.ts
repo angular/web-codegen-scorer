@@ -4,7 +4,7 @@ import {
   BuildWorkerMessage,
   RepairType,
 } from '../builder/builder-types.js';
-import { LlmRunner } from '../codegen/llm-runner.js';
+import { LlmGenerateFilesResponse, LlmRunner } from '../codegen/llm-runner.js';
 import { Environment } from '../configuration/environment.js';
 import {
   AttemptDetails,
@@ -44,11 +44,7 @@ export async function attemptBuild(
   rootPromptDef: RootPromptDefinition,
   directory: string,
   contextFiles: LlmContextFile[],
-  initialResponse: {
-    usage: Usage;
-    outputFiles: LlmResponseFile[];
-    reasoning: string;
-  },
+  initialResponse: LlmGenerateFilesResponse,
   attemptDetails: AttemptDetails[],
   skipScreenshots: boolean,
   skipAxeTesting: boolean,
@@ -72,7 +68,7 @@ export async function attemptBuild(
 
   // Clone the original files, because we're going to mutate them between repair
   // attempts and we don't want the different runs to influence each other.
-  const finalOutputFiles = initialResponse.outputFiles.map((file) => ({
+  const finalOutputFiles = initialResponse.files.map((file) => ({
     ...file,
   }));
   let buildResult = await workerConcurrencyQueue.add(
@@ -86,8 +82,11 @@ export async function attemptBuild(
     : DEFAULT_MAX_REPAIR_ATTEMPTS;
 
   attemptDetails.push({
-    outputFiles: initialResponse.outputFiles,
-    usage: initialResponse.usage,
+    outputFiles: initialResponse.files,
+    usage: {
+      ...{ inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+      ...initialResponse.usage,
+    },
     reasoning: initialResponse.reasoning,
     buildResult,
     attempt: 0,

@@ -5,7 +5,11 @@ import { randomUUID } from 'crypto';
 import PQueue from 'p-queue';
 import { basename, join } from 'path';
 import { existsSync, readdirSync } from 'fs';
-import { LlmGenerateFilesContext, LlmRunner } from '../codegen/llm-runner.js';
+import {
+  LlmGenerateFilesContext,
+  LlmGenerateFilesResponse,
+  LlmRunner,
+} from '../codegen/llm-runner.js';
 import {
   DEFAULT_AUTORATER_MODEL_NAME,
   LLM_OUTPUT_DIR,
@@ -346,6 +350,8 @@ async function startEvaluationTask(
       progress
     );
 
+    const toolLogs = initialResponse.toolLogs;
+
     if (!initialResponse) {
       progress.log(
         promptDef,
@@ -363,7 +369,7 @@ async function startEvaluationTask(
       // Write the generated files to disk within the project directory.
       await writeResponseFiles(
         directory,
-        initialResponse.outputFiles,
+        initialResponse.files,
         env,
         rootPromptDef.name
       );
@@ -373,7 +379,7 @@ async function startEvaluationTask(
       if (rootPromptDef.kind === 'multi-step') {
         await writeResponseFiles(
           directory,
-          initialResponse.outputFiles,
+          initialResponse.files,
           env,
           promptDef.name
         );
@@ -400,7 +406,7 @@ async function startEvaluationTask(
       ratingLlm,
       rootPromptDef.name,
       defsToExecute[0].prompt,
-      initialResponse.outputFiles,
+      initialResponse.files,
       abortSignal
     );
 
@@ -469,6 +475,7 @@ async function startEvaluationTask(
       attemptDetails,
       userJourneys: userJourneys,
       axeRepairAttempts: attempt.axeRepairAttempts,
+      toolLogs,
     } satisfies AssessmentResult);
   }
 
@@ -497,7 +504,7 @@ async function generateInitialFiles(
   localMode: boolean,
   abortSignal: AbortSignal,
   progress: ProgressLogger
-) {
+): Promise<LlmGenerateFilesResponse> {
   if (localMode) {
     const localFilesDirectory = join(LLM_OUTPUT_DIR, env.id, promptDef.name);
     const filePaths = globSync('**/*', { cwd: localFilesDirectory });
@@ -509,7 +516,7 @@ async function generateInitialFiles(
     }
 
     return {
-      outputFiles: await Promise.all(
+      files: await Promise.all(
         filePaths.map(async (filePath) => ({
           filePath,
           code: await readFile(join(localFilesDirectory, filePath), 'utf8'),
@@ -521,6 +528,7 @@ async function generateInitialFiles(
       } satisfies Usage,
       // TODO: We could also try save/restore reasoning locally.
       reasoning: '',
+      toolLogs: [],
     };
   }
 
@@ -542,9 +550,10 @@ async function generateInitialFiles(
   }
 
   return {
-    outputFiles: response.outputFiles!,
+    files: response.outputFiles!,
     usage: response.usage,
     reasoning: response.reasoning,
+    toolLogs: response.toolLogs,
   };
 }
 

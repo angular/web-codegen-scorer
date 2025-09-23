@@ -89,7 +89,7 @@ export class GeminiCliRunner implements LlmRunner {
       });
     }
 
-    return { files, reasoning };
+    return { files, reasoning, toolLogs: [] };
   }
 
   generateText(): Promise<LlmGenerateTextResponse> {

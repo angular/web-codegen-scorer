@@ -3,6 +3,7 @@ import {
   LlmResponse,
   LlmResponseFile,
   RootPromptDefinition,
+  ToolLogEntry,
   Usage,
 } from '../shared-interfaces.js';
 import {
@@ -49,6 +50,7 @@ export async function generateCodeWithAI(
   let usage: Usage;
   let success: boolean;
   let reasoning: string;
+  let toolLogs: ToolLogEntry[];
 
   const contextMessageData = prepareContextFilesMessage(contextFiles);
   const messages: PromptDataMessage[] | undefined = contextMessageData
@@ -72,6 +74,7 @@ export async function generateCodeWithAI(
       totalTokens: response.usage?.totalTokens ?? 0,
     };
     reasoning = response.reasoning;
+    toolLogs = response.toolLogs ?? [];
 
     progress.log(
       promptDef,
@@ -100,6 +103,7 @@ export async function generateCodeWithAI(
     usage = { inputTokens: 0, outputTokens: 0, totalTokens: 0 };
     success = false;
     reasoning = '';
+    toolLogs = [];
     errors.push(error + '');
     progress.log(
       promptDef,
@@ -117,6 +121,7 @@ export async function generateCodeWithAI(
     errors,
     usage,
     reasoning,
+    toolLogs,
   } satisfies LlmResponse;
 }
 

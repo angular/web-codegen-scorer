@@ -1,5 +1,6 @@
 import {
   DynamicResourceAction,
+  GenerateResponse,
   genkit,
   ModelReference,
   ToolAction,
@@ -27,6 +28,7 @@ import {
   GenkitModelProvider,
   PromptDataForCounting,
 } from './model-provider.js';
+import { ToolLogEntry } from '../../shared-interfaces.js';
 
 const globalLogger = new GenkitLogger();
 logger.init(globalLogger);
@@ -38,6 +40,7 @@ export class GenkitRunner implements LlmRunner {
   readonly hasBuiltInRepairLoop = false;
   private readonly genkitInstance = this.getGenkitInstance();
   private mcpHost: GenkitMcpHost | null = null;
+  private toolLogs: ToolLogEntry[] = [];
 
   async generateConstrained<T extends z.ZodTypeAny = z.ZodTypeAny>(
     options: LlmConstrainedOutputGenerateRequestOptions<T>
@@ -75,7 +78,12 @@ export class GenkitRunner implements LlmRunner {
       files: result.output.outputFiles || [],
       usage: result.usage,
       reasoning: result.reasoning,
+      toolLogs: this.flushToolLogs(),
     };
+  }
+
+  flushToolLogs(): ToolLogEntry[] {
+    return this.toolLogs.splice(0);
   }
 
   async generateText(
@@ -87,6 +95,7 @@ export class GenkitRunner implements LlmRunner {
       text: result.text,
       usage: result.usage,
       reasoning: result.reasoning,
+      toolLogs: this.flushToolLogs(),
     };
   }
 
@@ -120,7 +129,7 @@ export class GenkitRunner implements LlmRunner {
             ]);
           }
 
-          return this.genkitInstance.generate({
+          const response = await this.genkitInstance.generate({
             prompt: options.prompt,
             model,
             output: schema
@@ -145,6 +154,10 @@ export class GenkitRunner implements LlmRunner {
             resources,
             abortSignal: options.abortSignal,
           });
+
+          this._logToolUsage(response);
+
+          return response;
         };
 
         return options.timeout
@@ -156,6 +169,42 @@ export class GenkitRunner implements LlmRunner {
           : performRequest();
       }
     );
+  }
+
+  private _logToolUsage(response: GenerateResponse<any>) {
+    const toolRequests = new Map<string, any>();
+    const toolResponses = new Map<string, any>();
+
+    if (response.request?.messages) {
+      for (const message of response.request.messages) {
+        if (!message.content) {
+          continue;
+        }
+        for (const contentPart of message.content) {
+          if (contentPart.toolRequest) {
+            toolRequests.set(
+              contentPart.toolRequest.ref || '0',
+              contentPart.toolRequest
+            );
+          } else if (contentPart.toolResponse) {
+            toolResponses.set(
+              contentPart.toolResponse.ref || '0',
+              contentPart.toolResponse
+            );
+          }
+        }
+      }
+    }
+
+    for (const [ref, toolRequest] of toolRequests.entries()) {
+      const toolResponse = toolResponses.get(ref);
+      if (toolResponse) {
+        this.toolLogs.push({
+          request: toolRequest,
+          response: toolResponse,
+        });
+      }
+    }
   }
 
   startMcpServerHost(hostName: string, servers: McpServerOptions[]): void {

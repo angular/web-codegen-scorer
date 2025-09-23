@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LlmResponseFile, Usage } from '../shared-interfaces.js';
+import { LlmResponseFile, ToolLogEntry, Usage } from '../shared-interfaces.js';
 import { UserFacingError } from '../utils/errors.js';
 
 export function assertValidModelName(value: string, availableModels: string[]) {
@@ -141,22 +141,24 @@ export interface LlmConstrainedOutputGenerateResponse<
   reasoning: string;
 }
 
-/** File generation response from the LLM. */
-export interface LlmGenerateFilesResponse {
-  files: LlmResponseFile[];
+/** LLM response. */
+interface BaseLlmGenerateResponse {
   /** Token usage data, if available. */
   usage?: Partial<Usage>;
   /** Reasoning messages from the LLM. */
   reasoning: string;
+  /** Tool requests and responses. */
+  toolLogs: ToolLogEntry[];
+}
+
+/** File generation response from the LLM. */
+export interface LlmGenerateFilesResponse extends BaseLlmGenerateResponse {
+  files: LlmResponseFile[];
 }
 
 /** Text response from the LLM. */
-export interface LlmGenerateTextResponse {
+export interface LlmGenerateTextResponse extends BaseLlmGenerateResponse {
   text: string;
-  /** Token usage data, if available. */
-  usage?: Partial<Usage>;
-  /** Reasoning messages from the LLM. */
-  reasoning: string;
 }
 
 /** Schema for the LLM server options. */

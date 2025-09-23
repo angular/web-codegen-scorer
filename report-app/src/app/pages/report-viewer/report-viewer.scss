@@ -63,7 +63,7 @@ expansion-panel {
   padding: 0 1rem 1rem;
 }
 
-.app-details-section expansion-panel {
+.app-details-section expansion-panel, .app-details-section button {
   margin-bottom: 0.5rem;
 }
 
@@ -233,3 +233,32 @@ expansion-panel {
   padding: 0px 20px;
 }
 
+.mcp-log-entry {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  margin: 1rem 0;
+
+  & > summary {
+    cursor: pointer;
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+
+    &:hover {
+      background-color: var(--button-active-bg-color);
+    }
+  }
+
+  & .mcp-log-content {
+    padding: 0 1.5rem 1.5rem;
+
+    h5 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+.tool-logs-list {
+  list-style: none;
+  padding: 0;
+}

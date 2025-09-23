@@ -11,6 +11,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { BuildErrorType } from '../../../../../runner/builder/builder-types';
 import {
   AssessmentResult,
@@ -55,6 +56,7 @@ import { ProviderLabel } from '../../shared/provider-label';
     ExpansionPanel,
     ExpansionPanelHeader,
     ProviderLabel,
+    NgxJsonViewerModule,
   ],
   templateUrl: './report-viewer.html',
   styleUrls: ['./report-viewer.scss'],

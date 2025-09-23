@@ -105,6 +105,8 @@ export interface LlmResponse {
   usage: Usage;
   /** Reasoning messages from the LLM for generating this response. */
   reasoning: string;
+  /** Tool requests logs (e.g. MCP requests and responses). */
+  toolLogs: ToolLogEntry[];
 }
 
 /** Error response from an LLM API. */
@@ -367,6 +369,24 @@ export interface RunDetails {
 }
 
 /**
+ * Logs for a single tool request and response (e.g. an MCP tool).
+ *
+ * Fields are coming from GenerateRequestSchema.
+ */
+export interface ToolLogEntry {
+  request: {
+    name: string;
+    ref?: string | undefined;
+    input?: unknown;
+  };
+  response: {
+    name: string;
+    output?: unknown;
+    ref?: string | undefined;
+  };
+}
+
+/**
  * Encapsulates all results and details for the assessment of a single prompt.
  * This includes the original prompt definition, the final generated code,
  * build status, code quality score, number of repair attempts, and details of each attempt.
@@ -388,6 +408,8 @@ export interface AssessmentResult {
   userJourneys?: UserJourneysResult;
   /** The number of repair attempts made after the axe initial failures. */
   axeRepairAttempts: number;
+  /** Tool requests logs (e.g. MCP requests and responses). */
+  toolLogs: ToolLogEntry[];
 }
 
 /**
