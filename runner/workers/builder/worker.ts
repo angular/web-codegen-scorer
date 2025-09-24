@@ -1,48 +1,19 @@
 import { delimiter, join } from 'path';
+import { redX } from '../../reporting/format.js';
+import { executeCommand } from '../../utils/exec.js';
+import { callWithTimeout } from '../../utils/timeout.js';
 import {
-  BuildWorkerMessage,
-  BuildResult,
-  BuildResultStatus,
   BuildErrorType,
+  BuildResultStatus,
+  BuildWorkerMessage,
   BuildWorkerResponseMessage,
 } from './builder-types.js';
-import { CspViolation } from './auto-csp-types.js';
-import { runAppInPuppeteer } from './puppeteer.js';
-import { redX } from '../reporting/format.js';
-import { callWithTimeout } from '../utils/timeout.js';
-import { serveApp } from './serve-app.js';
-import { runBrowserAgentUserJourneyTests } from './browser-agent.js';
-import { AgentOutput } from '../testing/browser-agent/models.js';
-import { executeCommand } from '../utils/exec.js';
-import { ProgressType } from '../progress/progress-logger.js';
 
-import { PackageSummary } from '@safety-web/types';
 import { run as runSafetyWeb } from '@safety-web/runner';
+import { PackageSummary } from '@safety-web/types';
 
 process.on('message', async (message: BuildWorkerMessage) => {
-  const {
-    appName,
-    directory,
-    buildCommand,
-    serveCommand,
-    collectRuntimeErrors,
-    takeScreenshots,
-    includeAxeTesting,
-    userJourneyAgentTaskInput,
-    enableAutoCsp,
-  } = message;
-  let result: BuildResult;
-  const runtimeErrors: string[] = [];
-  const progressLog = (
-    state: ProgressType,
-    message: string,
-    details?: string
-  ) => {
-    process.send!({
-      type: 'log',
-      payload: { state, message, details },
-    } satisfies BuildWorkerResponseMessage);
-  };
+  const { appName, directory, buildCommand } = message;
 
   try {
     // Run the build command inside the temporary project directory
@@ -53,7 +24,7 @@ process.on('message', async (message: BuildWorkerMessage) => {
           buildCommand,
           directory,
           {
-            PATH: `${process.env.PATH}${delimiter}${join(directory, 'node_modules/.bin')}`,
+            PATH: `${process.env['PATH']}${delimiter}${join(directory, 'node_modules/.bin')}`,
           },
           { abortSignal }
         ),
@@ -73,7 +44,6 @@ process.on('message', async (message: BuildWorkerMessage) => {
           errorType === BuildErrorType.MISSING_DEPENDENCY
             ? extractMissingDependency(cleanErrorMessage)
             : undefined,
-        userJourneyAgentOutput: null,
       },
     } satisfies BuildWorkerResponseMessage);
     return;
@@ -100,88 +70,13 @@ process.on('message', async (message: BuildWorkerMessage) => {
     );
   }
 
-  const needsToServeApp =
-    collectRuntimeErrors ||
-    takeScreenshots ||
-    includeAxeTesting ||
-    userJourneyAgentTaskInput !== undefined;
-
-  // If build is successful, try to serve and app and take a screenshot if requested
-  let screenshotBase64Data: string | undefined = undefined;
-  let axeViolations: any[] | undefined = [];
-  let userJourneyAgentOutput: AgentOutput | null = null;
-  let cspViolations: CspViolation[] | undefined = [];
-
-  try {
-    if (needsToServeApp) {
-      await serveApp(
-        serveCommand,
-        appName,
-        directory,
-        progressLog,
-        async (hostUrl) => {
-          const result = await callWithTimeout(
-            `Running ${appName} in Puppeteer`,
-            () =>
-              runAppInPuppeteer(
-                appName,
-                hostUrl,
-                directory,
-                !!takeScreenshots,
-                !!includeAxeTesting,
-                progressLog,
-                !!enableAutoCsp
-              ),
-            4 // 4min
-          );
-
-          screenshotBase64Data = result.screenshotBase64Data;
-          axeViolations = result.axeViolations;
-          cspViolations = result.cspViolations;
-          if (collectRuntimeErrors) {
-            runtimeErrors.push(...result.runtimeErrors);
-          }
-
-          if (userJourneyAgentTaskInput) {
-            userJourneyAgentOutput = await runBrowserAgentUserJourneyTests(
-              appName,
-              hostUrl,
-              userJourneyAgentTaskInput,
-              progressLog
-            );
-          }
-        }
-      );
-    }
-    result = {
-      status: BuildResultStatus.SUCCESS,
-      message: 'Application built successfully!',
-      screenshotPngUrl: `data:image/png;base64,${screenshotBase64Data}`,
-      runtimeErrors: runtimeErrors.join('\n'),
-      axeViolations,
-      safetyWebReportJson,
-      userJourneyAgentOutput: userJourneyAgentOutput,
-      cspViolations,
-    };
-  } catch (error: any) {
-    const cleanErrorMessage = cleanupBuildMessage(error.message);
-    const errorType = classifyBuildError(cleanErrorMessage);
-
-    // TODO: Improve general error handling here. Split up build result with serve result.
-    result = {
-      status: BuildResultStatus.ERROR,
-      message: cleanErrorMessage,
-      errorType: errorType,
-      runtimeErrors: runtimeErrors.join('\n'),
-      safetyWebReportJson,
-      userJourneyAgentOutput: userJourneyAgentOutput,
-      cspViolations,
-    };
-  }
-
   process.send!({
     type: 'build',
-    payload: result,
+    payload: {
+      status: BuildResultStatus.SUCCESS,
+      message: 'Application built successfully!',
+      safetyWebReportJson,
+    },
   } satisfies BuildWorkerResponseMessage);
 });
 

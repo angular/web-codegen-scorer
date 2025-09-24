@@ -1,5 +1,5 @@
 import z from 'zod';
-import { BuildResult } from '../builder/builder-types.js';
+import { BuildResult } from '../workers/builder/builder-types.js';
 import type {
   LlmResponseFile,
   PromptDefinition,
@@ -7,6 +7,7 @@ import type {
 } from '../shared-interfaces.js';
 import { Environment } from '../configuration/environment.js';
 import { GenkitRunner } from '../codegen/genkit/genkit-runner.js';
+import { ServeTestingResult } from '../workers/serve-testing/worker-types.js';
 
 /** Possible types of ratings. */
 export enum RatingKind {
@@ -59,6 +60,7 @@ const perBuildRatingSchema = z
       .args(
         z.strictObject({
           buildResult: z.custom<BuildResult>(),
+          serveResult: z.custom<ServeTestingResult | null>(),
           repairAttempts: z.number(),
           axeRepairAttempts: z.number(),
           generatedFileCount: z.number(),
@@ -177,6 +179,7 @@ export interface LLMBasedRatingContext {
   model: string;
   outputFiles: LlmResponseFile[];
   buildResult: BuildResult;
+  serveTestingResult: ServeTestingResult | null;
   repairAttempts: number;
   axeRepairAttempts: number;
   abortSignal: AbortSignal;

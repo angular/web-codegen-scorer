@@ -21,11 +21,6 @@ export class AutoCsp {
   public readonly violations: CspViolation[] = [];
   private readonly scriptInfosByUrl = new Map<string, ScriptInfo[]>();
 
-  constructor(
-    private readonly hostUrl: string,
-    private readonly tempDir: string
-  ) {}
-
   /**
    * Connects to the Chrome DevTools Protocol to instrument the page
    * and cache the source code of all loaded scripts.

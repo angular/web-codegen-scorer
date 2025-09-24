@@ -7,13 +7,14 @@ import type {
   RunGroup,
   RunInfo,
 } from '../shared-interfaces.js';
+import { RunnerName } from '../codegen/runner-creation.js';
 
 /** Generates a unique grouping ID for a run. */
 export function getRunGroupId(
   timestamp: Date,
   env: Environment,
   options: {
-    llm: LlmRunner;
+    runner: RunnerName;
     model: string;
     labels?: string[];
   }
@@ -30,7 +31,7 @@ export function getRunGroupId(
   // We use this as a key to group identical reports together.
   const group =
     `${dateOnly.toLocaleDateString()}/${env.id}/` +
-    `${options.labels?.sort().join('/')}/${options.model}/${options.llm.id}`;
+    `${options.labels?.sort().join('/')}/${options.model}/${options.runner}`;
 
   // The group string above can get long. Hash it to something shorter and fixed length.
   return createHash('sha256').update(group).digest('hex');

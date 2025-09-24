@@ -1,20 +1,22 @@
 import { ChildProcess, exec } from 'child_process';
-import { killChildProcessGracefully } from '../utils/kill-gracefully.js';
-import { cleanupBuildMessage } from './worker.js';
-import { BuilderProgressLogFn } from './builder-types.js';
+import { killChildProcessGracefully } from '../../utils/kill-gracefully.js';
+import { cleanupBuildMessage } from '../builder/worker.js';
+import { ProgressLogger } from '../../progress/progress-logger.js';
+import { RootPromptDefinition } from '../../shared-interfaces.js';
 
-export async function serveApp(
+export async function serveApp<T>(
   serveCommand: string,
-  appName: string,
-  tempDir: string,
-  progressLog: BuilderProgressLogFn,
-  logicWhileServing: (serveUrl: string) => Promise<void>
-) {
+  rootPromptDef: RootPromptDefinition,
+  appDirectoryPath: string,
+  progress: ProgressLogger,
+  logicWhileServing: (serveUrl: string) => Promise<T>
+): Promise<T> {
   let serveProcess: ChildProcess | null = null;
 
   try {
-    serveProcess = exec(serveCommand, { cwd: tempDir });
-    progressLog(
+    serveProcess = exec(serveCommand, { cwd: appDirectoryPath });
+    progress.log(
+      rootPromptDef,
       'eval',
       'Launching app inside a browser',
       `(PID: ${serveProcess.pid})`
@@ -25,7 +27,7 @@ export async function serveApp(
       const timeoutId = setTimeout(() => {
         rejectPort(
           new Error(
-            `Serving process for \`${appName}\` timed out waiting for port information after ${serveStartTimeout / 1000}s.`
+            `Serving process for \`${rootPromptDef.name}\` timed out waiting for port information after ${serveStartTimeout / 1000}s.`
           )
         );
       }, serveStartTimeout);
@@ -45,7 +47,11 @@ export async function serveApp(
           if (match && match[1]) {
             clearTimeout(timeoutId);
             const port = parseInt(match[1], 10);
-            progressLog('eval', `App is up and running on port ${port}`);
+            progress.log(
+              rootPromptDef,
+              'eval',
+              `App is up and running on port ${port}`
+            );
             portResolved = true;
             resolvePort(port);
           }
@@ -57,7 +63,7 @@ export async function serveApp(
 
       serveProcess!.on('error', (err) => {
         clearTimeout(timeoutId);
-        progressLog('error', 'Failed to launch app', err + '');
+        progress.log(rootPromptDef, 'error', 'Failed to launch app', err + '');
         rejectPort(err);
       });
 
@@ -69,7 +75,7 @@ export async function serveApp(
         if (code !== 0 && code !== null) {
           rejectPort(
             new Error(
-              `Launch process for \`${appName}\` exited prematurely with code ${code}, signal ${signal}. Output: ${outputBuffer.slice(-500)}`
+              `Launch process for \`${rootPromptDef.name}\` exited prematurely with code ${code}, signal ${signal}. Output: ${outputBuffer.slice(-500)}`
             )
           );
         } else if (
@@ -81,7 +87,7 @@ export async function serveApp(
           // SIGTERM/SIGINT is expected for our kill
           rejectPort(
             new Error(
-              `Launch process for \`${appName}\` was killed by unexpected signal ${signal} before port resolution. Output: ${outputBuffer.slice(-500)}`
+              `Launch process for \`${rootPromptDef.name}\` was killed by unexpected signal ${signal} before port resolution. Output: ${outputBuffer.slice(-500)}`
             )
           );
         }
@@ -90,10 +96,11 @@ export async function serveApp(
 
     const hostUrl = `http://localhost:${actualPort}`;
 
-    await logicWhileServing(hostUrl);
+    return await logicWhileServing(hostUrl);
   } finally {
     if (serveProcess) {
-      progressLog(
+      progress.log(
+        rootPromptDef,
         'eval',
         'Terminating browser process for app',
         `(PID: ${serveProcess.pid})`

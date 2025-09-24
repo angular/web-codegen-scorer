@@ -1,5 +1,14 @@
 export * from './shared-interfaces.js';
 export * from './configuration/environment-config.js';
+export * from './orchestration/gateway.js';
+export {
+  type RemoteEnvironmentConfig,
+  RemoteEnvironment,
+} from './configuration/environment-remote.js';
+export {
+  type LocalEnvironmentConfig,
+  LocalEnvironment,
+} from './configuration/environment-local.js';
 export * from './ratings/built-in.js';
 export * from './ratings/rating-types.js';
 export * from './ratings/built-in-ratings/index.js';
@@ -12,7 +21,7 @@ export {
   BuildErrorType,
   BuildResultStatus,
   type BuildResult,
-} from './builder/builder-types.js';
+} from './workers/builder/builder-types.js';
 export { type UserJourneysResult } from './orchestration/user-journeys.js';
 export { type AutoRateResult } from './ratings/autoraters/auto-rate-shared.js';
 export { type McpServerOptions } from './codegen/llm-runner.js';

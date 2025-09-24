@@ -1,5 +1,5 @@
 import { marked } from 'marked';
-import { BuildResultStatus } from '../builder/builder-types.js';
+import { BuildResultStatus } from '../workers/builder/builder-types.js';
 import { GenkitRunner } from '../codegen/genkit/genkit-runner.js';
 import {
   AssessmentResult,
@@ -91,12 +91,18 @@ Build results: ${JSON.stringify(
                 a.buildResult.status === BuildResultStatus.ERROR
                   ? 'Error'
                   : 'Success',
-              runtimeErrors: a.buildResult.runtimeErrors,
             },
             attempt: a.attempt,
           })),
           null,
           2
+        )}
+Serve testing results: ${JSON.stringify(
+          app.attemptDetails.map((a) => ({
+            serveTestingResult: {
+              runtimeErrors: a.serveTestingResult?.runtimeErrors,
+            },
+          }))
         )}`
     )
     .join('\n------------\n');

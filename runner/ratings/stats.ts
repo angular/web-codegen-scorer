@@ -1,4 +1,7 @@
-import { BuildErrorType, BuildResultStatus } from '../builder/builder-types.js';
+import {
+  BuildErrorType,
+  BuildResultStatus,
+} from '../workers/builder/builder-types.js';
 import { UserFacingError } from '../utils/errors.js';
 import {
   AggregatedRunStats,
@@ -49,7 +52,7 @@ export function calculateBuildAndCheckStats(
   }));
 
   assessments.forEach((result) => {
-    if (result.build.status === BuildResultStatus.SUCCESS) {
+    if (result.finalAttempt.buildResult.status === BuildResultStatus.SUCCESS) {
       if (result.repairAttempts === 0) {
         successfulInitialBuilds++;
       } else {
@@ -57,25 +60,26 @@ export function calculateBuildAndCheckStats(
       }
     } else {
       failedBuilds++;
-      if (result.build.errorType) {
-        errorDistribution[result.build.errorType] =
-          (errorDistribution[result.build.errorType] || 0) + 1;
+      if (result.finalAttempt.buildResult.errorType) {
+        errorDistribution[result.finalAttempt.buildResult.errorType] =
+          (errorDistribution[result.finalAttempt.buildResult.errorType] || 0) +
+          1;
       }
     }
 
-    if (result.build.runtimeErrors != undefined) {
+    if (result.finalAttempt.serveTestingResult?.runtimeErrors != undefined) {
       runtimeStats ??= { appsWithErrors: 0, appsWithoutErrors: 0 };
-      if (result.build.runtimeErrors.trim() != '') {
+      if (result.finalAttempt.serveTestingResult.runtimeErrors.trim() != '') {
         runtimeStats.appsWithErrors++;
       }
     }
-    if (result.build.axeViolations != undefined) {
+    if (result.finalAttempt.serveTestingResult?.axeViolations != undefined) {
       accessibilityStats ??= {
         appsWithErrors: 0,
         appsWithoutErrors: 0,
         appsWithoutErrorsAfterRepair: 0,
       };
-      if (result.build.axeViolations.length > 0) {
+      if (result.finalAttempt.serveTestingResult.axeViolations.length > 0) {
         accessibilityStats.appsWithErrors++;
       } else {
         if (result.axeRepairAttempts === 0) {
@@ -87,7 +91,7 @@ export function calculateBuildAndCheckStats(
     }
     securityStats ??= { appsWithErrors: 0, appsWithoutErrors: 0 };
     const { numCspViolations, numTrustedTypesViolations } = (
-      result.build.cspViolations || []
+      result.finalAttempt.serveTestingResult?.cspViolations || []
     ).reduce(
       (acc, v) => {
         if (v['blocked-uri'] === 'trusted-types-sink') {
@@ -101,7 +105,8 @@ export function calculateBuildAndCheckStats(
     );
 
     const hasSafetyViolations =
-      (result.build.safetyWebReportJson?.[0]?.violations?.length ?? 0) > 0;
+      (result.finalAttempt.buildResult.safetyWebReportJson?.[0]?.violations
+        ?.length ?? 0) > 0;
     // TODO: Consider numTrustedTypesViolations once we update autoCsp and re-enable the rating.
     if (hasSafetyViolations || numCspViolations > 0) {
       securityStats.appsWithErrors++;

@@ -33,7 +33,7 @@ export const REPORTS_ROOT_DIR = join(rootDir, 'reports');
  * Current version of the report. Used to account for changes in the report shape.
  * MUST be kept in sync with `RunInfo.version`.
  */
-export const REPORT_VERSION = 2;
+export const REPORT_VERSION = 3;
 
 /** Environments that are shipped together with the eval tool. */
 export const BUILT_IN_ENVIRONMENTS = new Map<string, string>([

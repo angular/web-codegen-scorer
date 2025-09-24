@@ -14,36 +14,19 @@ import {
 import { Environment } from '../configuration/environment.js';
 import { getPossiblePackageManagers } from '../configuration/environment-config.js';
 import { ProgressLogger } from '../progress/progress-logger.js';
+import { EvalID, Gateway } from './gateway.js';
+import { LocalEnvironment } from '../configuration/environment-local.js';
 
 /**
  * Generates code using the configured AI model based on the provided prompt.
- *
- * @param llm LLM runner.
- * @param model Name of the LLM to use.
- * @param userPrompt The user prompt to send to the AI model.
- * @param requestType Type of the request: "codegen" or "repair"
- * @param appName Name of the app that we want to generate.
- * @returns A Promise that resolves with the generated code string.
- *          Returns `null` if an error occurs during generation.
  */
 export async function generateCodeWithAI(
   llm: LlmRunner,
   model: string,
   codegenContext: LlmGenerateFilesContext,
-  requestType: 'codegen' | 'repair',
-  promptDef: RootPromptDefinition,
   contextFiles: LlmContextFile[],
-  abortSignal: AbortSignal,
-  progress: ProgressLogger
+  abortSignal: AbortSignal
 ): Promise<LlmResponse> {
-  progress.log(
-    promptDef,
-    'codegen',
-    requestType === 'repair'
-      ? 'Repairing code with AI'
-      : 'Generating code with AI'
-  );
-
   const outputFiles: LlmResponseFile[] = [];
   const filesToIndexes = new Map<string, number>();
   const errors: string[] = [];
@@ -76,17 +59,6 @@ export async function generateCodeWithAI(
     reasoning = response.reasoning;
     toolLogs = response.toolLogs ?? [];
 
-    progress.log(
-      promptDef,
-      'codegen',
-      requestType === 'repair'
-        ? 'Received AI repair response'
-        : 'Received AI code generation response',
-      usage.inputTokens || usage.outputTokens || usage.totalTokens
-        ? `(input tokens: ${usage.inputTokens}, output tokens: ${usage.outputTokens}, total tokens: ${usage.totalTokens})`
-        : ''
-    );
-
     for (const file of response.files) {
       // In some cases the LLM appears to split the file up into individual objects,
       // rather than in a single one. If that's the case, stitch the files together,
@@ -105,14 +77,6 @@ export async function generateCodeWithAI(
     reasoning = '';
     toolLogs = [];
     errors.push(error + '');
-    progress.log(
-      promptDef,
-      'error',
-      requestType === 'repair'
-        ? 'Failed to repair code with AI'
-        : 'Failed to generate code with AI',
-      error + ''
-    );
   }
 
   return {
@@ -129,14 +93,15 @@ export async function generateCodeWithAI(
  * Attempts to repair the given code using an AI model based on the provided error message.
  */
 export async function repairCodeWithAI(
-  llm: LlmRunner,
-  env: Environment,
+  evalID: EvalID,
+  gateway: Gateway<Environment>,
   model: string,
+  env: Environment,
+  promptDef: RootPromptDefinition,
   directory: string,
-  files: LlmResponseFile[],
+  appFiles: LlmResponseFile[],
   errorMessage: string,
   errorContext: string,
-  promptDef: RootPromptDefinition,
   contextFiles: LlmContextFile[],
   abortSignal: AbortSignal,
   progress: ProgressLogger
@@ -149,7 +114,9 @@ export async function repairCodeWithAI(
     '```',
     '',
     'In the following source code:',
-    ...files.map((file) => `${file.filePath}:\n\`\`\`\n${file.code}\`\`\`\n\n`),
+    ...appFiles.map(
+      (file) => `${file.filePath}:\n\`\`\`\n${file.code}\`\`\`\n\n`
+    ),
   ].join('\n');
 
   const context: LlmGenerateFilesContext = {
@@ -157,21 +124,42 @@ export async function repairCodeWithAI(
     systemInstructions: repairSystemInstructions,
     executablePrompt: repairPrompt,
     combinedPrompt: `${repairSystemInstructions}\n${repairPrompt}`,
-    packageManager: env.packageManager,
+    packageManager:
+      env instanceof LocalEnvironment ? env.packageManager : undefined,
+    buildCommand:
+      env instanceof LocalEnvironment ? env.buildCommand : undefined,
     possiblePackageManagers: getPossiblePackageManagers().slice(),
-    buildCommand: env.buildCommand,
   };
 
-  return generateCodeWithAI(
-    llm,
-    model,
+  progress.log(promptDef, 'codegen', 'Repairing code with AI');
+
+  const response = await gateway.repairBuild(
+    evalID,
     context,
-    'repair',
-    promptDef,
+    model,
+    errorMessage,
+    appFiles,
     contextFiles,
-    abortSignal,
-    progress
+    abortSignal
   );
+
+  if (response.success) {
+    progress.log(
+      promptDef,
+      'codegen',
+      'Received AI repair response',
+      createLlmResponseTokenUsageMessage(response) ?? ''
+    );
+  } else {
+    progress.log(
+      promptDef,
+      'error',
+      'Failed to repair code with AI',
+      response.errors.join(', ')
+    );
+  }
+
+  return response;
 }
 
 export function prepareContextFilesMessage(
@@ -191,4 +179,14 @@ export function prepareContextFilesMessage(
     role: 'user',
     content: [{ text: contextMessage }],
   };
+}
+
+export function createLlmResponseTokenUsageMessage(
+  response: LlmResponse
+): string | null {
+  return response.usage.inputTokens ||
+    response.usage.outputTokens ||
+    response.usage.totalTokens
+    ? `(input tokens: ${response.usage.inputTokens}, output tokens: ${response.usage.outputTokens}, total tokens: ${response.usage.totalTokens})`
+    : null;
 }

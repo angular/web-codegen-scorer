@@ -16,9 +16,11 @@ import {
   setupProjectStructure,
   writeResponseFiles,
 } from './orchestration/file-system.js';
-import { serveApp } from './builder/serve-app.js';
+import { serveApp } from './workers/serve-testing/serve-app.js';
 import { ProgressLogger, ProgressType } from './progress/progress-logger.js';
-import { formatTitleCard } from './reporting/format.js';
+import { formatTitleCard, redX } from './reporting/format.js';
+import { NoopProgressLogger } from './progress/noop-progress-logger.js';
+import { LocalEnvironment } from './configuration/environment-local.js';
 
 export const RunModule = {
   builder,
@@ -65,6 +67,13 @@ async function runApp(options: Options) {
   const { environment, rootPromptDef, files } = await resolveConfig(options);
   const progress = new ErrorOnlyProgressLogger();
 
+  if (!(environment instanceof LocalEnvironment)) {
+    console.error(
+      `${redX()} Unable to run eval app locally for a remote environment.`
+    );
+    return;
+  }
+
   console.log(
     `Setting up the "${environment.displayName}" environment with the "${rootPromptDef.name}" prompt...`
   );
@@ -96,9 +105,9 @@ async function runApp(options: Options) {
 
     await serveApp(
       environment.serveCommand,
-      rootPromptDef.name,
+      rootPromptDef,
       directory,
-      () => {},
+      new NoopProgressLogger(),
       async (url) => {
         console.log();
         console.log(formatTitleCard(`🎉 App is up and running at ${url}`));
@@ -128,7 +137,8 @@ async function resolveConfig(options: Options) {
   }
 
   const environment = await getEnvironmentByPath(
-    BUILT_IN_ENVIRONMENTS.get(options.environment) || options.environment
+    BUILT_IN_ENVIRONMENTS.get(options.environment) || options.environment,
+    'genkit'
   );
   const environmentDir = join(LLM_OUTPUT_DIR, environment.id);
 

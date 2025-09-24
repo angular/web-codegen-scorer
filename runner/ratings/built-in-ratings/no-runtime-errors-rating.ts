@@ -1,4 +1,4 @@
-import { BuildResultStatus } from '../../builder/builder-types.js';
+import { BuildResultStatus } from '../../workers/builder/builder-types.js';
 import {
   PerBuildRating,
   RatingKind,
@@ -14,12 +14,16 @@ export const noRuntimeExceptionsRating: PerBuildRating = {
   category: RatingCategory.HIGH_IMPACT,
   scoreReduction: '50%',
   id: 'common-no-runtime-errors',
-  rate: ({ buildResult }) => ({
+  rate: ({ buildResult, serveResult }) => ({
     state: RatingState.EXECUTED,
     coefficient:
       // If we can't build - we can't run it as well.
       buildResult.status === BuildResultStatus.ERROR ||
-      !!buildResult.runtimeErrors
+      // If we couldn't serve, then it can't run as well.
+      serveResult === null ||
+      serveResult.errorMessage !== undefined ||
+      // If there are actual runtime errors:
+      !!serveResult.runtimeErrors
         ? 0
         : 1,
   }),

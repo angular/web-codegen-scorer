@@ -6,6 +6,7 @@ import PQueue from 'p-queue';
 import { basename, join } from 'path';
 import { existsSync, readdirSync } from 'fs';
 import {
+  assertValidModelName,
   LlmGenerateFilesContext,
   LlmGenerateFilesResponse,
   LlmRunner,
@@ -34,8 +35,8 @@ import {
 } from '../shared-interfaces.js';
 import { BrowserAgentTaskInput } from '../testing/browser-agent/models.js';
 import { callWithTimeout } from '../utils/timeout.js';
-import { attemptBuild } from './build.js';
-import { generateCodeWithAI } from './codegen.js';
+import { attemptBuild } from './build-serve-loop.js';
+import { createLlmResponseTokenUsageMessage } from './codegen.js';
 import { generateUserJourneysForApp } from './user-journeys.js';
 import {
   resolveContextFiles,
@@ -52,6 +53,10 @@ import { DynamicProgressLogger } from '../progress/dynamic-progress-logger.js';
 import { UserFacingError } from '../utils/errors.js';
 import { getRunGroupId } from './grouping.js';
 import { executeCommand } from '../utils/exec.js';
+import { EvalID, Gateway } from './gateway.js';
+import { LocalGateway } from './gateways/local_gateway.js';
+import { LocalEnvironment } from '../configuration/environment-local.js';
+import { RunnerName } from '../codegen/runner-creation.js';
 
 /**
  * Orchestrates the entire assessment process for each prompt defined in the `prompts` array.
@@ -66,9 +71,9 @@ import { executeCommand } from '../utils/exec.js';
  *          each containing the prompt, generated code, and final validation status.
  */
 export async function generateCodeAndAssess(options: {
-  llm: LlmRunner;
   ratingLlm: GenkitRunner;
   model: string;
+  runner: RunnerName;
   environmentConfigPath: string;
   localMode: boolean;
   limit: number;
@@ -87,183 +92,204 @@ export async function generateCodeAndAssess(options: {
   logging?: 'text-only' | 'dynamic';
   autoraterModel?: string;
 }): Promise<RunInfo> {
-  const env = await getEnvironmentByPath(options.environmentConfigPath);
-  const promptsToProcess = getCandidateExecutablePrompts(
-    env,
-    options.localMode,
-    options.promptFilter
-  ).slice(0, options.limit);
-  const progress =
-    options.logging === 'dynamic'
-      ? new DynamicProgressLogger()
-      : new TextProgressLogger();
-  const appConcurrency =
-    options.concurrency === 'auto'
-      ? Math.floor(availableParallelism() * 0.8)
-      : options.concurrency;
+  const env = await getEnvironmentByPath(
+    options.environmentConfigPath,
+    options.runner
+  );
 
-  if (promptsToProcess.length === 0) {
-    throw new UserFacingError(
-      `No prompts have been configured for environment '${env.displayName}'` +
-        (options.promptFilter
-          ? ` and filtered by '${options.promptFilter}'.`
-          : '.')
-    );
+  // TODO(devversion): Consider validating model names also for remote environments.
+  if (env instanceof LocalEnvironment) {
+    assertValidModelName(options.model, env.llm.getSupportedModels());
   }
 
-  // Scrolls the terminal back to the top so that our logging looks a bit cleaner.
-  // via https://stackoverflow.com/questions/9006988/node-js-on-windows-how-to-clear-console
-  if (options.logging === 'dynamic') {
-    process.stdout.write('\x1Bc');
-  }
-
-  logReportHeader(env, promptsToProcess.length, appConcurrency, options);
-
-  // We need Chrome to collect runtime information.
-  await installChrome();
-
-  if (
-    options.startMcp &&
-    env.mcpServerOptions.length &&
-    options.llm.startMcpServerHost
-  ) {
-    options.llm.startMcpServerHost(
-      `mcp-${env.clientSideFramework.id}`,
-      env.mcpServerOptions
-    );
-  }
-
-  progress.initialize(promptsToProcess.length);
-
-  const appConcurrencyQueue = new PQueue({ concurrency: appConcurrency });
-  const workerConcurrencyQueue = new PQueue({
-    concurrency:
-      options.concurrency === 'auto'
-        ? // Building can be really expensive. We likely should add support for "CPU hints" per environment.
-          // E.g. CLI building is really CPU intensive with ESBuild being multi-core.
-          // TODO: Follow-up on this and add CPU hints.
-          Math.floor(availableParallelism() * 0.4 * 0.5)
-        : Infinity,
-  });
-
-  const allTasks: Promise<AssessmentResult[]>[] = [];
-  const failedPrompts: CompletionStats['failedPrompts'] = [];
-
-  for (const rootPromptDef of promptsToProcess) {
-    allTasks.push(
-      appConcurrencyQueue.add(
-        async () => {
-          try {
-            return await callWithTimeout(
-              `Evaluation of ${rootPromptDef.name}`,
-              async (abortSignal) =>
-                startEvaluationTask(
-                  env,
-                  options.llm,
-                  options.ratingLlm,
-                  options.model,
-                  rootPromptDef,
-                  options.localMode,
-                  options.skipScreenshots,
-                  options.outputDirectory,
-                  options.ragEndpoint,
-                  abortSignal,
-                  options.skipAxeTesting,
-                  !!options.enableUserJourneyTesting,
-                  !!options.enableAutoCsp,
-                  workerConcurrencyQueue,
-                  progress,
-                  options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME
-                ),
-              // 10min max per app evaluation.  We just want to make sure it never gets stuck.
-              10
-            );
-          } catch (e: unknown) {
-            failedPrompts.push({
-              promptName: rootPromptDef.name,
-              error: `${e}`,
-              stack: e instanceof Error ? e.stack : undefined,
-            });
-
-            let details = `Error: ${e}`;
-            if (e instanceof Error && e.stack) {
-              details += `\nStack: ${e.stack}`;
-            }
-
-            progress.log(
-              rootPromptDef,
-              'error',
-              'Failed to evaluate code',
-              details
-            );
-            return [] satisfies AssessmentResult[];
-          } finally {
-            progress.log(rootPromptDef, 'done', 'Done');
-          }
-        },
-        { throwOnTimeout: true }
-      )
-    );
-  }
-
-  const results = (await Promise.all(allTasks))
-    .flat()
-    .sort((a, b) => a.promptDef.name.localeCompare(b.promptDef.name));
-
-  // Sanity check. Should be a noop because app queue is a parent of worker-awaited tasks.
-  await workerConcurrencyQueue.onEmpty();
-  progress.finalize();
-
-  const mcp =
-    options.startMcp &&
-    env.mcpServerOptions.length > 0 &&
-    options.llm.startMcpServerHost &&
-    options.llm.flushMcpServerLogs
-      ? {
-          servers: env.mcpServerOptions.map((m) => ({
-            name: m.name,
-            command: m.command,
-            args: m.args,
-          })),
-          logs: options.llm.flushMcpServerLogs().join('\n'),
-        }
-      : undefined;
-
-  const timestamp = new Date();
-  const details = {
-    summary: await prepareSummary(
-      options.llm,
-      options.ratingLlm,
-      new AbortController().signal, // Note: AI summarization is currently not abortable.
-      options.model,
+  try {
+    const promptsToProcess = getCandidateExecutablePrompts(
       env,
-      results,
-      {
-        allPromptsCount: promptsToProcess.length,
-        failedPrompts,
-      },
-      options
-    ),
-    timestamp: timestamp.toISOString(),
-    reportName: options.reportName,
-    systemPromptGeneration: env.classifyPrompts
-      ? 'Classified 🕵️'
-      : env.systemPromptGeneration(),
-    systemPromptRepair: env.classifyPrompts
-      ? 'Classified 🕵️'
-      : env.systemPromptRepair(),
-    // Deduplicate labels before finalizing the report.
-    labels: Array.from(new Set(options.labels)),
-    mcp,
-  } satisfies RunDetails;
+      options.localMode,
+      options.promptFilter
+    ).slice(0, options.limit);
+    const progress =
+      options.logging === 'dynamic'
+        ? new DynamicProgressLogger()
+        : new TextProgressLogger();
+    const appConcurrency =
+      options.concurrency === 'auto'
+        ? Math.floor(availableParallelism() * 0.8)
+        : options.concurrency;
 
-  return {
-    id: randomUUID(),
-    group: getRunGroupId(timestamp, env, options),
-    version: REPORT_VERSION,
-    results,
-    details,
-  } satisfies RunInfo;
+    if (promptsToProcess.length === 0) {
+      throw new UserFacingError(
+        `No prompts have been configured for environment '${env.displayName}'` +
+          (options.promptFilter
+            ? ` and filtered by '${options.promptFilter}'.`
+            : '.')
+      );
+    }
+
+    // Scrolls the terminal back to the top so that our logging looks a bit cleaner.
+    // via https://stackoverflow.com/questions/9006988/node-js-on-windows-how-to-clear-console
+    if (options.logging === 'dynamic') {
+      process.stdout.write('\x1Bc');
+    }
+
+    logReportHeader(env, promptsToProcess.length, appConcurrency, options);
+
+    // We need Chrome to collect runtime information.
+    await installChrome();
+
+    if (
+      env instanceof LocalEnvironment &&
+      options.startMcp &&
+      env.mcpServerOptions.length &&
+      env.llm.startMcpServerHost
+    ) {
+      env.llm.startMcpServerHost(
+        `mcp-${env.clientSideFramework.id}`,
+        env.mcpServerOptions
+      );
+    }
+
+    progress.initialize(promptsToProcess.length);
+
+    const appConcurrencyQueue = new PQueue({ concurrency: appConcurrency });
+    const workerConcurrencyQueue = new PQueue({
+      concurrency:
+        options.concurrency === 'auto'
+          ? // Building can be really expensive. We likely should add support for "CPU hints" per environment.
+            // E.g. CLI building is really CPU intensive with ESBuild being multi-core.
+            // TODO: Follow-up on this and add CPU hints.
+            Math.floor(availableParallelism() * 0.4 * 0.5)
+          : Infinity,
+    });
+
+    const allTasks: Promise<AssessmentResult[]>[] = [];
+    const failedPrompts: CompletionStats['failedPrompts'] = [];
+
+    for (const rootPromptDef of promptsToProcess) {
+      allTasks.push(
+        appConcurrencyQueue.add(
+          async () => {
+            const evalID = await env.gateway.initializeEval();
+
+            try {
+              return await callWithTimeout(
+                `Evaluation of ${rootPromptDef.name}`,
+                async (abortSignal) =>
+                  startEvaluationTask(
+                    evalID,
+                    env,
+                    env.gateway,
+                    options.ratingLlm,
+                    options.model,
+                    rootPromptDef,
+                    options.localMode,
+                    options.skipScreenshots,
+                    options.outputDirectory,
+                    options.ragEndpoint,
+                    abortSignal,
+                    options.skipAxeTesting,
+                    !!options.enableUserJourneyTesting,
+                    !!options.enableAutoCsp,
+                    workerConcurrencyQueue,
+                    progress,
+                    options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME
+                  ),
+                // 10min max per app evaluation.  We just want to make sure it never gets stuck.
+                10
+              );
+            } catch (e: unknown) {
+              failedPrompts.push({
+                promptName: rootPromptDef.name,
+                error: `${e}`,
+                stack: e instanceof Error ? e.stack : undefined,
+              });
+
+              let details = `Error: ${e}`;
+              if (e instanceof Error && e.stack) {
+                details += `\nStack: ${e.stack}`;
+              }
+
+              progress.log(
+                rootPromptDef,
+                'error',
+                'Failed to evaluate code',
+                details
+              );
+              return [] satisfies AssessmentResult[];
+            } finally {
+              progress.log(rootPromptDef, 'done', 'Done');
+
+              await env.gateway.finalizeEval(evalID);
+            }
+          },
+          { throwOnTimeout: true }
+        )
+      );
+    }
+
+    const results = (await Promise.all(allTasks))
+      .flat()
+      .sort((a, b) => a.promptDef.name.localeCompare(b.promptDef.name));
+
+    // Sanity check. Should be a noop because app queue is a parent of worker-awaited tasks.
+    await workerConcurrencyQueue.onEmpty();
+    progress.finalize();
+
+    const mcp =
+      env instanceof LocalEnvironment &&
+      options.startMcp &&
+      env.mcpServerOptions.length > 0 &&
+      env.llm.startMcpServerHost &&
+      env.llm.flushMcpServerLogs
+        ? {
+            servers: env.mcpServerOptions.map((m) => ({
+              name: m.name,
+              command: m.command,
+              args: m.args,
+            })),
+            logs: env.llm.flushMcpServerLogs().join('\n'),
+          }
+        : undefined;
+
+    const timestamp = new Date();
+    const details = {
+      summary: await prepareSummary(
+        options.ratingLlm,
+        new AbortController().signal, // Note: AI summarization is currently not abortable.
+        options.model,
+        env,
+        results,
+        {
+          allPromptsCount: promptsToProcess.length,
+          failedPrompts,
+        },
+        options
+      ),
+      timestamp: timestamp.toISOString(),
+      reportName: options.reportName,
+      systemPromptGeneration: env.classifyPrompts
+        ? 'Classified 🕵️'
+        : env.systemPromptGeneration(),
+      systemPromptRepair: env.classifyPrompts
+        ? 'Classified 🕵️'
+        : env.systemPromptRepair(),
+      // Deduplicate labels before finalizing the report.
+      labels: Array.from(new Set(options.labels)),
+      mcp,
+    } satisfies RunDetails;
+
+    return {
+      id: randomUUID(),
+      group: getRunGroupId(timestamp, env, options),
+      version: REPORT_VERSION,
+      results,
+      details,
+    } satisfies RunInfo;
+  } finally {
+    if (env instanceof LocalEnvironment) {
+      await env.llm.dispose();
+    }
+  }
 }
 
 /**
@@ -273,8 +299,9 @@ export async function generateCodeAndAssess(options: {
  * This function handles both online (AI-generated) and local (file-based) code retrieval.
  * It manages build attempts and AI-driven repair cycles.
  *
- * @param framework Name of the framework to use.
- * @param llm LLM runner.
+ * @param evalID ID of the evaluation task.
+ * @param env Environment for this evaluation.
+ * @param gateway Gateway.
  * @param model Name of the LLM to use.
  * @param rootPromptDef Definition of the root prompt being processed.
  * @param localMode A boolean indicating whether to load code from local files instead of generating it.
@@ -287,8 +314,9 @@ export async function generateCodeAndAssess(options: {
  * @returns A Promise that resolves to an AssessmentResult object containing all details of the task's execution.
  */
 async function startEvaluationTask(
+  evalID: EvalID,
   env: Environment,
-  llm: LlmRunner,
+  gateway: Gateway<Environment>,
   ratingLlm: GenkitRunner,
   model: string,
   rootPromptDef: PromptDefinition | MultiStepPromptDefinition,
@@ -331,7 +359,8 @@ async function startEvaluationTask(
 
     // Generate the initial set of files through the LLM.
     const initialResponse = await generateInitialFiles(
-      llm,
+      evalID,
+      gateway,
       model,
       env,
       promptDef,
@@ -340,8 +369,10 @@ async function startEvaluationTask(
         systemInstructions,
         combinedPrompt: fullPromptText,
         executablePrompt: promptDef.prompt,
-        packageManager: env.packageManager,
-        buildCommand: env.buildCommand,
+        packageManager:
+          env instanceof LocalEnvironment ? env.packageManager : undefined,
+        buildCommand:
+          env instanceof LocalEnvironment ? env.buildCommand : undefined,
         possiblePackageManagers: getPossiblePackageManagers().slice(),
       },
       contextFiles,
@@ -425,7 +456,8 @@ async function startEvaluationTask(
     // Try to build the files in the root prompt directory.
     // This will also attempt to fix issues with the generated code.
     const attempt = await attemptBuild(
-      llm,
+      evalID,
+      gateway,
       model,
       env,
       rootPromptDef,
@@ -433,12 +465,12 @@ async function startEvaluationTask(
       contextFiles,
       initialResponse,
       attemptDetails,
-      skipScreenshots,
-      skipAxeTesting,
-      enableAutoCsp,
       abortSignal,
       workerConcurrencyQueue,
       progress,
+      skipScreenshots,
+      skipAxeTesting,
+      enableAutoCsp,
       userJourneyAgentTaskInput
     );
 
@@ -454,6 +486,7 @@ async function startEvaluationTask(
       fullPromptText,
       attempt.outputFiles,
       attempt.buildResult,
+      attempt.serveTestingResult,
       attempt.repairAttempts,
       attempt.axeRepairAttempts,
       abortSignal,
@@ -469,7 +502,7 @@ async function startEvaluationTask(
         prompt: promptDef.prompt,
       },
       outputFiles: attempt.outputFiles,
-      build: attempt.buildResult,
+      finalAttempt: attempt,
       score,
       repairAttempts: attempt.repairAttempts,
       attemptDetails,
@@ -485,8 +518,9 @@ async function startEvaluationTask(
 
 /**
  * Generates the initial files for a prompt using an LLM.
- * @param llm LLM runner.
- * @param model Name of the LLM to use.
+ * @param evalID ID of the eval for which files are generated.
+ * @param gateway Gateway.
+ * @param model Name of the model used for generation.
  * @param env Environment that is currently being run.
  * @param promptName Name of the prompt being generated.
  * @param fullPromptText Full prompt to send to the LLM, including system instructions.
@@ -495,7 +529,8 @@ async function startEvaluationTask(
  * @param abortSignal Signal to fire when this process should be aborted.
  */
 async function generateInitialFiles(
-  llm: LlmRunner,
+  evalID: EvalID,
+  gateway: Gateway<Environment>,
   model: string,
   env: Environment,
   promptDef: RootPromptDefinition,
@@ -532,16 +567,31 @@ async function generateInitialFiles(
     };
   }
 
-  const response = await generateCodeWithAI(
-    llm,
-    model,
+  progress.log(promptDef, 'codegen', 'Generating code with AI');
+
+  const response = await gateway.generateInitialFiles(
+    evalID,
     codegenContext,
-    'codegen',
-    promptDef,
+    model,
     contextFiles,
-    abortSignal,
-    progress
+    abortSignal
   );
+
+  if (response.success) {
+    progress.log(
+      promptDef,
+      'codegen',
+      'Received AI code generation response',
+      createLlmResponseTokenUsageMessage(response) ?? ''
+    );
+  } else {
+    progress.log(
+      promptDef,
+      'error',
+      'Failed to generate code with AI',
+      response.errors.join(', ')
+    );
+  }
 
   if (!response.success) {
     throw new Error(
@@ -562,7 +612,6 @@ async function generateInitialFiles(
  * and also some extra metadata about the run.
  */
 async function prepareSummary(
-  llm: LlmRunner,
   genkit: GenkitRunner,
   abortSignal: AbortSignal,
   model: string,
@@ -635,8 +684,9 @@ async function prepareSummary(
       totalTokens,
     },
     runner: {
-      id: llm.id,
-      displayName: llm.displayName,
+      id: env instanceof LocalEnvironment ? env.llm.id : 'remote',
+      displayName:
+        env instanceof LocalEnvironment ? env.llm.displayName : 'Remote',
     },
   } satisfies RunSummary;
 }

@@ -19,6 +19,7 @@ import { globSync } from 'tinyglobby';
 import { executeCommand } from '../utils/exec.js';
 import { UserFacingError } from '../utils/errors.js';
 import { ProgressLogger } from '../progress/progress-logger.js';
+import { LocalEnvironment } from '../configuration/environment-local.js';
 
 const SYMLINK_PROJECT_PATHS = new Set(['node_modules']);
 const PENDING_INSTALLS = new Map<string, Promise<void>>();
@@ -64,7 +65,7 @@ export async function setupProjectStructure(
 
   const directoriesToCopy: string[] = [];
 
-  if (env.projectTemplatePath) {
+  if (env instanceof LocalEnvironment && env.projectTemplatePath) {
     // Copy the template files first.
     directoriesToCopy.push(env.projectTemplatePath);
 
@@ -81,7 +82,7 @@ export async function setupProjectStructure(
     }
   }
 
-  if (env.sourceDirectory) {
+  if (env instanceof LocalEnvironment && env.sourceDirectory) {
     // Push this after the project so the environment's files that precedence.
     directoriesToCopy.push(env.sourceDirectory);
 
@@ -113,7 +114,7 @@ export async function setupProjectStructure(
   // If the environment is built in, it'll likely be inside of the user's `node_modules`.
   // Since running an installation inside `node_modules` can be problematic, we install
   // in the temporary directory instead. This can be slower, but is more reliable.
-  if (env.isBuiltIn) {
+  if (env instanceof LocalEnvironment && env.isBuiltIn) {
     await installDependenciesInDirectory(
       env,
       rootPromptDef,
@@ -127,7 +128,7 @@ export async function setupProjectStructure(
 
 /** Run the package manager install command in a specific directory. */
 function installDependenciesInDirectory(
-  env: Environment,
+  env: LocalEnvironment,
   rootPromptDef: RootPromptDefinition,
   directory: string,
   progress: ProgressLogger

@@ -12,7 +12,7 @@ import {
 } from '../configuration/constants.js';
 import { calculateBuildAndCheckStats } from '../ratings/stats.js';
 import { safeWriteFile } from '../file-system-utils.js';
-import { BuildResultStatus } from '../builder/builder-types.js';
+import { BuildResultStatus } from '../workers/builder/builder-types.js';
 import {
   formatTokenCount,
   greenCheckmark,
@@ -25,6 +25,7 @@ import {
 import { Environment } from '../configuration/environment.js';
 import { LlmRunner } from '../codegen/llm-runner.js';
 import { groupSimilarReports } from '../orchestration/grouping.js';
+import { LocalEnvironment } from '../configuration/environment-local.js';
 
 /**
  * Generates a structured report on fs, based on the assessment run information.
@@ -88,6 +89,7 @@ export async function writeReportToDisk(
           0
         ),
         buildResult: attempt.buildResult,
+        serveTestingResult: attempt.serveTestingResult,
       };
       const statsCodePath = join(attemptPath, 'stats.json');
       await safeWriteFile(statsCodePath, printJson(statsJson));
@@ -108,20 +110,20 @@ export async function writeReportToDisk(
 
       // Write screenshot to fs first, since we'll remove this info
       // from JSON later in this function.
-      if (attempt.buildResult.screenshotPngUrl) {
+      if (attempt.serveTestingResult?.screenshotPngUrl) {
         const screenshotFilePath = join(attemptPath, 'screenshot.png');
 
         // Note: In practice this is a base64 data URL, but `fetch` conveniently
         // allows us to extract the content for writing a PNG to disk.
         const screenshotContent = await (
-          await fetch(attempt.buildResult.screenshotPngUrl)
+          await fetch(attempt.serveTestingResult.screenshotPngUrl)
         ).arrayBuffer();
 
         await safeWriteFile(screenshotFilePath, Buffer.from(screenshotContent));
       }
 
       // Write the safety web report if it exists.
-      if (attempt.buildResult.safetyWebReportJson) {
+      if (attempt.buildResult?.safetyWebReportJson) {
         const reportFilePath = join(attemptPath, 'safety-web.json');
         await safeWriteFile(
           reportFilePath,
@@ -131,13 +133,13 @@ export async function writeReportToDisk(
 
       // Write the CSP violations if they exist.
       if (
-        attempt.buildResult.cspViolations &&
-        attempt.buildResult.cspViolations.length > 0
+        attempt.serveTestingResult?.cspViolations &&
+        attempt.serveTestingResult.cspViolations.length > 0
       ) {
         const reportFilePath = join(attemptPath, 'csp-violations.json');
         await safeWriteFile(
           reportFilePath,
-          JSON.stringify(attempt.buildResult.cspViolations, null, 2)
+          JSON.stringify(attempt.serveTestingResult.cspViolations, null, 2)
         );
       }
     }
@@ -160,7 +162,6 @@ export function logReportHeader(
   concurrency: number,
   options: {
     model: string;
-    llm: LlmRunner;
     labels: string[];
     startMcp?: boolean;
     autoraterModel?: string;
@@ -175,8 +176,10 @@ export function logReportHeader(
     options.autoraterModel !== DEFAULT_AUTORATER_MODEL_NAME
       ? ` - Autorater model: ${options.autoraterModel}`
       : null,
-    ` - Runner: ${options.llm.displayName}`,
-    ` - MCP servers: ${options.startMcp && env.mcpServerOptions.length ? env.mcpServerOptions.length : 'none'}`,
+    ` - Runner: ${env instanceof LocalEnvironment ? env.llm.displayName : 'Remote'}`,
+    env instanceof LocalEnvironment
+      ? ` - MCP servers: ${options.startMcp && env.mcpServerOptions.length ? env.mcpServerOptions.length : 'none'}`
+      : null,
     options.labels.length ? ` - Labels: ${options.labels.join(', ')}` : null,
     ` - Concurrency: ${concurrency}`,
     ` - Framework: ${env.clientSideFramework.displayName}`,

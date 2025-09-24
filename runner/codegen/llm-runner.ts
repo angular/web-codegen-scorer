@@ -98,14 +98,24 @@ export interface LlmGenerateFilesContext {
   /**
    * Combined system instructions and prompt for the environments
    * where the two can't be provided separately.
+   *
+   * TODO(crisbeto): Can we explain the reason for this better?
    */
   combinedPrompt: string;
   /** Directory in which the generation will occur. */
   directory: string;
-  /** Command that the LLM can use to verify that the build works. */
-  buildCommand: string;
-  /** Package manager that the LLM can use. */
-  packageManager: string;
+  /**
+   * Command that the LLM can use to verify that the build works.
+   *
+   * Can be `undefined` for remote environments.
+   */
+  buildCommand: string | undefined;
+  /**
+   * Package manager that the LLM can use.
+   *
+   * Can be `undefined` for remote environments.
+   */
+  packageManager: string | undefined;
   /** All available package managers supported by the runner. */
   possiblePackageManagers: string[];
 }

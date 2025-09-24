@@ -4,7 +4,7 @@ import {
   RatingKind,
   RatingState,
 } from '../rating-types.js';
-import { CspViolation } from '../../builder/auto-csp-types.js';
+import { CspViolation } from '../../workers/serve-testing/auto-csp-types.js';
 
 /**
  * Formats an array of CSP violations into a readable string for the report.
@@ -45,18 +45,17 @@ export const cspViolationsRating: PerBuildRating = {
   id: 'csp-violations',
   category: RatingCategory.HIGH_IMPACT,
   scoreReduction: '50%',
-  rate: ({ buildResult }) => {
-    const violations = buildResult.cspViolations?.filter(
-      (v) => v['violated-directive'] !== 'require-trusted-types-for'
-    );
-
-    if (!buildResult.cspViolations) {
+  rate: ({ serveResult }) => {
+    if (!serveResult?.cspViolations) {
       return {
         state: RatingState.SKIPPED,
         message: 'CSP violation data not available for this run.',
       };
     }
 
+    const violations = serveResult.cspViolations?.filter(
+      (v) => v['violated-directive'] !== 'require-trusted-types-for'
+    );
     if (!violations || violations.length === 0) {
       return {
         state: RatingState.EXECUTED,
@@ -86,17 +85,17 @@ export const trustedTypesViolationsRating: PerBuildRating = {
   id: 'trusted-types-violations',
   category: RatingCategory.HIGH_IMPACT,
   scoreReduction: '50%',
-  rate: ({ buildResult }) => {
-    const violations = buildResult.cspViolations?.filter(
-      (v) => v['violated-directive'] === 'require-trusted-types-for'
-    );
-
-    if (!buildResult.cspViolations) {
+  rate: ({ serveResult }) => {
+    if (!serveResult?.cspViolations) {
       return {
         state: RatingState.SKIPPED,
         message: 'Trusted Types violation data not available for this run.',
       };
     }
+
+    const violations = serveResult?.cspViolations?.filter(
+      (v) => v['violated-directive'] === 'require-trusted-types-for'
+    );
 
     if (!violations || violations.length === 0) {
       return {

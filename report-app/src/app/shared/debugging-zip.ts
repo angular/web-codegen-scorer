@@ -1,4 +1,4 @@
-import { BuildResultStatus } from '../../../../runner/builder/builder-types';
+import { BuildResultStatus } from '../../../../runner/workers/builder/builder-types';
 import {
   AssessmentResult,
   RunInfo,
@@ -31,11 +31,11 @@ export async function createPromptDebuggingZip(
   zip.file('generated-files.md', generatedFiles);
 
   let errors = ``;
-  if (app.build.runtimeErrors) {
-    errors += `## Runtime errors\n${app.build.runtimeErrors}\n`;
+  if (app.finalAttempt.serveTestingResult?.runtimeErrors) {
+    errors += `## Runtime errors\n${app.finalAttempt.serveTestingResult?.runtimeErrors}\n`;
   }
-  if (app.build.status === BuildResultStatus.ERROR) {
-    errors += `## Build error\n  ${app.build.message}`;
+  if (app.finalAttempt.buildResult.status === BuildResultStatus.ERROR) {
+    errors += `## Build error\n  ${app.finalAttempt.buildResult.message}`;
   }
 
   zip.file('errors.md', errors);

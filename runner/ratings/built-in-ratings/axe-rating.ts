@@ -27,8 +27,8 @@ export const axeRating: PerBuildRating = {
   category: RatingCategory.MEDIUM_IMPACT,
   id: 'axe-a11y',
   scoreReduction: '10%',
-  rate: ({ buildResult, axeRepairAttempts }) => {
-    const violations = buildResult.axeViolations as Result[] | undefined;
+  rate: ({ serveResult, axeRepairAttempts }) => {
+    const violations = serveResult?.axeViolations as Result[] | undefined;
     // Start with a perfect score.
     let coefficient = 1.0;
     let message: string = '';

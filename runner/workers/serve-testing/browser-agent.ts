@@ -1,21 +1,21 @@
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { runPythonAgentScript } from '../testing/browser-agent/index.js';
+import { runPythonAgentScript } from '../../testing/browser-agent/index.js';
 import {
   AgentOutput,
   BrowserAgentTaskInput,
-} from '../testing/browser-agent/models.js';
-import { callWithTimeout } from '../utils/timeout.js';
-import { binaryExists } from '../utils/binary-exists.js';
-import { BuilderProgressLogFn } from './builder-types.js';
-import { UserFacingError } from '../utils/errors.js';
+} from '../../testing/browser-agent/models.js';
+import { callWithTimeout } from '../../utils/timeout.js';
+import { binaryExists } from '../../utils/binary-exists.js';
+import { UserFacingError } from '../../utils/errors.js';
+import { ServeTestingProgressLogFn } from './worker-types.js';
 
 export async function runBrowserAgentUserJourneyTests(
   appName: string,
   hostUrl: string,
   agentTask: BrowserAgentTaskInput,
-  progressLog: BuilderProgressLogFn
+  progressLog: ServeTestingProgressLogFn
 ): Promise<AgentOutput | null> {
   const tmpDir = await mkdtemp(
     join(tmpdir(), 'browser-agent-user-journey-task-')

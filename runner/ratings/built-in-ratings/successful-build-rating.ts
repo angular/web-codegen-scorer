@@ -1,4 +1,4 @@
-import { BuildResultStatus } from '../../builder/builder-types.js';
+import { BuildResultStatus } from '../../workers/builder/builder-types.js';
 import {
   PerBuildRating,
   RatingKind,

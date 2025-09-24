@@ -18,7 +18,10 @@ export const visualAppearanceRating: LLMBasedRating = {
   scoreReduction: '30%',
   id: 'common-autorater-visuals',
   rate: async (ctx) => {
-    if (ctx.buildResult.screenshotPngUrl === undefined) {
+    if (
+      ctx.serveTestingResult === null ||
+      ctx.serveTestingResult.screenshotPngUrl === undefined
+    ) {
       return {
         state: RatingState.SKIPPED,
         message: 'No screenshot available',
@@ -34,7 +37,7 @@ export const visualAppearanceRating: LLMBasedRating = {
         ctx.model,
         ctx.environment,
         ctx.fullPromptText,
-        ctx.buildResult.screenshotPngUrl,
+        ctx.serveTestingResult.screenshotPngUrl,
         ctx.currentPromptDef.name
       );
     } catch (e) {

@@ -1,12 +1,10 @@
 import { AxePuppeteer } from '@axe-core/puppeteer';
 import { Result } from 'axe-core';
-import { readFile } from 'fs/promises';
-import path from 'path';
 import puppeteer from 'puppeteer';
-import { callWithTimeout } from '../utils/timeout.js';
-import { BuilderProgressLogFn } from './builder-types.js';
+import { callWithTimeout } from '../../utils/timeout.js';
 import { AutoCsp } from './auto-csp.js';
 import { CspViolation } from './auto-csp-types.js';
+import { ServeTestingProgressLogFn } from './worker-types.js';
 
 /**
  * Uses Puppeteer to take a screenshot of the main page, perform Axe testing,
@@ -16,10 +14,9 @@ import { CspViolation } from './auto-csp-types.js';
 export async function runAppInPuppeteer(
   appName: string,
   hostUrl: string,
-  tempDir: string,
   takeScreenshots: boolean,
   includeAxeTesting: boolean,
-  progressLog: BuilderProgressLogFn,
+  progressLog: ServeTestingProgressLogFn,
   enableAutoCsp: boolean
 ) {
   const runtimeErrors: string[] = [];
@@ -80,7 +77,7 @@ export async function runAppInPuppeteer(
 
     // Set up auto-CSP handling if enabled for the environment.
     if (enableAutoCsp) {
-      const autoCsp = new AutoCsp(hostUrl, tempDir);
+      const autoCsp = new AutoCsp();
       await autoCsp.connectToDevTools(page);
       await page.setRequestInterception(true);
       page.on('request', async (request) => {
@@ -136,21 +133,17 @@ export async function runAppInPuppeteer(
 
     if (takeScreenshots) {
       progressLog('eval', `Taking screenshot from ${hostUrl}`);
-      const tempScreenshotFilePath = path.join(tempDir, 'screenshot');
 
-      await callWithTimeout(
+      screenshotBase64Data = await callWithTimeout(
         `Taking screenshot for ${appName}`,
         () =>
           page.screenshot({
-            path: `${tempScreenshotFilePath}.png`,
             type: 'png',
             fullPage: true,
+            encoding: 'base64',
           }),
         1 // 1 minute
       );
-      screenshotBase64Data = await readFile(`${tempScreenshotFilePath}.png`, {
-        encoding: 'base64',
-      });
       progressLog('success', 'Screenshot captured and encoded');
     }
     await browser.close();

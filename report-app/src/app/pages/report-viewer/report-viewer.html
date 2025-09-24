@@ -257,22 +257,22 @@
               {{ result.promptDef.name }}
 
               <div class="status-badge-group">
-                @let initialBuild = result.attemptDetails[0].buildResult;
-                @let repairBuild =
+                @let initialAttempt = result.attemptDetails[0];
+                @let repairAttempt =
                   result.attemptDetails.length > 1
-                    ? result.attemptDetails[1].buildResult
+                    ? result.attemptDetails[1]
                     : null;
-                @let finalBuild = repairBuild ?? initialBuild;
+                @let finalAttempt = result.attemptDetails.at(-1)!;
 
-                @if (finalBuild.runtimeErrors) {
+                @if (finalAttempt.serveTestingResult?.runtimeErrors) {
                   <span class="status-badge error">Runtime error</span>
                 }
 
-                @if (repairBuild?.status === 'error') {
+                @if (repairAttempt?.buildResult?.status === 'error') {
                   <span class="status-badge error">Build after repair</span>
                 }
 
-                @if (initialBuild.status === 'error') {
+                @if (initialAttempt?.buildResult?.status === 'error') {
                   <span class="status-badge error">Initial build failed</span>
                 }
               </div>
@@ -354,7 +354,8 @@
                 <h4>Additional info</h4>
                 @for (attempt of result.attemptDetails; track attempt) {
                   @let isBuilt = attempt.buildResult.status === 'success';
-                  @let axeViolations = attempt.buildResult.axeViolations;
+                  @let axeViolations =
+                    attempt.serveTestingResult?.axeViolations;
                   @let hasAxeViolations =
                     axeViolations && axeViolations.length > 0;
 
@@ -501,12 +502,12 @@
                 }
               </div>
 
-              @if (finalBuild.runtimeErrors) {
+              @let finalRuntimeErrors =
+                finalAttempt.serveTestingResult?.runtimeErrors;
+              @if (finalRuntimeErrors) {
                 <div class="app-details-section">
                   <h4>Runtime errors</h4>
-                  <pre class="callout warn code">{{
-                    finalBuild.runtimeErrors
-                  }}</pre>
+                  <pre class="callout warn code">{{ finalRuntimeErrors }}</pre>
                 </div>
               }
 

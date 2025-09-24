@@ -12,7 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
-import { BuildErrorType } from '../../../../../runner/builder/builder-types';
+import { BuildErrorType } from '../../../../../runner/workers/builder/builder-types';
 import {
   AssessmentResult,
   IndividualAssessment,
@@ -237,7 +237,7 @@ export class ReportViewer {
   });
 
   protected getScreenshotUrl(result: AssessmentResult): string | null {
-    return result.build.screenshotPngUrl ?? null;
+    return result.finalAttempt.serveTestingResult?.screenshotPngUrl ?? null;
   }
 
   protected isLoading = this.reportsFetcher.isLoadingSingleReport;

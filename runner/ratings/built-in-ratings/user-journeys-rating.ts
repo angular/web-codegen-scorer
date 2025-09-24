@@ -14,15 +14,15 @@ export const userJourneysRating: PerBuildRating = {
   kind: RatingKind.PER_BUILD,
   category: RatingCategory.MEDIUM_IMPACT,
   scoreReduction: '30%',
-  rate: ({ buildResult }) => {
-    if (buildResult.userJourneyAgentOutput === null) {
+  rate: ({ serveResult }) => {
+    if (serveResult === null || serveResult.userJourneyAgentOutput === null) {
       return {
         state: RatingState.SKIPPED,
         message: 'Was not enabled for this run',
       };
     }
 
-    const output = buildResult.userJourneyAgentOutput;
+    const output = serveResult.userJourneyAgentOutput;
     if (output.errors !== undefined) {
       return {
         coefficient: 0,

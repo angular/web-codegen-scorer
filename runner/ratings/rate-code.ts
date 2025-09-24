@@ -1,4 +1,4 @@
-import { BuildResult } from '../builder/builder-types.js';
+import { BuildResult } from '../workers/builder/builder-types.js';
 import { extname } from 'path';
 import {
   IndividualAssessment,
@@ -26,6 +26,7 @@ import { Environment } from '../configuration/environment.js';
 import { GenkitRunner } from '../codegen/genkit/genkit-runner.js';
 import { ProgressLogger } from '../progress/progress-logger.js';
 import { UserFacingError } from '../utils/errors.js';
+import { ServeTestingResult } from '../workers/serve-testing/worker-types.js';
 
 interface FileOrEmbeddedSyntheticFile {
   /**
@@ -51,6 +52,7 @@ export async function rateGeneratedCode(
   fullPromptText: string,
   outputFiles: LlmResponseFile[],
   buildResult: BuildResult,
+  serveTestingResult: ServeTestingResult | null,
   repairAttempts: number,
   axeRepairAttempts: number,
   abortSignal: AbortSignal,
@@ -68,7 +70,7 @@ export async function rateGeneratedCode(
     totalTokens: 0,
   };
 
-  progress.log(currentPromptDef, 'eval', 'Evaluating generated code');
+  progress.log(currentPromptDef, 'eval', 'Rating generated code');
 
   const categories: AssessmentCategory[] = [
     RatingCategory.HIGH_IMPACT,
@@ -90,6 +92,7 @@ export async function rateGeneratedCode(
         result = runPerBuildRating(
           current,
           buildResult,
+          serveTestingResult,
           repairAttempts,
           outputFiles.length,
           axeRepairAttempts
@@ -106,6 +109,7 @@ export async function rateGeneratedCode(
           llm,
           outputFiles,
           buildResult,
+          serveTestingResult,
           repairAttempts,
           axeRepairAttempts,
           abortSignal,
@@ -171,12 +175,14 @@ export async function rateGeneratedCode(
 function runPerBuildRating(
   rating: PerBuildRating,
   buildResult: BuildResult,
+  serveResult: ServeTestingResult | null,
   repairAttempts: number,
   generatedFileCount: number,
   axeRepairAttempts: number
 ): IndividualAssessment | SkippedIndividualAssessment {
   const rateResult = rating.rate({
     buildResult,
+    serveResult,
     repairAttempts,
     generatedFileCount,
     axeRepairAttempts,
@@ -269,6 +275,7 @@ async function runLlmBasedRating(
   llm: GenkitRunner,
   outputFiles: LlmResponseFile[],
   buildResult: BuildResult,
+  serveTestingResult: ServeTestingResult | null,
   repairAttempts: number,
   axeRepairAttempts: number,
   abortSignal: AbortSignal,
@@ -282,6 +289,7 @@ async function runLlmBasedRating(
     model: autoraterModel,
     outputFiles,
     buildResult,
+    serveTestingResult,
     repairAttempts,
     axeRepairAttempts,
     abortSignal,

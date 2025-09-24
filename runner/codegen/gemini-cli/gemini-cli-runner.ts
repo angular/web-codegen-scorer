@@ -18,6 +18,7 @@ import {
 import { DirectorySnapshot } from './directory-snapshot.js';
 import { LlmResponseFile } from '../../shared-interfaces.js';
 import { UserFacingError } from '../../utils/errors.js';
+import assert from 'assert';
 
 const SUPPORTED_MODELS = [
   'gemini-2.5-pro',
@@ -45,6 +46,19 @@ export class GeminiCliRunner implements LlmRunner {
     options: LlmGenerateFilesRequestOptions
   ): Promise<LlmGenerateFilesResponse> {
     const { context, model } = options;
+
+    // TODO: Consider removing these assertions when we have better types here.
+    // These fields are always set when running in a local environment, and this
+    // is a requirement for selecting the `gemini-cli` runner.
+    assert(
+      context.buildCommand,
+      'Expected a `buildCommand` to be set in the LLM generate request context'
+    );
+    assert(
+      context.packageManager,
+      'Expected a `packageManager` to be set in the LLM generate request context'
+    );
+
     const ignoreFilePath = join(context.directory, '.geminiignore');
     const instructionFilePath = join(context.directory, 'GEMINI.md');
     const settingsDir = join(context.directory, '.gemini');

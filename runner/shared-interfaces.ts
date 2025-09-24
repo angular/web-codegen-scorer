@@ -1,8 +1,12 @@
-import type { BuildErrorType, BuildResult } from './builder/builder-types.js';
+import type {
+  BuildErrorType,
+  BuildResult,
+} from './workers/builder/builder-types.js';
 import type { REPORT_VERSION } from './configuration/constants.js';
 import type { UserJourneysResult } from './orchestration/user-journeys.js';
 import type { AutoRateResult } from './ratings/autoraters/auto-rate-shared.js';
 import type { Rating, RatingCategory } from './ratings/rating-types.js';
+import type { ServeTestingResult } from './workers/serve-testing/worker-types.js';
 
 /**
  * Represents a single prompt definition and extra metadata for it.
@@ -210,6 +214,8 @@ export interface AttemptDetails {
   outputFiles: LlmResponseFile[];
   /** The result of the build process for this attempt's code. */
   buildResult: BuildResult;
+  /** The result of testing the served app with this attempt's code. */
+  serveTestingResult: ServeTestingResult | null;
   /** The sequential number of this attempt (0 for initial generation, 1+ for repairs). */
   attempt: number;
   /** Captures usage details (# of input and output tokens) */
@@ -396,8 +402,11 @@ export interface AssessmentResult {
   promptDef: Pick<PromptDefinition, 'name' | 'prompt'>;
   /** The final version of the generated source code after all attempts. */
   outputFiles: LlmResponseFile[];
-  /** The final build result for the generated code. */
-  build: BuildResult;
+  /** The final attempt of the app. */
+  finalAttempt: {
+    buildResult: BuildResult;
+    serveTestingResult: ServeTestingResult | null;
+  };
   /** The code quality assessment score. */
   score: CodeAssessmentScore;
   /** The number of repair attempts made after the initial code generation. */
