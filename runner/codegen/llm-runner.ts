@@ -148,7 +148,7 @@ interface BaseLlmGenerateResponse {
   /** Reasoning messages from the LLM. */
   reasoning: string;
   /** Tool requests and responses. */
-  toolLogs: ToolLogEntry[];
+  toolLogs?: ToolLogEntry[];
 }
 
 /** File generation response from the LLM. */

@@ -350,7 +350,7 @@ async function startEvaluationTask(
       progress
     );
 
-    const toolLogs = initialResponse.toolLogs;
+    const toolLogs = initialResponse.toolLogs ?? [];
 
     if (!initialResponse) {
       progress.log(
@@ -688,7 +688,7 @@ async function installChrome(): Promise<void> {
 
   try {
     await chromeInstallPromise;
-  } catch {}
+  } catch {} // Ignore errors here, as it might be already installed.
 }
 
 /**

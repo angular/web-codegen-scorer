@@ -106,7 +106,7 @@ export interface LlmResponse {
   /** Reasoning messages from the LLM for generating this response. */
   reasoning: string;
   /** Tool requests logs (e.g. MCP requests and responses). */
-  toolLogs: ToolLogEntry[];
+  toolLogs?: ToolLogEntry[];
 }
 
 /** Error response from an LLM API. */
@@ -409,7 +409,7 @@ export interface AssessmentResult {
   /** The number of repair attempts made after the axe initial failures. */
   axeRepairAttempts: number;
   /** Tool requests logs (e.g. MCP requests and responses). */
-  toolLogs: ToolLogEntry[];
+  toolLogs?: ToolLogEntry[];
 }
 
 /**

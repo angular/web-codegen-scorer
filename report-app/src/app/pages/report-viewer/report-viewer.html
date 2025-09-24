@@ -411,7 +411,7 @@
                   (click)="downloadDebuggingZip(result)">
                   Download ZIP for debugging
                 </button>
-                @if (result.toolLogs.length > 0) {
+                @if (result.toolLogs && result.toolLogs.length > 0) {
                   <expansion-panel>
                     <expansion-panel-header>Tool Logs</expansion-panel-header>
                     <ul class="tool-logs-list">
