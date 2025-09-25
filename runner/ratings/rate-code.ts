@@ -20,6 +20,7 @@ import {
   POINTS_FOR_CATEGORIES,
   Rating,
   CATEGORY_NAMES,
+  RatingsContext,
 } from './rating-types.js';
 import { extractEmbeddedCodeFromTypeScript } from './embedded-languages.js';
 import { Environment } from '../configuration/environment.js';
@@ -62,6 +63,7 @@ export async function rateGeneratedCode(
   let categorizedFiles: CategorizedFiles | null = null;
   let totalPoints = 0;
   let maxOverallPoints = 0;
+  const ratingsContext: RatingsContext = {};
 
   // Rating may also invoke LLMs. Track the usage.
   const tokenUsage = {
@@ -95,11 +97,16 @@ export async function rateGeneratedCode(
           serveTestingResult,
           repairAttempts,
           outputFiles.length,
-          axeRepairAttempts
+          axeRepairAttempts,
+          ratingsContext
         );
       } else if (current.kind === RatingKind.PER_FILE) {
         categorizedFiles ??= splitFilesIntoCategories(outputFiles);
-        result = await runPerFileRating(current, categorizedFiles);
+        result = await runPerFileRating(
+          current,
+          categorizedFiles,
+          ratingsContext
+        );
       } else if (current.kind === RatingKind.LLM_BASED) {
         result = await runLlmBasedRating(
           environment,
@@ -113,7 +120,8 @@ export async function rateGeneratedCode(
           repairAttempts,
           axeRepairAttempts,
           abortSignal,
-          autoraterModel
+          autoraterModel,
+          ratingsContext
         );
       } else {
         throw new UserFacingError(`Unsupported rating type ${current}`);
@@ -139,6 +147,7 @@ export async function rateGeneratedCode(
       );
     }
 
+    ratingsContext[current.id] = result;
     category.assessments.push(result);
   }
 
@@ -178,7 +187,8 @@ function runPerBuildRating(
   serveResult: ServeTestingResult | null,
   repairAttempts: number,
   generatedFileCount: number,
-  axeRepairAttempts: number
+  axeRepairAttempts: number,
+  ratingsContext: RatingsContext
 ): IndividualAssessment | SkippedIndividualAssessment {
   const rateResult = rating.rate({
     buildResult,
@@ -186,6 +196,7 @@ function runPerBuildRating(
     repairAttempts,
     generatedFileCount,
     axeRepairAttempts,
+    ratingsContext,
   });
 
   // If the rating was skipped (e.g., Axe test wasn't run), create a skipped assessment.
@@ -203,7 +214,8 @@ function runPerBuildRating(
 
 async function runPerFileRating(
   rating: PerFileRating,
-  categorizedFiles: CategorizedFiles
+  categorizedFiles: CategorizedFiles,
+  ratingsContext: RatingsContext
 ): Promise<IndividualAssessment | SkippedIndividualAssessment> {
   const errorMessages: string[] = [];
   let contentType: PerFileRatingContentType;
@@ -234,7 +246,7 @@ async function runPerFileRating(
       // Remove comments from the code to avoid false-detection of bad patterns.
       // Some keywords like `NgModule` can be used in code comments.
       const code = removeComments(file.code, contentType);
-      const result = await rating.rate(code, file.filePath);
+      const result = await rating.rate(code, file.filePath, ratingsContext);
       let coeff: number;
 
       if (typeof result === 'number') {
@@ -279,7 +291,8 @@ async function runLlmBasedRating(
   repairAttempts: number,
   axeRepairAttempts: number,
   abortSignal: AbortSignal,
-  autoraterModel: string
+  autoraterModel: string,
+  ratingsContext: RatingsContext
 ): Promise<IndividualAssessment | SkippedIndividualAssessment> {
   const result = await rating.rate({
     environment,
@@ -293,6 +306,7 @@ async function runLlmBasedRating(
     repairAttempts,
     axeRepairAttempts,
     abortSignal,
+    ratingsContext,
   });
 
   if (result.state === RatingState.SKIPPED) {

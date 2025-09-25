@@ -1,8 +1,10 @@
 import z from 'zod';
 import { BuildResult } from '../workers/builder/builder-types.js';
 import type {
+  IndividualAssessment,
   LlmResponseFile,
   PromptDefinition,
+  SkippedIndividualAssessment,
   Usage,
 } from '../shared-interfaces.js';
 import { Environment } from '../configuration/environment.js';
@@ -64,6 +66,9 @@ const perBuildRatingSchema = z
           repairAttempts: z.number(),
           axeRepairAttempts: z.number(),
           generatedFileCount: z.number(),
+          ratingsContext: z.record(
+            z.custom<IndividualAssessment | SkippedIndividualAssessment>()
+          ),
         })
       )
       .returns(z.custom<PerBuildRatingResult>()),
@@ -76,7 +81,13 @@ const perFileRatingSchema = z
     kind: z.literal(RatingKind.PER_FILE),
     rate: z
       .function()
-      .args(z.string(), z.string().optional())
+      .args(
+        z.string(),
+        z.string().optional(),
+        z.record(
+          z.custom<IndividualAssessment | SkippedIndividualAssessment>()
+        )
+      )
       .returns(z.custom<PerFileRatingResult>()),
     filter: z.union([
       z
@@ -171,6 +182,11 @@ export interface ExecutedLLMBasedRating {
   };
 }
 
+export type RatingsContext = Record<
+  string,
+  IndividualAssessment | SkippedIndividualAssessment
+>;
+
 export interface LLMBasedRatingContext {
   environment: Environment;
   fullPromptText: string;
@@ -183,6 +199,7 @@ export interface LLMBasedRatingContext {
   repairAttempts: number;
   axeRepairAttempts: number;
   abortSignal: AbortSignal;
+  ratingsContext: RatingsContext;
 }
 
 /** Rating that applies over build results. */
