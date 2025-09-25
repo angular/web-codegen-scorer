@@ -86,10 +86,23 @@ export function calculateBuildAndCheckStats(
       }
     }
     securityStats ??= { appsWithErrors: 0, appsWithoutErrors: 0 };
-    const numCspViolations = (result.build.cspViolations || []).length;
+    const { numCspViolations, numTrustedTypesViolations } = (
+      result.build.cspViolations || []
+    ).reduce(
+      (acc, v) => {
+        if (v['blocked-uri'] === 'trusted-types-sink') {
+          acc.numTrustedTypesViolations++;
+        } else {
+          acc.numCspViolations++;
+        }
+        return acc;
+      },
+      { numCspViolations: 0, numTrustedTypesViolations: 0 }
+    );
+
     const hasSafetyViolations =
       (result.build.safetyWebReportJson?.[0]?.violations?.length ?? 0) > 0;
-
+    // TODO: Consider numTrustedTypesViolations once we update autoCsp and re-enable the rating.
     if (hasSafetyViolations || numCspViolations > 0) {
       securityStats.appsWithErrors++;
     } else {
