@@ -84,9 +84,7 @@ const perFileRatingSchema = z
       .args(
         z.string(),
         z.string().optional(),
-        z.record(
-          z.custom<IndividualAssessment | SkippedIndividualAssessment>()
-        )
+        z.record(z.custom<IndividualAssessment | SkippedIndividualAssessment>())
       )
       .returns(z.custom<PerFileRatingResult>()),
     filter: z.union([
