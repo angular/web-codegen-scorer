@@ -1,12 +1,18 @@
-import { getBuiltInRatings } from 'web-codegen-scorer';
+// @ts-check
 
-/** @type {import("web-codegen-scorer").EnvironmentConfig} */
+/**
+ * @import {RemoteEnvironmentConfig} from 'web-codegen-scorer';
+ */
+
+import { getBuiltInRatings } from 'web-codegen-scorer';
+import { FakeRemoteGateway } from './fake-gateway';
+
+/** @type {RemoteEnvironmentConfig} */
 export default {
   displayName: 'Remote Env (example)',
   clientSideFramework: 'angular',
-  sourceDirectory: './project',
   ratings: getBuiltInRatings(),
   generationSystemPrompt: './system-instructions.md',
   executablePrompts: ['../../prompts/**/*.md'],
-  packageManager: 'npm',
+  gateway: new FakeRemoteGateway(),
 };
