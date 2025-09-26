@@ -69,6 +69,9 @@ export async function autoRateCode(
     promptText = defaultCodeRaterPrompt;
   }
 
+  // At this point, we assume that safety-web checks have run.
+  // The order in runner/ratings/built-in.ts has been set to ensure this.
+  // (But it's entirely possible that a particular run has overridden a different order. )
   const safetyRating = ratingsResult['safety-web'];
   const safetyWebResultsJson =
     safetyRating?.state === IndividualAssessmentState.EXECUTED
