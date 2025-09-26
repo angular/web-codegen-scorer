@@ -20,6 +20,7 @@ import {
 export function getBuiltInRatings(): Rating[] {
   return [
     successfulBuildRating,
+    safetyWebRating,
     noRuntimeExceptionsRating,
     sufficientCodeSizeRating,
     sufficientGeneratedFilesRating,
@@ -27,7 +28,6 @@ export function getBuiltInRatings(): Rating[] {
     visualAppearanceRating,
     validCssRating,
     axeRating,
-    safetyWebRating,
     userJourneysRating,
     NoInnerHtmlBindingsRating,
     NoDangerouslySetInnerHtmlRating,

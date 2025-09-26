@@ -2,7 +2,12 @@ import { readFileSync } from 'node:fs';
 import { z } from 'zod';
 import { prepareContextFilesMessage } from '../../orchestration/codegen.js';
 import { Environment } from '../../configuration/environment.js';
-import { LlmResponseFile } from '../../shared-interfaces.js';
+import {
+  IndividualAssessment,
+  IndividualAssessmentState,
+  LlmResponseFile,
+  SkippedIndividualAssessment,
+} from '../../shared-interfaces.js';
 import {
   AutoRateResult,
   getCoefficient,
@@ -10,6 +15,7 @@ import {
 } from './auto-rate-shared.js';
 import { GenkitRunner } from '../../codegen/genkit/genkit-runner.js';
 import defaultCodeRaterPrompt from './code-rating-prompt.js';
+import { RatingsResult } from '../rating-types.js';
 
 /** Framework-specific hints for the rating prompt. */
 const FW_HINTS: Record<string, string | undefined> = {
@@ -33,6 +39,7 @@ const CACHED_RATING_PROMPTS: Record<string, string> = {};
  * @param environment Environment in which the rating is running.
  * @param files Files to be rated.
  * @param appPrompt Prompt to be used for the rating.
+ * @param ratingsResult Context containing results from previous ratings.
  */
 export async function autoRateCode(
   llm: GenkitRunner,
@@ -40,7 +47,8 @@ export async function autoRateCode(
   model: string,
   environment: Environment,
   files: LlmResponseFile[],
-  appPrompt: string
+  appPrompt: string,
+  ratingsResult: RatingsResult
 ): Promise<AutoRateResult> {
   const contextMessage = prepareContextFilesMessage(
     files.map((o) => ({
@@ -61,10 +69,25 @@ export async function autoRateCode(
     promptText = defaultCodeRaterPrompt;
   }
 
-  const prompt = environment.renderPrompt(promptText, null, {
-    APP_PROMPT: appPrompt,
-    FRAMEWORK_SPECIFIC_HINTS: FW_HINTS[environment.fullStackFramework.id] ?? '',
-  }).result;
+  // At this point, we assume that safety-web checks have run.
+  // The order in runner/ratings/built-in.ts has been set to ensure this.
+  // (But it's entirely possible that a particular run has overridden a different order. )
+  const safetyRating = ratingsResult['safety-web'];
+  const safetyWebResultsJson =
+    safetyRating?.state === IndividualAssessmentState.EXECUTED
+      ? JSON.stringify(safetyRating, null, 2)
+      : '';
+
+  const prompt = environment.renderPrompt(
+    promptText,
+    environment.codeRatingPromptPath,
+    {
+      APP_PROMPT: appPrompt,
+      FRAMEWORK_SPECIFIC_HINTS:
+        FW_HINTS[environment.fullStackFramework.id] ?? '',
+      SAFETY_WEB_RESULTS_JSON: safetyWebResultsJson,
+    }
+  ).result;
 
   const result = await llm.generateConstrained({
     abortSignal,
