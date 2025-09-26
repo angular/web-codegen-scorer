@@ -22,7 +22,7 @@ export const codeQualityRating: LLMBasedRating = {
       ctx.environment,
       ctx.outputFiles,
       ctx.fullPromptText,
-      ctx.ratingsContext
+      ctx.ratingsResult
     );
 
     return {

@@ -15,7 +15,7 @@ import {
 } from './auto-rate-shared.js';
 import { GenkitRunner } from '../../codegen/genkit/genkit-runner.js';
 import defaultCodeRaterPrompt from './code-rating-prompt.js';
-import { RatingsContext } from '../rating-types.js';
+import { RatingsResult } from '../rating-types.js';
 
 /** Framework-specific hints for the rating prompt. */
 const FW_HINTS: Record<string, string | undefined> = {
@@ -39,7 +39,7 @@ const CACHED_RATING_PROMPTS: Record<string, string> = {};
  * @param environment Environment in which the rating is running.
  * @param files Files to be rated.
  * @param appPrompt Prompt to be used for the rating.
- * @param ratingsContext Context containing results from previous ratings.
+ * @param ratingsResult Context containing results from previous ratings.
  */
 export async function autoRateCode(
   llm: GenkitRunner,
@@ -48,7 +48,7 @@ export async function autoRateCode(
   environment: Environment,
   files: LlmResponseFile[],
   appPrompt: string,
-  ratingsContext: RatingsContext
+  ratingsResult: RatingsResult
 ): Promise<AutoRateResult> {
   const contextMessage = prepareContextFilesMessage(
     files.map((o) => ({
@@ -69,7 +69,7 @@ export async function autoRateCode(
     promptText = defaultCodeRaterPrompt;
   }
 
-  const safetyRating = ratingsContext['safety-web'];
+  const safetyRating = ratingsResult['safety-web'];
   const safetyWebResultsJson =
     safetyRating?.state === IndividualAssessmentState.EXECUTED
       ? JSON.stringify(safetyRating, null, 2)

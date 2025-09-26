@@ -66,7 +66,7 @@ const perBuildRatingSchema = z
           repairAttempts: z.number(),
           axeRepairAttempts: z.number(),
           generatedFileCount: z.number(),
-          ratingsContext: z.record(
+          ratingsResult: z.record(
             z.custom<IndividualAssessment | SkippedIndividualAssessment>()
           ),
         })
@@ -180,7 +180,7 @@ export interface ExecutedLLMBasedRating {
   };
 }
 
-export type RatingsContext = Record<
+export type RatingsResult = Record<
   string,
   IndividualAssessment | SkippedIndividualAssessment
 >;
@@ -197,7 +197,7 @@ export interface LLMBasedRatingContext {
   repairAttempts: number;
   axeRepairAttempts: number;
   abortSignal: AbortSignal;
-  ratingsContext: RatingsContext;
+  ratingsResult: RatingsResult;
 }
 
 /** Rating that applies over build results. */

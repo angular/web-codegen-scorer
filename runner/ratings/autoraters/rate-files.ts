@@ -9,7 +9,7 @@ import { autoRateCode } from './code-rater.js';
 import { autoRateAppearance } from './visuals-rater.js';
 import { Environment } from '../../configuration/environment.js';
 import { GenkitRunner } from '../../codegen/genkit/genkit-runner.js';
-import { RatingsContext } from '../rating-types.js';
+import { RatingsResult } from '../rating-types.js';
 
 /**
  * Automatically rates the code inside of a file.
@@ -19,7 +19,7 @@ import { RatingsContext } from '../rating-types.js';
  * @param filePath Path to the file to be rated.
  * @param appPrompt Prompt that should be checked.
  * @param screenshotPath Path to the screenshot to use for visual rating.
- * @param ratingsContext Context containing results from previous ratings.
+ * @param ratingsResult Context containing results from previous ratings.
  */
 export async function autoRateFiles(
   llm: GenkitRunner,
@@ -29,7 +29,7 @@ export async function autoRateFiles(
   files: LlmResponseFile[],
   appPrompt: string,
   screenshotPngUrl: string | null,
-  ratingsContext: RatingsContext
+  ratingsResult: RatingsResult,
 ): Promise<AutoraterRunInfo> {
   console.log(`Autorater is using '${model}' model. \n`);
 
@@ -42,7 +42,7 @@ export async function autoRateFiles(
     environment,
     files,
     appPrompt,
-    ratingsContext
+    ratingsResult,
   );
   console.log(`${greenCheckmark()} Code scoring is successful.`);
 
