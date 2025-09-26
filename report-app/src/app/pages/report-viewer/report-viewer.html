@@ -12,7 +12,8 @@
         label="Score"
         size="large"
         [total]="overview.totalPoints"
-        [max]="overview.maxOverallPoints" />
+        [max]="overview.maxOverallPoints"
+      />
     </div>
     <div>
       <h2>{{ overview.displayName }}</h2>
@@ -31,9 +32,7 @@
       <div class="summary-grid">
         <div>
           <h3>Model</h3>
-          <provider-label
-            [id]="overview.model"
-            [label]="overview.model"/>
+          <provider-label [id]="overview.model" [label]="overview.model" />
         </div>
         @if (fw) {
           <div>
@@ -41,11 +40,13 @@
             <div class="framework-info">
               <provider-label
                 [id]="fw.fullStackFramework.id"
-                [label]="fw.fullStackFramework.displayName"/>
+                [label]="fw.fullStackFramework.displayName"
+              />
               @if (fw.clientSideFramework.id !== fw.fullStackFramework.id) {
                 <provider-label
                   [id]="fw.clientSideFramework.id"
-                  [label]="fw.clientSideFramework.displayName"/>
+                  [label]="fw.clientSideFramework.displayName"
+                />
               }
             </div>
           </div>
@@ -53,9 +54,7 @@
         @if (runner) {
           <div>
             <h3>Runner</h3>
-            <provider-label
-              [id]="runner.id"
-              [label]="runner.displayName"/>
+            <provider-label [id]="runner.id" [label]="runner.displayName" />
           </div>
         }
       </div>
@@ -113,7 +112,9 @@
             </h3>
             <div class="summary-card-item">
               <stacked-bar-chart
-                [data]="accessibilityStatsAsGraphData(overview.stats.accessibility)!"
+                [data]="
+                  accessibilityStatsAsGraphData(overview.stats.accessibility)!
+                "
                 [compact]="true"
               />
             </div>
@@ -124,11 +125,17 @@
       @if (details) {
         <h3>Usage Details</h3>
         <ul class="status-badge-group">
-          <li class="status-badge neutral">Input tokens: {{ details.summary.usage.inputTokens | number }}</li>
-          <li class="status-badge neutral">Output tokens: {{ details.summary.usage.outputTokens | number }}</li>
+          <li class="status-badge neutral">
+            Input tokens: {{ details.summary.usage.inputTokens | number }}
+          </li>
+          <li class="status-badge neutral">
+            Output tokens: {{ details.summary.usage.outputTokens | number }}
+          </li>
 
           @if (details.summary.usage.totalTokens != null) {
-            <li class="status-badge neutral">Total tokens: {{ details.summary.usage.totalTokens | number }}</li>
+            <li class="status-badge neutral">
+              Total tokens: {{ details.summary.usage.totalTokens | number }}
+            </li>
           }
         </ul>
       }
@@ -136,9 +143,9 @@
   </section>
 
   @if (isLoading()) {
-    <message-spinner message="Loading full report"/>
+    <message-spinner message="Loading full report" />
   } @else if (error()) {
-    <pre class="callout error code">{{error()?.stack}}</pre>
+    <pre class="callout error code">{{ error()?.stack }}</pre>
   } @else if (report) {
     @let details = report.details;
 
@@ -151,12 +158,18 @@
       @if (details.systemInstructionsPrompt || details.bestPracticesPrompt) {
         <!-- Legacy code path for older reports. -->
         <h4>System Prompt</h4>
-        <pre class="callout neutral code">{{ details.systemInstructionsPrompt }}</pre>
+        <pre class="callout neutral code">{{
+          details.systemInstructionsPrompt
+        }}</pre>
         <h4>Best Practices Prompt</h4>
-        <pre class="callout neutral code">{{ details.bestPracticesPrompt }}</pre>
+        <pre class="callout neutral code">{{
+          details.bestPracticesPrompt
+        }}</pre>
       } @else {
         <h4>Generation System Prompt</h4>
-        <pre class="callout neutral code">{{ details.systemPromptGeneration }}</pre>
+        <pre class="callout neutral code">{{
+          details.systemPromptGeneration
+        }}</pre>
         <h4>Repair System Prompt</h4>
         <pre class="callout neutral code">{{ details.systemPromptRepair }}</pre>
       }
@@ -219,7 +232,9 @@
     <h2>Generated applications</h2>
     @if (allFailedChecks().length > 0) {
       <details class="filter-dropdown" #dropdown>
-        <summary>Filter by failed checks ({{ selectedChecks().size }} selected)</summary>
+        <summary>
+          Filter by failed checks ({{ selectedChecks().size }} selected)
+        </summary>
         <div class="dropdown-content">
           <failed-checks-filter
             [allFailedChecks]="allFailedChecks()"
@@ -236,14 +251,17 @@
             <score
               size="small"
               [total]="result.score.totalPoints"
-              [max]="result.score.maxOverallPoints" />
+              [max]="result.score.maxOverallPoints"
+            />
             <div class="app-header">
               {{ result.promptDef.name }}
 
               <div class="status-badge-group">
                 @let initialBuild = result.attemptDetails[0].buildResult;
                 @let repairBuild =
-                  result.attemptDetails.length > 1 ? result.attemptDetails[1].buildResult : null;
+                  result.attemptDetails.length > 1
+                    ? result.attemptDetails[1].buildResult
+                    : null;
                 @let finalBuild = repairBuild ?? initialBuild;
 
                 @if (finalBuild.runtimeErrors) {
@@ -259,7 +277,6 @@
                 }
               </div>
             </div>
-
           </expansion-panel-header>
 
           @if (appPanel.opened()) {
@@ -273,7 +290,9 @@
                 <h4>Results</h4>
                 @for (category of result.score.categories; track category.id) {
                   <h5>
-                    {{ category.name }} ({{ category.points }}/{{ category.maxPoints }}
+                    {{ category.name }} ({{ category.points }}/{{
+                      category.maxPoints
+                    }}
                     points)
                   </h5>
 
@@ -283,16 +302,24 @@
                         @if (isSkippedAssessment(check)) {
                           <span class="status">➖</span>
                           <span class="name">{{ check.name }}</span>
-                          <span class="status-text points">Skipped: {{ check.message }}</span>
+                          <span class="status-text points"
+                            >Skipped: {{ check.message }}</span
+                          >
                         } @else {
                           @let isMax = check.successPercentage === 1;
-                          <span class="status status-text" [class.success]="isMax" [class.error]="!isMax">{{
-                            isMax ? '✔' : '✘'
-                          }}</span>
+                          <span
+                            class="status status-text"
+                            [class.success]="isMax"
+                            [class.error]="!isMax"
+                            >{{ isMax ? '✔' : '✘' }}</span
+                          >
                           <span class="name">{{ check.name }}</span>
-                          <span class="status-text points" [class.success]="isMax" [class.error]="!isMax">{{
-                            check.message
-                          }}</span>
+                          <span
+                            class="status-text points"
+                            [class.success]="isMax"
+                            [class.error]="!isMax"
+                            >{{ check.message }}</span
+                          >
                         }
                       </div>
                     } @empty {
@@ -302,15 +329,21 @@
                 }
                 <!-- Total score section -->
                 <div class="check-details total">
-                  @let totalPercent = formatScore(result.score.totalPoints, result.score.maxOverallPoints);
+                  @let totalPercent =
+                    formatScore(
+                      result.score.totalPoints,
+                      result.score.maxOverallPoints
+                    );
                   <span class="status"></span>
                   <span class="name">Total: &nbsp;</span>
                   <span
                     class="status-text points"
                     [class.success]="totalPercent >= 90"
                     [class.warn]="totalPercent < 90 && totalPercent >= 80"
-                    [class.error]="totalPercent < 80">
-                    {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{
+                    [class.error]="totalPercent < 80"
+                  >
+                    {{ result.score.totalPoints }} /
+                    {{ result.score.maxOverallPoints }} points ({{
                       totalPercent
                     }})
                   </span>
@@ -322,33 +355,46 @@
                 @for (attempt of result.attemptDetails; track attempt) {
                   @let isBuilt = attempt.buildResult.status === 'success';
                   @let axeViolations = attempt.buildResult.axeViolations;
-                  @let hasAxeViolations = axeViolations && axeViolations.length > 0;
+                  @let hasAxeViolations =
+                    axeViolations && axeViolations.length > 0;
 
                   <expansion-panel #expansionPanel>
                     <expansion-panel-header>
-                      {{ $index === 0 ? 'Initial response' : `Repair attempt #${$index}` }}
+                      {{
+                        $index === 0
+                          ? 'Initial response'
+                          : `Repair attempt #${$index}`
+                      }}
                       @if (!isBuilt) {
-                      <span
-                        class="status-badge"
-                        [class.error]="!isBuilt">Build</span>
+                        <span class="status-badge" [class.error]="!isBuilt"
+                          >Build</span
+                        >
                       }
                       @if (hasAxeViolations) {
-                      <span
-                        class="status-badge"
-                        [class.error]="hasAxeViolations">A11y</span>
+                        <span
+                          class="status-badge"
+                          [class.error]="hasAxeViolations"
+                          >A11y</span
+                        >
                       }
                     </expansion-panel-header>
 
                     @if (expansionPanel.opened()) {
                       @if (attempt.reasoning) {
                         <details class="thoughts-button">
-                          <summary class="neutral-button">See LLM Thoughts</summary>
-                          <pre class="callout neutral code">{{ attempt.reasoning }}</pre>
+                          <summary class="neutral-button">
+                            See LLM Thoughts
+                          </summary>
+                          <pre class="callout neutral code">{{
+                            attempt.reasoning
+                          }}</pre>
                         </details>
                       }
                       @if (!isBuilt) {
                         <h4>Build Message</h4>
-                        <pre class="callout warn code">{{ attempt.buildResult.message }}</pre>
+                        <pre class="callout warn code">{{
+                          attempt.buildResult.message
+                        }}</pre>
                       }
 
                       @if (hasAxeViolations) {
@@ -381,17 +427,26 @@
                             Format source code
                           </button>
                         </div>
-                        <app-code-viewer [code]="formatted().get(file) ?? file.code" />
+                        <app-code-viewer
+                          [code]="formatted().get(file) ?? file.code"
+                        />
                       }
                     }
                   </expansion-panel>
                 }
 
-                @if (result.userJourneys && result.userJourneys.result.length > 0) {
+                @if (
+                  result.userJourneys && result.userJourneys.result.length > 0
+                ) {
                   <expansion-panel>
-                    <expansion-panel-header>User Journeys</expansion-panel-header>
-                    @for (journey of result.userJourneys.result; track journey.name) {
-                      <h4>{{journey.name}}</h4>
+                    <expansion-panel-header
+                      >User Journeys</expansion-panel-header
+                    >
+                    @for (
+                      journey of result.userJourneys.result;
+                      track journey.name
+                    ) {
+                      <h4>{{ journey.name }}</h4>
 
                       <ol>
                         @for (step of journey.steps; track $index) {
@@ -408,32 +463,39 @@
                 <button
                   class="neutral-button"
                   title="Download a ZIP for debugging. You can upload the ZIP to AI Studio for further analysis of a specific app."
-                  (click)="downloadDebuggingZip(result)">
+                  (click)="downloadDebuggingZip(result)"
+                >
                   Download ZIP for debugging
                 </button>
                 @if (result.toolLogs && result.toolLogs.length > 0) {
                   <expansion-panel>
                     <expansion-panel-header>Tool Logs</expansion-panel-header>
                     <ul class="tool-logs-list">
-                    @for (log of result.toolLogs; track $index) {
-                      <li>
-                        <details class="details mcp-log-entry">
-                          @let name = log.request.name;
-                          <summary>
-                            Log Entry #{{ $index + 1
-                            }}{{ name ? ' - ' + name : '' }}
-                          </summary>
-                          <div class="mcp-log-content">
-                            <h5>Request</h5>
-                            <ngx-json-viewer [json]="log.request" [expanded]="false"></ngx-json-viewer>
-                            <h5>Response</h5>
-                            <ngx-json-viewer [json]="log.response" [expanded]="false"></ngx-json-viewer>
-                          </div>
-                        </details>
-                      </li>
-                    } @empty {
-                      <li>No MCP logs were recorded for this run.</li>
-                    }
+                      @for (log of result.toolLogs; track $index) {
+                        <li>
+                          <details class="details mcp-log-entry">
+                            @let name = log.request.name;
+                            <summary>
+                              Log Entry #{{ $index + 1
+                              }}{{ name ? ' - ' + name : '' }}
+                            </summary>
+                            <div class="mcp-log-content">
+                              <h5>Request</h5>
+                              <ngx-json-viewer
+                                [json]="log.request"
+                                [expanded]="false"
+                              ></ngx-json-viewer>
+                              <h5>Response</h5>
+                              <ngx-json-viewer
+                                [json]="log.response"
+                                [expanded]="false"
+                              ></ngx-json-viewer>
+                            </div>
+                          </details>
+                        </li>
+                      } @empty {
+                        <li>No MCP logs were recorded for this run.</li>
+                      }
                     </ul>
                   </expansion-panel>
                 }
@@ -442,7 +504,9 @@
               @if (finalBuild.runtimeErrors) {
                 <div class="app-details-section">
                   <h4>Runtime errors</h4>
-                  <pre class="callout warn code">{{ finalBuild.runtimeErrors }}</pre>
+                  <pre class="callout warn code">{{
+                    finalBuild.runtimeErrors
+                  }}</pre>
                 </div>
               }
 
@@ -451,7 +515,7 @@
               @if (screenshot) {
                 <div class="app-details-section">
                   <h4>Screenshot</h4>
-                  <img class="screenshot" [src]="screenshot"/>
+                  <img class="screenshot" [src]="screenshot" />
                 </div>
               }
             </div>
