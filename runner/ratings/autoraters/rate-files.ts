@@ -29,7 +29,7 @@ export async function autoRateFiles(
   files: LlmResponseFile[],
   appPrompt: string,
   screenshotPngUrl: string | null,
-  ratingsResult: RatingsResult,
+  ratingsResult: RatingsResult
 ): Promise<AutoraterRunInfo> {
   console.log(`Autorater is using '${model}' model. \n`);
 
@@ -42,7 +42,7 @@ export async function autoRateFiles(
     environment,
     files,
     appPrompt,
-    ratingsResult,
+    ratingsResult
   );
   console.log(`${greenCheckmark()} Code scoring is successful.`);
 
