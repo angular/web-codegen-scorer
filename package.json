@@ -51,13 +51,13 @@
     "wcs": "./runner/bin/cli.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.63.0",
+    "@anthropic-ai/sdk": "^0.64.0",
     "@axe-core/puppeteer": "^4.10.2",
     "@genkit-ai/compat-oai": "^1.19.1",
-    "@genkit-ai/googleai": "1.19.3",
-    "@genkit-ai/mcp": "1.19.3",
-    "@google/gemini-cli": "^0.5.0",
-    "@google/genai": "1.20.0",
+    "@genkit-ai/googleai": "1.20.0",
+    "@genkit-ai/mcp": "1.20.0",
+    "@google/gemini-cli": "^0.6.0",
+    "@google/genai": "1.21.0",
     "@inquirer/prompts": "^7.8.4",
     "@safety-web/runner": "0.4.0-alpha.14",
     "@safety-web/types": "0.4.0-alpha.14",
