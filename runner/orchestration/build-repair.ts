@@ -71,6 +71,7 @@ export async function repairAndBuild(
     rootPromptDef,
     directory,
     workerConcurrencyQueue,
+    abortSignal,
     attempts,
     progress
   );
@@ -89,6 +90,7 @@ async function handleRepairResponse(
   rootPromptDef: RootPromptDefinition,
   directory: string,
   workerConcurrencyQueue: PQueue,
+  abortSignal: AbortSignal,
   attempts: number,
   progress: ProgressLogger
 ) {
@@ -107,9 +109,15 @@ async function handleRepairResponse(
   mergeRepairFiles(repairResponse.outputFiles, finalOutputFiles);
   writeResponseFiles(directory, finalOutputFiles, env, rootPromptDef.name);
 
-  const buildResult = await workerConcurrencyQueue.add(
-    () => runBuild(evalID, gateway, directory, env, rootPromptDef, progress),
-    { throwOnTimeout: true }
+  const buildResult = await runBuild(
+    evalID,
+    gateway,
+    directory,
+    env,
+    rootPromptDef,
+    abortSignal,
+    workerConcurrencyQueue,
+    progress
   );
 
   return {

@@ -6,6 +6,7 @@ import { Environment } from '../configuration/environment.js';
 import { ProgressLogger } from '../progress/progress-logger.js';
 import { RootPromptDefinition } from '../shared-interfaces.js';
 import { EvalID, Gateway } from './gateway.js';
+import PQueue from 'p-queue';
 
 /** Attempts to build the code. */
 export async function runBuild(
@@ -14,6 +15,8 @@ export async function runBuild(
   appDirectoryPath: string,
   env: Environment,
   rootPromptDef: RootPromptDefinition,
+  abortSignal: AbortSignal,
+  workerConcurrencyQueue: PQueue,
   progress: ProgressLogger
 ): Promise<BuildResult> {
   progress.log(rootPromptDef, 'build', `Building the app`);
@@ -24,6 +27,8 @@ export async function runBuild(
       env,
       appDirectoryPath,
       rootPromptDef,
+      workerConcurrencyQueue,
+      abortSignal,
       progress
     );
     if (result.status === BuildResultStatus.SUCCESS) {

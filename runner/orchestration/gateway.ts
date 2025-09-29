@@ -1,3 +1,4 @@
+import PQueue from 'p-queue';
 import { LlmGenerateFilesContext } from '../codegen/llm-runner.js';
 import { Environment } from '../configuration/environment.js';
 import { ProgressLogger } from '../progress/progress-logger.js';
@@ -41,6 +42,8 @@ export interface Gateway<Env extends Environment> {
     env: Env,
     appDirectoryPath: string,
     rootPromptDef: RootPromptDefinition,
+    workerConcurrencyQueue: PQueue,
+    abortSignal: AbortSignal,
     progress: ProgressLogger
   ): Promise<BuildResult>;
 

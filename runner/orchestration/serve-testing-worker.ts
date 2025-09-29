@@ -11,6 +11,7 @@ import {
 } from '../workers/serve-testing/worker-types.js';
 import { EvalID, Gateway } from './gateway.js';
 import { BrowserAgentTaskInput } from '../testing/browser-agent/models.js';
+import PQueue from 'p-queue';
 
 /** Attempts to run & test an eval app. */
 export async function serveAndTestApp(
@@ -19,6 +20,8 @@ export async function serveAndTestApp(
   appDirectoryPath: string,
   env: Environment,
   rootPromptDef: RootPromptDefinition,
+  workerConcurrencyQueue: PQueue,
+  abortSignal: AbortSignal,
   progress: ProgressLogger,
   skipScreenshots: boolean,
   skipAxeTesting: boolean,
@@ -43,37 +46,41 @@ export async function serveAndTestApp(
         userJourneyAgentTaskInput,
       };
 
-      return await new Promise<ServeTestingResult>((resolve, reject) => {
-        const child: ChildProcess = fork(
-          path.resolve(
-            import.meta.dirname,
-            '../workers/serve-testing/worker.js'
-          )
-        );
-        child.send(serveParams);
+      return await workerConcurrencyQueue.add(
+        () =>
+          new Promise<ServeTestingResult>((resolve, reject) => {
+            const child: ChildProcess = fork(
+              path.resolve(
+                import.meta.dirname,
+                '../workers/serve-testing/worker.js'
+              ),
+              { signal: abortSignal }
+            );
+            child.send(serveParams);
 
-        child.on(
-          'message',
-          async (result: ServeTestingWorkerResponseMessage) => {
-            if (result.type === 'result') {
+            child.on(
+              'message',
+              async (result: ServeTestingWorkerResponseMessage) => {
+                if (result.type === 'result') {
+                  await killChildProcessGracefully(child);
+                  resolve(result.payload);
+                } else {
+                  progress.log(
+                    rootPromptDef,
+                    result.payload.state,
+                    result.payload.message,
+                    result.payload.details
+                  );
+                }
+              }
+            );
+            child.on('error', async (err) => {
               await killChildProcessGracefully(child);
-              resolve(result.payload);
-            } else {
-              progress.log(
-                rootPromptDef,
-                result.payload.state,
-                result.payload.message,
-                result.payload.details
-              );
-            }
-          }
-        );
-        child.on('error', async (err) => {
-          console.error('Caught error');
-          await killChildProcessGracefully(child);
-          reject(err);
-        });
-      });
+              reject(err);
+            });
+          }),
+        { throwOnTimeout: true }
+      );
     }
   );
 

@@ -5,9 +5,7 @@ import { Environment } from '../configuration/environment.js';
 import {
   AttemptDetails,
   LlmContextFile,
-  LlmResponseFile,
   RootPromptDefinition,
-  Usage,
 } from '../shared-interfaces.js';
 import { DEFAULT_MAX_REPAIR_ATTEMPTS } from '../configuration/constants.js';
 import { ProgressLogger } from '../progress/progress-logger.js';
@@ -59,9 +57,15 @@ export async function attemptBuild(
   const finalOutputFiles = initialResponse.files.map((file) => ({
     ...file,
   }));
-  const initialBuildResult = await workerConcurrencyQueue.add(
-    () => runBuild(evalID, gateway, directory, env, rootPromptDef, progress),
-    { throwOnTimeout: true }
+  const initialBuildResult = await runBuild(
+    evalID,
+    gateway,
+    directory,
+    env,
+    rootPromptDef,
+    abortSignal,
+    workerConcurrencyQueue,
+    progress
   );
   let repairAttempts = 0;
   const maxRepairAttempts = gateway.shouldRetryFailedBuilds(evalID)
@@ -122,6 +126,8 @@ export async function attemptBuild(
     directory,
     env,
     rootPromptDef,
+    workerConcurrencyQueue,
+    abortSignal,
     progress,
     skipScreenshots,
     skipAxeTesting,
@@ -176,6 +182,8 @@ export async function attemptBuild(
       directory,
       env,
       rootPromptDef,
+      workerConcurrencyQueue,
+      abortSignal,
       progress,
       skipScreenshots,
       skipAxeTesting,

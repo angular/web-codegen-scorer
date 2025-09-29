@@ -21,6 +21,7 @@ import { killChildProcessGracefully } from '../../utils/kill-gracefully.js';
 import { ProgressLogger } from '../../progress/progress-logger.js';
 import { serveApp } from '../../workers/serve-testing/serve-app.js';
 import { LocalEnvironment } from '../../configuration/environment-local.js';
+import PQueue from 'p-queue';
 
 let uniqueIDs = 0;
 
@@ -70,6 +71,8 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
     env: LocalEnvironment,
     appDirectoryPath: string,
     rootPromptDef: RootPromptDefinition,
+    workerConcurrencyQueue: PQueue,
+    abortSignal: AbortSignal,
     progress: ProgressLogger
   ): Promise<BuildResult> {
     const buildParams: BuildWorkerMessage = {
@@ -78,21 +81,29 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
       buildCommand: env.buildCommand,
     };
 
-    return new Promise<BuildResult>((resolve, reject) => {
-      const child: ChildProcess = fork(
-        path.resolve(import.meta.dirname, '../../workers/builder/worker.js')
-      );
-      child.send(buildParams);
+    return workerConcurrencyQueue.add(
+      () =>
+        new Promise<BuildResult>((resolve, reject) => {
+          const child: ChildProcess = fork(
+            path.resolve(
+              import.meta.dirname,
+              '../../workers/builder/worker.js'
+            ),
+            { signal: abortSignal }
+          );
+          child.send(buildParams);
 
-      child.on('message', async (result: BuildWorkerResponseMessage) => {
-        await killChildProcessGracefully(child);
-        resolve(result.payload);
-      });
-      child.on('error', async (err) => {
-        await killChildProcessGracefully(child);
-        reject(err);
-      });
-    });
+          child.on('message', async (result: BuildWorkerResponseMessage) => {
+            await killChildProcessGracefully(child);
+            resolve(result.payload);
+          });
+          child.on('error', async (err) => {
+            await killChildProcessGracefully(child);
+            reject(err);
+          });
+        }),
+      { throwOnTimeout: true }
+    );
   }
 
   async serveBuild<T>(
