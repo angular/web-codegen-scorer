@@ -11,6 +11,8 @@ import {
   FetchedLocalReports,
   fetchReportsFromDisk,
 } from '../runner/reporting/report-local-disk';
+import { RunInfo } from '../runner/shared-interfaces';
+import { convertV2ReportToV3Report } from '../runner/reporting/migrations/v2_to_v3';
 
 const app = express();
 const reportsLoader = await getReportLoader();
@@ -39,13 +41,16 @@ app.get('/api/reports', async (_, res) => {
 app.get('/api/reports/:id', async (req, res) => {
   const id = req.params.id;
   const localData = await resolveLocalData(options.reportsRoot);
-  let result: { group: string }[] | null = null;
+  let result: RunInfo[] | null = null;
 
   if (localData.has(id)) {
     result = [localData.get(id)!.run];
   } else {
     result = await reportsLoader.getGroupedReports(id);
   }
+
+  // Convert potential older v2 reports.
+  result = result.map((r) => convertV2ReportToV3Report(r));
 
   res.json(result);
 });
@@ -79,7 +84,7 @@ if (isMainModule(import.meta.url)) {
 export const reqHandler = createNodeRequestHandler(app);
 
 interface ReportLoader {
-  getGroupedReports: (groupId: string) => Promise<{ group: string }[]>;
+  getGroupedReports: (groupId: string) => Promise<RunInfo[]>;
   getGroupsList: () => Promise<{ id: string }[]>;
   configureEndpoints?: (expressApp: typeof app) => Promise<void>;
 }
