@@ -10,6 +10,7 @@ import {
   LlmResponse,
   LlmResponseFile,
   RootPromptDefinition,
+  TestExecutionResult,
 } from '../../shared-interfaces.js';
 import {killChildProcessGracefully} from '../../utils/kill-gracefully.js';
 import {
@@ -21,7 +22,10 @@ import {serveApp} from '../../workers/serve-testing/serve-app.js';
 import {generateCodeWithAI} from '../codegen.js';
 import {EvalID, Executor} from './executor.js';
 import {LocalExecutorConfig} from './local-executor-config.js';
-import {getPossiblePackageManagers} from '../../configuration/environment-config.js';
+import {getPossiblePackageManagers} from '../../configuration/package-managers.js';
+import {callWithTimeout} from '../../utils/timeout.js';
+import {executeCommand} from '../../utils/exec.js';
+import {cleanupBuildMessage} from '../../workers/builder/worker.js';
 
 let uniqueIDs = 0;
 
@@ -115,6 +119,48 @@ export class LocalExecutor implements Executor {
           });
         }),
     );
+  }
+
+  async executeProjectTests(
+    _id: EvalID,
+    appDirectoryPath: string,
+    rootPromptDef: RootPromptDefinition,
+    workerConcurrencyQueue: PQueue,
+    abortSignal: AbortSignal,
+    progress: ProgressLogger,
+  ): Promise<TestExecutionResult | null> {
+    if (!this.config.testCommand) {
+      return Promise.resolve(null);
+    }
+    const testCommand = this.config.testCommand;
+
+    let output: string;
+    let passed: boolean;
+
+    try {
+      // Run the test command inside the temporary project directory
+      // Also add to the worker concurrency queue to not overload local systems.
+      const stdout = await workerConcurrencyQueue.add(() =>
+        callWithTimeout(
+          `Testing ${rootPromptDef.name}`,
+          timeoutAbort =>
+            executeCommand(testCommand, appDirectoryPath, undefined, {
+              abortSignal: AbortSignal.any([abortSignal, timeoutAbort]),
+            }),
+          4, // 4min. This is a safety boundary. Lots of parallelism can slow-down.
+        ),
+      );
+      output = stdout;
+      passed = true;
+    } catch (error: any) {
+      output = error.message;
+      passed = false;
+    }
+
+    return {
+      passed,
+      output: cleanupBuildMessage(output),
+    } satisfies TestExecutionResult;
   }
 
   async serveWebApplication<T>(

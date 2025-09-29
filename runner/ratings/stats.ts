@@ -25,6 +25,10 @@ export function calculateBuildAndCheckStats(assessments: AssessmentResult[]): Ag
   let successfulInitialBuilds = 0;
   let successfulBuildsAfterRepair = 0;
   let failedBuilds = 0;
+  let successfulInitialTests = 0;
+  let successfulTestsAfterRepair = 0;
+  let failedTests = 0;
+  let noTestsRun = 0;
   let runtimeStats: RuntimeStats | undefined;
   let accessibilityStats:
     | {
@@ -59,6 +63,20 @@ export function calculateBuildAndCheckStats(assessments: AssessmentResult[]): Ag
       }
     }
 
+    // Calculate test statistics
+    if (result.testResult) {
+      if (result.testResult.passed) {
+        if ((result.testRepairAttempts || 0) === 0) {
+          successfulInitialTests++;
+        } else {
+          successfulTestsAfterRepair++;
+        }
+      } else {
+        failedTests++;
+      }
+    } else {
+      noTestsRun++;
+    }
     if (result.finalAttempt.serveTestingResult?.runtimeErrors != undefined) {
       runtimeStats ??= {appsWithErrors: 0, appsWithoutErrors: 0};
       if (result.finalAttempt.serveTestingResult.runtimeErrors.trim() != '') {
@@ -123,6 +141,12 @@ export function calculateBuildAndCheckStats(assessments: AssessmentResult[]): Ag
       successfulBuildsAfterRepair,
       failedBuilds,
       errorDistribution: Object.keys(errorDistribution).length > 0 ? errorDistribution : undefined,
+    },
+    tests: {
+      successfulInitialTests,
+      successfulTestsAfterRepair,
+      failedTests,
+      noTestsRun,
     },
     buckets,
     runtime: runtimeStats
