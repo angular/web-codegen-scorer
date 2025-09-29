@@ -179,3 +179,8 @@ Defaults to `<package manager> run build`.
 
 Command used to start a local dev server as a part of the evaluation.
 Defaults to `<package manager> run start --port 0`.
+
+### `testCommand`
+
+Command used to run tests against the generated code. If this property is not provided, tests will not be run. The command should exit with code 0 on success and a non-zero exit code on failure. The output from the command (both `stdout` and `stderr`) is captured and used for repair attempts if the tests fail. The test command will time out after 4 minutes.
+

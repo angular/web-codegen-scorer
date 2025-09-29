@@ -25,7 +25,13 @@ export const LLM_OUTPUT_DIR = join(rootDir, 'llm-output');
  * providing the build output and the code that causes the problem.
  */
 // Note: When updating, also adjust the default description in `README.md`.
-export const DEFAULT_MAX_REPAIR_ATTEMPTS = 1;
+export const DEFAULT_MAX_BUILD_REPAIR_ATTEMPTS = 1;
+
+/**
+ * Number of times we'll try to ask LLM to repair test failures
+ * E.g. Axe violations, or test command failures
+ */
+export const DEFAULT_MAX_TEST_REPAIR_ATTEMPTS = 1;
 
 /** Name of the folder where we store all generated reports */
 export const REPORTS_ROOT_DIR = join(rootDir, 'reports');

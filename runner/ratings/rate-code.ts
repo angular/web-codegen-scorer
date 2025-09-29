@@ -8,6 +8,7 @@ import {
   IndividualAssessmentState,
   PromptDefinition,
   AssessmentCategory,
+  TestExecutionResult,
 } from '../shared-interfaces.js';
 import {
   RatingState,
@@ -56,6 +57,8 @@ export async function rateGeneratedCode(
   abortSignal: AbortSignal,
   progress: ProgressLogger,
   autoraterModel: string,
+  testResult: TestExecutionResult | null,
+  testRepairAttempts: number,
 ): Promise<CodeAssessmentScore> {
   let categorizedFiles: CategorizedFiles | null = null;
   let totalPoints = 0;
@@ -93,6 +96,8 @@ export async function rateGeneratedCode(
           buildResult,
           serveTestingResult,
           repairAttempts,
+          testResult,
+          testRepairAttempts,
           outputFiles.length,
           axeRepairAttempts,
           ratingsResult,
@@ -173,6 +178,8 @@ function runPerBuildRating(
   buildResult: BuildResult,
   serveResult: ServeTestingResult | null,
   repairAttempts: number,
+  testResult: TestExecutionResult | null,
+  testRepairAttempts: number,
   generatedFileCount: number,
   axeRepairAttempts: number,
   ratingsResult: RatingsResult,
@@ -184,6 +191,8 @@ function runPerBuildRating(
     generatedFileCount,
     axeRepairAttempts,
     ratingsResult,
+    testResult,
+    testRepairAttempts,
   });
 
   // If the rating was skipped (e.g., Axe test wasn't run), create a skipped assessment.

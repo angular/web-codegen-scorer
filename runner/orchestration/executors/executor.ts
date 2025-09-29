@@ -6,6 +6,7 @@ import {
   LlmResponse,
   LlmResponseFile,
   RootPromptDefinition,
+  TestExecutionResult,
 } from '../../shared-interfaces.js';
 import {BuildResult} from '../../workers/builder/builder-types.js';
 import z from 'zod';
@@ -71,6 +72,19 @@ export const executorSchema = z.object({
         .describe('Call this function while the server is running'),
     ]),
     z.promise(z.custom<ServeTestingResult>()),
+  ),
+  executeProjectTests: z.function(
+    z.tuple([
+      z.custom<EvalID>().describe('ID of the eval'),
+      z.string().describe('Path to the application directory'),
+      z.custom<RootPromptDefinition>().describe('Root prompt definition'),
+      z
+        .custom<WorkerQueueType>()
+        .describe('Worker concurrency queue. Use this for limiting local workers.'),
+      z.custom<AbortSignal>().describe('Abort Signal to fire when tests should be canceled.'),
+      z.custom<ProgressLogger>().describe('Progress logger'),
+    ]),
+    z.promise(z.custom<TestExecutionResult>().nullable()),
   ),
   finalizeEval: z.function(
     z.tuple([z.custom<EvalID>().describe('ID of the eval')]),

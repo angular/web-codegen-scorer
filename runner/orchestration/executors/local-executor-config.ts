@@ -1,6 +1,6 @@
 import z from 'zod';
 import {mcpServerOptionsSchema} from '../../codegen/llm-runner.js';
-import {getPossiblePackageManagers} from '../../configuration/environment-config.js';
+import {getPossiblePackageManagers} from '../../configuration/package-managers.js';
 
 export const localExecutorConfigSchema = z.strictObject({
   /** MCP servers that can be started for this environment. */
@@ -24,6 +24,10 @@ export const localExecutorConfigSchema = z.strictObject({
    * Defaults to `<package manager> run start --port 0`.
    */
   serveCommand: z.string().optional(),
+  /**
+   * Optional command for executing project tests.
+   */
+  testCommand: z.string().optional(),
   /**
    * Whether to skip installing dependencies when running evals in the environment.
    * Useful if you're managing dependencies yourself.

@@ -3,7 +3,8 @@ import chalk from 'chalk';
 import {
   BUILT_IN_ENVIRONMENTS,
   DEFAULT_AUTORATER_MODEL_NAME,
-  DEFAULT_MAX_REPAIR_ATTEMPTS,
+  DEFAULT_MAX_BUILD_REPAIR_ATTEMPTS,
+  DEFAULT_MAX_TEST_REPAIR_ATTEMPTS,
   DEFAULT_MODEL_NAME,
 } from './configuration/constants.js';
 import {generateCodeAndAssess} from './orchestration/generate.js';
@@ -37,9 +38,9 @@ interface Options {
   enableUserJourneyTesting?: boolean;
   enableAutoCsp?: boolean;
   autoraterModel?: string;
-  a11yRepairAttempts?: number;
   logging?: 'text-only' | 'dynamic';
   skipLighthouse?: boolean;
+  maxTestRepairAttempts?: number;
   maxBuildRepairAttempts?: number;
 }
 
@@ -151,11 +152,6 @@ function builder(argv: Argv): Argv<Options> {
         default: DEFAULT_AUTORATER_MODEL_NAME,
         description: 'Model to use when automatically rating generated code',
       })
-      .option('a11y-repair-attempts', {
-        type: 'number',
-        default: 0,
-        description: 'Number of repair attempts for discovered a11y violations',
-      })
       .option('skip-lighthouse', {
         type: 'boolean',
         default: false,
@@ -163,8 +159,14 @@ function builder(argv: Argv): Argv<Options> {
       })
       .option('max-build-repair-attempts', {
         type: 'number',
-        default: DEFAULT_MAX_REPAIR_ATTEMPTS,
+        default: DEFAULT_MAX_BUILD_REPAIR_ATTEMPTS,
         description: 'Number of repair attempts when build errors are discovered',
+      })
+      .option('max-test-repair-attempts', {
+        type: 'number',
+        default: DEFAULT_MAX_TEST_REPAIR_ATTEMPTS,
+        description:
+          'Number of repair attempts for discovered test failures (including a11y violations and ones from testCommand)',
       })
       .strict()
       .version(false)
@@ -209,9 +211,9 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
       logging: cliArgs.logging,
       autoraterModel: cliArgs.autoraterModel,
       skipAiSummary: cliArgs.skipAiSummary,
-      a11yRepairAttempts: cliArgs.a11yRepairAttempts,
       skipLighthouse: cliArgs.skipLighthouse,
       maxBuildRepairAttempts: cliArgs.maxBuildRepairAttempts,
+      maxTestRepairAttempts: cliArgs.maxTestRepairAttempts,
     });
 
     logReportToConsole(runInfo);

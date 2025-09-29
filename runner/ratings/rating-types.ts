@@ -5,6 +5,7 @@ import type {
   LlmResponseFile,
   PromptDefinition,
   SkippedIndividualAssessment,
+  TestExecutionResult,
   Usage,
 } from '../shared-interfaces.js';
 import {Environment} from '../configuration/environment.js';
@@ -64,6 +65,8 @@ const perBuildRatingSchema = z
           buildResult: z.custom<BuildResult>(),
           serveResult: z.custom<ServeTestingResult | null>(),
           repairAttempts: z.number(),
+          testResult: z.custom<TestExecutionResult | null>(),
+          testRepairAttempts: z.number(),
           axeRepairAttempts: z.number(),
           generatedFileCount: z.number(),
           ratingsResult: z.record(z.custom<IndividualAssessment | SkippedIndividualAssessment>()),
