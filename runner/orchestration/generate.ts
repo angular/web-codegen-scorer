@@ -158,7 +158,7 @@ export async function generateCodeAndAssess(options: {
           ? // Building can be really expensive. We likely should add support for "CPU hints" per environment.
             // E.g. CLI building is really CPU intensive with ESBuild being multi-core.
             // TODO: Follow-up on this and add CPU hints.
-            Math.floor(availableParallelism() * 0.4 * 0.5)
+            Math.floor(appConcurrency * 0.5)
           : Infinity,
     });
 

@@ -83,6 +83,7 @@
     "stylelint-config-recommended-scss": "^16.0.0",
     "tiktoken": "^1.0.22",
     "tinyglobby": "^0.2.14",
+    "tree-kill": "^1.2.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "yargs": "^18.0.0",
