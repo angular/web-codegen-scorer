@@ -38,7 +38,7 @@ export async function repairAndBuild(
   env: Environment,
   rootPromptDef: RootPromptDefinition,
   directory: string,
-  finalOutputFiles: LlmResponseFile[],
+  previousAttemptFiles: LlmResponseFile[],
   errorMessage: string,
   errorContext: string,
   contextFiles: LlmContextFile[],
@@ -54,7 +54,7 @@ export async function repairAndBuild(
     env,
     rootPromptDef,
     directory,
-    finalOutputFiles,
+    previousAttemptFiles,
     errorMessage,
     errorContext,
     contextFiles,
@@ -66,7 +66,7 @@ export async function repairAndBuild(
     evalID,
     gateway,
     repairResponse,
-    finalOutputFiles,
+    previousAttemptFiles,
     env,
     rootPromptDef,
     directory,
@@ -85,7 +85,7 @@ async function handleRepairResponse(
   evalID: EvalID,
   gateway: Gateway<Environment>,
   repairResponse: LlmResponse,
-  finalOutputFiles: LlmResponseFile[],
+  previousAttemptFiles: LlmResponseFile[],
   env: Environment,
   rootPromptDef: RootPromptDefinition,
   directory: string,
@@ -106,8 +106,13 @@ async function handleRepairResponse(
       `Repair request failed: ${repairResponse.errors.join('\n')}`
     );
   }
-  mergeRepairFiles(repairResponse.outputFiles, finalOutputFiles);
-  writeResponseFiles(directory, finalOutputFiles, env, rootPromptDef.name);
+
+  // Clone the previous files because `mergeRepairFiles` mutates the attempt files.
+  // We don't want to change files of a previous attempt.
+  const newAttemptFiles = previousAttemptFiles.map((f) => ({ ...f }));
+
+  mergeRepairFiles(repairResponse.outputFiles, newAttemptFiles);
+  writeResponseFiles(directory, newAttemptFiles, env, rootPromptDef.name);
 
   const buildResult = await runBuild(
     evalID,
@@ -120,12 +125,8 @@ async function handleRepairResponse(
     progress
   );
 
-  // Capture attempt's full files. Copy because `finalOutputFiles` can be
-  // mutated in subsequent repair attempts.
-  const attemptFullFiles = finalOutputFiles.map((f) => ({ ...f }));
-
   return {
-    outputFiles: attemptFullFiles,
+    outputFiles: newAttemptFiles,
     usage: repairResponse.usage,
     reasoning: repairResponse.reasoning,
     buildResult,

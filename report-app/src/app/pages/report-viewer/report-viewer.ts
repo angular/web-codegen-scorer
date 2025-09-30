@@ -12,7 +12,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
-import { BuildErrorType } from '../../../../../runner/workers/builder/builder-types';
+import {
+  BuildErrorType,
+  BuildResultStatus,
+} from '../../../../../runner/workers/builder/builder-types';
 import {
   AssessmentResult,
   IndividualAssessment,

@@ -50,13 +50,9 @@ export async function attemptBuild(
   skipScreenshots: boolean,
   skipAxeTesting: boolean,
   enableAutoCsp: boolean,
-  userJourneyAgentTaskInput?: BrowserAgentTaskInput
+  userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined,
+  maxAxeRepairAttempts: number
 ) {
-  // Clone the original files, because we're going to mutate them between repair
-  // attempts and we don't want the different runs to influence each other.
-  const finalOutputFiles = initialResponse.files.map((file) => ({
-    ...file,
-  }));
   const initialBuildResult = await runBuild(
     evalID,
     gateway,
@@ -104,7 +100,7 @@ export async function attemptBuild(
       env,
       rootPromptDef,
       directory,
-      finalOutputFiles,
+      lastAttempt.outputFiles,
       lastAttempt.buildResult.message,
       'There are the following build errors:',
       contextFiles,
@@ -137,13 +133,14 @@ export async function attemptBuild(
     );
   }
 
-  // Attempt to repair axe testing.
-  // This only runs when the last build completed & serving did run.
+  // Attempt to repair axe testing. This only runs when the last build
+  // passed and serving did run. Note: By default, we don't run axe repair
+  // attempts as it's not commonly done by LLMs in the ecosystem.
   let axeRepairAttempts = 0;
   while (
     lastAttempt.serveTestingResult &&
     (lastAttempt.serveTestingResult.axeViolations?.length ?? 0) > 0 &&
-    axeRepairAttempts < maxRepairAttempts
+    axeRepairAttempts < maxAxeRepairAttempts
   ) {
     axeRepairAttempts++;
     progress.log(
@@ -167,7 +164,7 @@ export async function attemptBuild(
       env,
       rootPromptDef,
       directory,
-      finalOutputFiles,
+      lastAttempt.outputFiles,
       axeViolationsError,
       'There are the following accessibility errors from axe accessibility violations:',
       contextFiles,
@@ -180,8 +177,9 @@ export async function attemptBuild(
     attemptDetails.push(attempt);
     lastAttempt = attempt;
 
-    // If we somehow introduced build errors via the Axe repair loop,
-    // then we should abort and let that last attempt have "build errors".
+    // If we somehow introduced build errors via the Axe repair loop, we abort
+    // further a11y repairs and capture the failed build. This is useful insight
+    // as LLMs seem to regress when asked to repair a11y violations.
     if (attempt.buildResult.status !== BuildResultStatus.SUCCESS) {
       break;
     }
@@ -215,7 +213,7 @@ export async function attemptBuild(
   return {
     buildResult: lastAttempt.buildResult,
     serveTestingResult: lastAttempt.serveTestingResult,
-    outputFiles: finalOutputFiles,
+    outputFiles: lastAttempt.outputFiles,
     repairAttempts,
     axeRepairAttempts,
   };

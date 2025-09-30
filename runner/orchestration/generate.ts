@@ -88,6 +88,7 @@ export async function generateCodeAndAssess(options: {
   enableAutoCsp?: boolean;
   logging?: 'text-only' | 'dynamic';
   autoraterModel?: string;
+  a11yRepairAttempts?: number;
 }): Promise<RunInfo> {
   const env = await getEnvironmentByPath(
     options.environmentConfigPath,
@@ -190,7 +191,8 @@ export async function generateCodeAndAssess(options: {
                     !!options.enableAutoCsp,
                     workerConcurrencyQueue,
                     progress,
-                    options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME
+                    options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME,
+                    options.a11yRepairAttempts ?? 0
                   ),
                 // 10min max per app evaluation.  We just want to make sure it never gets stuck.
                 10
@@ -328,7 +330,8 @@ async function startEvaluationTask(
   enableAutoCsp: boolean,
   workerConcurrencyQueue: PQueue,
   progress: ProgressLogger,
-  autoraterModel: string
+  autoraterModel: string,
+  a11yRepairAttempts: number
 ): Promise<AssessmentResult[]> {
   // Set up the project structure once for the root project.
   const { directory, cleanup } = await setupProjectStructure(
@@ -469,7 +472,8 @@ async function startEvaluationTask(
       skipScreenshots,
       skipAxeTesting,
       enableAutoCsp,
-      userJourneyAgentTaskInput
+      userJourneyAgentTaskInput,
+      a11yRepairAttempts
     );
 
     if (!attempt) {
