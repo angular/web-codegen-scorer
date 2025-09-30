@@ -1,6 +1,5 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import chalk from 'chalk';
-import { assertValidModelName, LlmRunner } from './codegen/llm-runner.js';
 import {
   BUILT_IN_ENVIRONMENTS,
   DEFAULT_AUTORATER_MODEL_NAME,
@@ -11,8 +10,7 @@ import {
   logReportToConsole,
   writeReportToDisk,
 } from './reporting/report-logging.js';
-import { getRunnerByName, RunnerName } from './codegen/runner-creation.js';
-import { GenkitRunner } from './codegen/genkit/genkit-runner.js';
+import { RunnerName } from './codegen/runner-creation.js';
 import { UserFacingError } from './utils/errors.js';
 
 export const EvalModule = {
@@ -166,9 +164,6 @@ function builder(argv: Argv): Argv<Options> {
 }
 
 async function handler(cliArgs: Arguments<Options>): Promise<void> {
-  let llm: LlmRunner | null = null;
-  let ratingLlm: GenkitRunner | null = null;
-
   if (!cliArgs.environment) {
     console.error(
       chalk.red(
@@ -184,9 +179,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
   }
 
   try {
-    ratingLlm = await getRunnerByName('genkit');
     const runInfo = await generateCodeAndAssess({
-      ratingLlm,
       runner: cliArgs.runner,
       model: cliArgs.model,
       environmentConfigPath:
@@ -222,7 +215,5 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
         console.error(chalk.red((error as Error).stack));
       }
     }
-  } finally {
-    await ratingLlm?.dispose();
   }
 }

@@ -9,7 +9,6 @@ import {
   assertValidModelName,
   LlmGenerateFilesContext,
   LlmGenerateFilesResponse,
-  LlmRunner,
 } from '../codegen/llm-runner.js';
 import {
   DEFAULT_AUTORATER_MODEL_NAME,
@@ -54,9 +53,8 @@ import { UserFacingError } from '../utils/errors.js';
 import { getRunGroupId } from './grouping.js';
 import { executeCommand } from '../utils/exec.js';
 import { EvalID, Gateway } from './gateway.js';
-import { LocalGateway } from './gateways/local_gateway.js';
 import { LocalEnvironment } from '../configuration/environment-local.js';
-import { RunnerName } from '../codegen/runner-creation.js';
+import { getRunnerByName, RunnerName } from '../codegen/runner-creation.js';
 
 /**
  * Orchestrates the entire assessment process for each prompt defined in the `prompts` array.
@@ -71,7 +69,6 @@ import { RunnerName } from '../codegen/runner-creation.js';
  *          each containing the prompt, generated code, and final validation status.
  */
 export async function generateCodeAndAssess(options: {
-  ratingLlm: GenkitRunner;
   model: string;
   runner: RunnerName;
   environmentConfigPath: string;
@@ -96,6 +93,7 @@ export async function generateCodeAndAssess(options: {
     options.environmentConfigPath,
     options.runner
   );
+  const ratingLlm = await getRunnerByName('genkit');
 
   // TODO(devversion): Consider validating model names also for remote environments.
   if (env instanceof LocalEnvironment) {
@@ -179,7 +177,7 @@ export async function generateCodeAndAssess(options: {
                     evalID,
                     env,
                     env.gateway,
-                    options.ratingLlm,
+                    ratingLlm,
                     options.model,
                     rootPromptDef,
                     options.localMode,
@@ -254,7 +252,7 @@ export async function generateCodeAndAssess(options: {
     const timestamp = new Date();
     const details = {
       summary: await prepareSummary(
-        options.ratingLlm,
+        ratingLlm,
         new AbortController().signal, // Note: AI summarization is currently not abortable.
         options.model,
         env,
