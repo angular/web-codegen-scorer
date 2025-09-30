@@ -1,49 +1,34 @@
 import {ChildProcess, spawn} from 'child_process';
+import {join, relative} from 'path';
+import {existsSync} from 'fs';
+import assert from 'assert';
 import {
   LlmConstrainedOutputGenerateResponse,
-  LlmGenerateFilesContext,
   LlmGenerateFilesRequestOptions,
   LlmGenerateFilesResponse,
   LlmGenerateTextResponse,
-  LlmRunner,
-} from '../llm-runner.js';
-import {join, relative} from 'path';
-import {existsSync, mkdirSync} from 'fs';
-import {writeFile} from 'fs/promises';
-import {
-  getGeminiIgnoreFile,
-  getGeminiInstructionsFile,
-  getGeminiSettingsFile,
-} from './gemini-files.js';
-import {DirectorySnapshot} from '../directory-snapshot.js';
-import {LlmResponseFile} from '../../shared-interfaces.js';
-import {UserFacingError} from '../../utils/errors.js';
-import assert from 'assert';
+} from './llm-runner.js';
+import {DirectorySnapshot} from './directory-snapshot.js';
+import {LlmResponseFile} from '../shared-interfaces.js';
+import {UserFacingError} from '../utils/errors.js';
 
-const SUPPORTED_MODELS = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+/** Base class for a command-line-based runner. */
+export abstract class BaseCliAgentRunner {
+  abstract readonly displayName: string;
+  protected abstract readonly binaryName: string;
+  protected abstract readonly ignoredFilePatterns: string[];
+  protected abstract getCommandLineFlags(options: LlmGenerateFilesRequestOptions): string[];
+  protected abstract writeAgentFiles(options: LlmGenerateFilesRequestOptions): Promise<void>;
 
-/** Runner that generates code using the Gemini CLI. */
-export class GeminiCliRunner implements LlmRunner {
-  readonly id = 'gemini-cli';
-  readonly displayName = 'Gemini CLI';
-  readonly hasBuiltInRepairLoop = true;
   private pendingTimeouts = new Set<ReturnType<typeof setTimeout>>();
   private pendingProcesses = new Set<ChildProcess>();
-  private binaryPath = this.resolveBinaryPath();
-  private evalIgnoredPatterns = [
-    '**/node_modules/**',
-    '**/dist/**',
-    '**/.angular/**',
-    '**/GEMINI.md',
-    '**/.geminiignore',
-  ];
+  private binaryPath: string | null = null;
+  private commonIgnoredPatterns = ['**/node_modules/**', '**/dist/**', '**/.angular/**'];
 
   async generateFiles(options: LlmGenerateFilesRequestOptions): Promise<LlmGenerateFilesResponse> {
-    const {context, model} = options;
+    const {context} = options;
 
-    // TODO: Consider removing these assertions when we have better types here.
-    // These fields are always set when running in a local environment, and this
-    // is a requirement for selecting the `gemini-cli` runner.
+    // TODO: Consider removing these assertions when we have better types.
     assert(
       context.buildCommand,
       'Expected a `buildCommand` to be set in the LLM generate request context',
@@ -53,33 +38,16 @@ export class GeminiCliRunner implements LlmRunner {
       'Expected a `packageManager` to be set in the LLM generate request context',
     );
 
-    const ignoreFilePath = join(context.directory, '.geminiignore');
-    const instructionFilePath = join(context.directory, 'GEMINI.md');
-    const settingsDir = join(context.directory, '.gemini');
+    const ignoredPatterns = [...this.commonIgnoredPatterns, ...this.ignoredFilePatterns];
     const initialSnapshot = await DirectorySnapshot.forDirectory(
       context.directory,
-      this.evalIgnoredPatterns,
+      ignoredPatterns,
     );
 
-    mkdirSync(settingsDir);
+    await this.writeAgentFiles(options);
 
-    await Promise.all([
-      writeFile(ignoreFilePath, getGeminiIgnoreFile()),
-      writeFile(
-        instructionFilePath,
-        getGeminiInstructionsFile(context.systemInstructions, context.buildCommand),
-      ),
-      writeFile(
-        join(settingsDir, 'settings.json'),
-        getGeminiSettingsFile(context.packageManager, context.possiblePackageManagers),
-      ),
-    ]);
-
-    const reasoning = await this.runGeminiProcess(model, context, 2, 10);
-    const finalSnapshot = await DirectorySnapshot.forDirectory(
-      context.directory,
-      this.evalIgnoredPatterns,
-    );
+    const reasoning = await this.runAgentProcess(options, 2, 10);
+    const finalSnapshot = await DirectorySnapshot.forDirectory(context.directory, ignoredPatterns);
 
     const diff = finalSnapshot.getChangedOrAddedFiles(initialSnapshot);
     const files: LlmResponseFile[] = [];
@@ -96,17 +64,13 @@ export class GeminiCliRunner implements LlmRunner {
 
   generateText(): Promise<LlmGenerateTextResponse> {
     // Technically we can make this work, but we don't need it at the time of writing.
-    throw new UserFacingError('Generating text with Gemini CLI is not supported.');
+    throw new UserFacingError(`Generating text with ${this.displayName} is not supported.`);
   }
 
   generateConstrained(): Promise<LlmConstrainedOutputGenerateResponse<any>> {
     // We can't support this, because there's no straightforward
-    // way to tell the Gemini CLI to follow a schema.
-    throw new UserFacingError('Constrained output with Gemini CLI is not supported.');
-  }
-
-  getSupportedModels(): string[] {
-    return SUPPORTED_MODELS;
+    // way to tell the agent to follow a schema.
+    throw new UserFacingError(`Constrained output with ${this.displayName} is not supported.`);
   }
 
   async dispose(): Promise<void> {
@@ -122,13 +86,13 @@ export class GeminiCliRunner implements LlmRunner {
     this.pendingProcesses.clear();
   }
 
-  private resolveBinaryPath(): string {
+  private resolveBinaryPath(binaryName: string): string {
     let dir = import.meta.dirname;
     let closestRoot: string | null = null;
 
-    // Attempt to resolve the Gemini CLI binary by starting at the current file and going up until
+    // Attempt to resolve the agent CLI binary by starting at the current file and going up until
     // we find the closest `node_modules`. Note that we can't rely on `import.meta.resolve` here,
-    // because that'll point us to the Gemini CLI bundle, but not its binary. In some package
+    // because that'll point us to the agent bundle, but not its binary. In some package
     // managers (pnpm specifically) the `node_modules` in which the file is installed is different
     // from the one in which the binary is placed.
     while (dir.length > 1) {
@@ -147,18 +111,17 @@ export class GeminiCliRunner implements LlmRunner {
       }
     }
 
-    const binaryPath = closestRoot ? join(closestRoot, 'node_modules/.bin/gemini') : null;
+    const binaryPath = closestRoot ? join(closestRoot, `node_modules/.bin/${binaryName}`) : null;
 
     if (!binaryPath || !existsSync(binaryPath)) {
-      throw new UserFacingError('Gemini CLI is not installed inside the current project');
+      throw new UserFacingError(`${this.displayName} is not installed inside the current project`);
     }
 
     return binaryPath;
   }
 
-  private runGeminiProcess(
-    model: string,
-    context: LlmGenerateFilesContext,
+  private runAgentProcess(
+    options: LlmGenerateFilesRequestOptions,
     inactivityTimeoutMins: number,
     totalRequestTimeoutMins: number,
   ): Promise<string> {
@@ -196,12 +159,12 @@ export class GeminiCliRunner implements LlmRunner {
 
       const noOutputCallback = () => {
         finalize(
-          `There was no output from Gemini CLI for ${inactivityTimeoutMins} minute(s). ` +
+          `There was no output from ${this.displayName} for ${inactivityTimeoutMins} minute(s). ` +
             `Stopping the process...`,
         );
       };
 
-      // Gemini can get into a state where it stops outputting code, but it also doesn't exit
+      // The agent can get into a state where it stops outputting code, but it also doesn't exit
       // the process. Stop if there hasn't been any output for a certain amount of time.
       let inactivityTimeout = setTimeout(noOutputCallback, inactivityTimeoutMins * msPerMin);
       this.pendingTimeouts.add(inactivityTimeout);
@@ -209,30 +172,22 @@ export class GeminiCliRunner implements LlmRunner {
       // Also add a timeout for the entire codegen process.
       const globalTimeout = setTimeout(() => {
         finalize(
-          `Gemini CLI didn't finish within ${totalRequestTimeoutMins} minute(s). ` +
+          `${this.displayName} didn't finish within ${totalRequestTimeoutMins} minute(s). ` +
             `Stopping the process...`,
         );
       }, totalRequestTimeoutMins * msPerMin);
 
-      const childProcess = spawn(
-        this.binaryPath,
-        [
-          '--prompt',
-          context.executablePrompt,
-          '--model',
-          model,
-          // Skip all confirmations.
-          '--approval-mode',
-          'yolo',
-        ],
-        {
-          cwd: context.directory,
-          env: {...process.env},
-        },
-      );
+      this.binaryPath ??= this.resolveBinaryPath(this.binaryName);
+
+      const childProcess = spawn(this.binaryPath, this.getCommandLineFlags(options), {
+        cwd: options.context.directory,
+        env: {...process.env},
+      });
 
       childProcess.on('close', code =>
-        finalize('Gemini CLI process has exited' + (code == null ? '.' : ` with ${code} code.`)),
+        finalize(
+          `${this.displayName} process has exited` + (code == null ? '.' : ` with ${code} code.`),
+        ),
       );
       childProcess.stdout.on('data', data => {
         if (inactivityTimeout) {
