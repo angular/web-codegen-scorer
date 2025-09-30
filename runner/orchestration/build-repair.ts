@@ -120,10 +120,12 @@ async function handleRepairResponse(
     progress
   );
 
+  // Capture attempt's full files. Copy because `finalOutputFiles` can be
+  // mutated in subsequent repair attempts.
+  const attemptFullFiles = finalOutputFiles.map((f) => ({ ...f }));
+
   return {
-    // Log the `outputFiles` from the repair response specifically, because
-    // we want a snapshot after the current API call, not the full file set.
-    outputFiles: repairResponse.outputFiles,
+    outputFiles: attemptFullFiles,
     usage: repairResponse.usage,
     reasoning: repairResponse.reasoning,
     buildResult,
