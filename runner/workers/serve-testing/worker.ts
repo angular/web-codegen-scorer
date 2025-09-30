@@ -15,7 +15,6 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
   const {
     appName,
     serveUrl,
-    collectRuntimeErrors,
     enableAutoCsp,
     includeAxeTesting,
     takeScreenshots,
@@ -57,9 +56,8 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
     screenshotBase64Data = puppeteerResult.screenshotBase64Data;
     axeViolations = puppeteerResult.axeViolations;
     cspViolations = puppeteerResult.cspViolations;
-    if (collectRuntimeErrors) {
-      runtimeErrors.push(...puppeteerResult.runtimeErrors);
-    }
+
+    runtimeErrors.push(...puppeteerResult.runtimeErrors);
 
     if (userJourneyAgentTaskInput) {
       userJourneyAgentOutput = await runBrowserAgentUserJourneyTests(

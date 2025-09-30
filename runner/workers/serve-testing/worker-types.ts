@@ -16,24 +16,19 @@ export interface ServeTestingWorkerMessage {
   /** Name of the app. */
   appName: string;
   /**
-   * Whether this application should be invoked via Puppeteer and
-   * runtime errors should be collected and reported.
-   */
-  collectRuntimeErrors?: boolean;
-  /**
    * Whether to take a screenshot of the application.
    */
-  takeScreenshots?: boolean;
+  takeScreenshots: boolean;
   /**
    * Whether or not to perform Axe testing of the application.
    */
-  includeAxeTesting?: boolean;
+  includeAxeTesting: boolean;
 
   /** Whether to enable the auto CSP checks. */
-  enableAutoCsp?: boolean;
+  enableAutoCsp: boolean;
 
   /** User journey browser agent task input */
-  userJourneyAgentTaskInput?: BrowserAgentTaskInput;
+  userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined;
 }
 
 export interface ServeTestingResult {
