@@ -8,6 +8,7 @@ import {
 import { lazy } from '../../../utils/lazy-creation.js';
 import { GoogleGenAI, Part } from '@google/genai';
 import { RateLimiter } from 'limiter';
+import { LlmResponseFile } from '../../../shared-interfaces.js';
 
 export class GeminiModelProvider extends GenkitModelProvider {
   readonly apiKeyVariableName = 'GEMINI_API_KEY';
@@ -72,6 +73,15 @@ export class GeminiModelProvider extends GenkitModelProvider {
 
   getModelSpecificConfig(opts: { includeThoughts?: boolean }): object {
     return { thinkingConfig: { includeThoughts: opts.includeThoughts } };
+  }
+
+  validateGeneratedFiles(files: LlmResponseFile[]): boolean {
+    // Gemini responses occasionally get truncated on `class=`.
+    // Consider these cases as invalid so they don't influence the results.
+    return (
+      files.length === 0 ||
+      !files.some((file) => file.code.trim().endsWith('class='))
+    );
   }
 
   private async countGeminiTokens(

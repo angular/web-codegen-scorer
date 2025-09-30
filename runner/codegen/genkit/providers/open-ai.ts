@@ -81,6 +81,10 @@ export class OpenAiModelProvider extends GenkitModelProvider {
     return {};
   }
 
+  validateGeneratedFiles(): boolean {
+    return true;
+  }
+
   private genkitPromptToOpenAi(
     prompt: PromptDataForCounting
   ): Array<{ role: string; content: string }> {

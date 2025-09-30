@@ -38,6 +38,10 @@ export class ClaudeModelProvider extends GenkitModelProvider {
     return {};
   }
 
+  validateGeneratedFiles(): boolean {
+    return true;
+  }
+
   private anthropicApi = lazy(() => {
     return new Anthropic({ apiKey: this.getApiKey() || undefined });
   });

@@ -96,6 +96,10 @@ export class GrokModelProvider extends GenkitModelProvider {
     return {};
   }
 
+  validateGeneratedFiles(): boolean {
+    return true;
+  }
+
   private genkitPromptToXaiFormat(
     prompt: PromptDataForCounting
   ): Array<{ role: string; content: string }> {
