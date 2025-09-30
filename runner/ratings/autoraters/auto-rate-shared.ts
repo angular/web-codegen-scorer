@@ -1,4 +1,4 @@
-import { Usage } from '../../shared-interfaces.js';
+import {Usage} from '../../shared-interfaces.js';
 
 /** Maximum rating that the LLM can assign. */
 export const MAX_RATING = 10;
@@ -9,7 +9,7 @@ export interface AutoRateResult {
   usage: Usage;
   details: {
     summary: string;
-    categories: { name: string; message: string }[];
+    categories: {name: string; message: string}[];
   };
 }
 

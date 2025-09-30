@@ -1,4 +1,4 @@
-import { logger } from 'genkit/logging';
+import {logger} from 'genkit/logging';
 
 const defaultLogger = logger.defaultLogger;
 

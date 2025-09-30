@@ -1,16 +1,13 @@
-export { axeRating } from './axe-rating.js';
-export { codeQualityRating } from './code-quality-rating.js';
-export { NoInnerHtmlBindingsRating } from './no-inner-html-bindings-rating.js';
-export { NoDangerouslySetInnerHtmlRating } from './no-dangerously-set-inner-html-rating.js';
-export { noRuntimeExceptionsRating } from './no-runtime-errors-rating.js';
-export { safetyWebRating } from './safety-web-rating.js';
-export { successfulBuildRating } from './successful-build-rating.js';
-export { sufficientCodeSizeRating } from './sufficient-code-size-rating.js';
-export { sufficientGeneratedFilesRating } from './sufficient-generated-files-rating.js';
-export { userJourneysRating } from './user-journeys-rating.js';
-export { validCssRating } from './valid-css-rating.js';
-export { visualAppearanceRating } from './visual-appearance-rating.js';
-export {
-  cspViolationsRating,
-  trustedTypesViolationsRating,
-} from './security-ratings.js';
+export {axeRating} from './axe-rating.js';
+export {codeQualityRating} from './code-quality-rating.js';
+export {NoInnerHtmlBindingsRating} from './no-inner-html-bindings-rating.js';
+export {NoDangerouslySetInnerHtmlRating} from './no-dangerously-set-inner-html-rating.js';
+export {noRuntimeExceptionsRating} from './no-runtime-errors-rating.js';
+export {safetyWebRating} from './safety-web-rating.js';
+export {successfulBuildRating} from './successful-build-rating.js';
+export {sufficientCodeSizeRating} from './sufficient-code-size-rating.js';
+export {sufficientGeneratedFilesRating} from './sufficient-generated-files-rating.js';
+export {userJourneysRating} from './user-journeys-rating.js';
+export {validCssRating} from './valid-css-rating.js';
+export {visualAppearanceRating} from './visual-appearance-rating.js';
+export {cspViolationsRating, trustedTypesViolationsRating} from './security-ratings.js';

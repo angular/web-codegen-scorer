@@ -1,7 +1,7 @@
-import puppeteer, { Protocol } from 'puppeteer';
+import puppeteer, {Protocol} from 'puppeteer';
 import fetch from 'node-fetch';
-import { StrictCsp } from 'strict-csp';
-import { CspViolation } from './auto-csp-types.js';
+import {StrictCsp} from 'strict-csp';
+import {CspViolation} from './auto-csp-types.js';
 
 /**
  * Stores metadata about a script parsed by the browser's debugger.
@@ -30,35 +30,29 @@ export class AutoCsp {
     const client = await page.createCDPSession();
     await client.send('Debugger.enable');
 
-    client.on(
-      'Debugger.scriptParsed',
-      async (event: Protocol.Debugger.ScriptParsedEvent) => {
-        if (!event.url) {
-          return;
-        }
-        try {
-          const { scriptSource } = await client.send(
-            'Debugger.getScriptSource',
-            {
-              scriptId: event.scriptId,
-            }
-          );
-
-          const info: ScriptInfo = {
-            url: event.url,
-            source: scriptSource,
-            startLine: event.startLine,
-            endLine: event.endLine,
-          };
-
-          const existing = this.scriptInfosByUrl.get(event.url) ?? [];
-          existing.push(info);
-          this.scriptInfosByUrl.set(event.url, existing);
-        } catch (e) {
-          // This can happen for certain browser-internal scripts. We can ignore them.
-        }
+    client.on('Debugger.scriptParsed', async (event: Protocol.Debugger.ScriptParsedEvent) => {
+      if (!event.url) {
+        return;
       }
-    );
+      try {
+        const {scriptSource} = await client.send('Debugger.getScriptSource', {
+          scriptId: event.scriptId,
+        });
+
+        const info: ScriptInfo = {
+          url: event.url,
+          source: scriptSource,
+          startLine: event.startLine,
+          endLine: event.endLine,
+        };
+
+        const existing = this.scriptInfosByUrl.get(event.url) ?? [];
+        existing.push(info);
+        this.scriptInfosByUrl.set(event.url, existing);
+      } catch (e) {
+        // This can happen for certain browser-internal scripts. We can ignore them.
+      }
+    });
   }
 
   /**
@@ -107,7 +101,7 @@ export class AutoCsp {
       console.error('Could not parse CSP report:', e);
     }
     // Respond to the request so the browser doesn't hang
-    await request.respond({ status: 204 });
+    await request.respond({status: 204});
   }
 
   private addCodeSnippetToReport(report: CspViolation): void {
@@ -126,9 +120,7 @@ export class AutoCsp {
     }
 
     // Find the specific script block that contains the violation line.
-    const script = scriptInfos.find(
-      (s) => lineNumber >= s.startLine && lineNumber <= s.endLine
-    );
+    const script = scriptInfos.find(s => lineNumber >= s.startLine && lineNumber <= s.endLine);
 
     if (script) {
       const lines = script.source.split('\n');
@@ -148,9 +140,7 @@ export class AutoCsp {
     }
   }
 
-  private async handleNavigation(
-    request: puppeteer.HTTPRequest
-  ): Promise<void> {
+  private async handleNavigation(request: puppeteer.HTTPRequest): Promise<void> {
     try {
       const response = await fetch(request.url(), {
         headers: request.headers(),

@@ -1,10 +1,10 @@
-import { globSync } from 'tinyglobby';
-import { readFile } from 'fs/promises';
-import { availableParallelism } from 'os';
-import { randomUUID } from 'crypto';
+import {globSync} from 'tinyglobby';
+import {readFile} from 'fs/promises';
+import {availableParallelism} from 'os';
+import {randomUUID} from 'crypto';
 import PQueue from 'p-queue';
-import { basename, join } from 'path';
-import { existsSync, readdirSync } from 'fs';
+import {basename, join} from 'path';
+import {existsSync, readdirSync} from 'fs';
 import {
   assertValidModelName,
   LlmGenerateFilesContext,
@@ -15,10 +15,10 @@ import {
   LLM_OUTPUT_DIR,
   REPORT_VERSION,
 } from '../configuration/constants.js';
-import { Environment } from '../configuration/environment.js';
-import { rateGeneratedCode } from '../ratings/rate-code.js';
-import { summarizeReportWithAI } from '../reporting/ai-summarize.js';
-import { redX } from '../reporting/format.js';
+import {Environment} from '../configuration/environment.js';
+import {rateGeneratedCode} from '../ratings/rate-code.js';
+import {summarizeReportWithAI} from '../reporting/ai-summarize.js';
+import {redX} from '../reporting/format.js';
 import {
   AssessmentResult,
   AttemptDetails,
@@ -32,29 +32,25 @@ import {
   RunSummary,
   Usage,
 } from '../shared-interfaces.js';
-import { BrowserAgentTaskInput } from '../testing/browser-agent/models.js';
-import { callWithTimeout } from '../utils/timeout.js';
-import { attemptBuild } from './build-serve-loop.js';
-import { createLlmResponseTokenUsageMessage } from './codegen.js';
-import { generateUserJourneysForApp } from './user-journeys.js';
-import {
-  resolveContextFiles,
-  setupProjectStructure,
-  writeResponseFiles,
-} from './file-system.js';
-import { GenkitRunner } from '../codegen/genkit/genkit-runner.js';
-import { getEnvironmentByPath } from '../configuration/environment-resolution.js';
-import { getPossiblePackageManagers } from '../configuration/environment-config.js';
-import { ProgressLogger } from '../progress/progress-logger.js';
-import { TextProgressLogger } from '../progress/text-progress-logger.js';
-import { logReportHeader } from '../reporting/report-logging.js';
-import { DynamicProgressLogger } from '../progress/dynamic-progress-logger.js';
-import { UserFacingError } from '../utils/errors.js';
-import { getRunGroupId } from './grouping.js';
-import { executeCommand } from '../utils/exec.js';
-import { EvalID, Gateway } from './gateway.js';
-import { LocalEnvironment } from '../configuration/environment-local.js';
-import { getRunnerByName, RunnerName } from '../codegen/runner-creation.js';
+import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
+import {callWithTimeout} from '../utils/timeout.js';
+import {attemptBuild} from './build-serve-loop.js';
+import {createLlmResponseTokenUsageMessage} from './codegen.js';
+import {generateUserJourneysForApp} from './user-journeys.js';
+import {resolveContextFiles, setupProjectStructure, writeResponseFiles} from './file-system.js';
+import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
+import {getEnvironmentByPath} from '../configuration/environment-resolution.js';
+import {getPossiblePackageManagers} from '../configuration/environment-config.js';
+import {ProgressLogger} from '../progress/progress-logger.js';
+import {TextProgressLogger} from '../progress/text-progress-logger.js';
+import {logReportHeader} from '../reporting/report-logging.js';
+import {DynamicProgressLogger} from '../progress/dynamic-progress-logger.js';
+import {UserFacingError} from '../utils/errors.js';
+import {getRunGroupId} from './grouping.js';
+import {executeCommand} from '../utils/exec.js';
+import {EvalID, Gateway} from './gateway.js';
+import {LocalEnvironment} from '../configuration/environment-local.js';
+import {getRunnerByName, RunnerName} from '../codegen/runner-creation.js';
 
 /**
  * Orchestrates the entire assessment process for each prompt defined in the `prompts` array.
@@ -90,10 +86,7 @@ export async function generateCodeAndAssess(options: {
   autoraterModel?: string;
   a11yRepairAttempts?: number;
 }): Promise<RunInfo> {
-  const env = await getEnvironmentByPath(
-    options.environmentConfigPath,
-    options.runner
-  );
+  const env = await getEnvironmentByPath(options.environmentConfigPath, options.runner);
   const ratingLlm = await getRunnerByName('genkit');
 
   // TODO(devversion): Consider validating model names also for remote environments.
@@ -105,12 +98,10 @@ export async function generateCodeAndAssess(options: {
     const promptsToProcess = getCandidateExecutablePrompts(
       env,
       options.localMode,
-      options.promptFilter
+      options.promptFilter,
     ).slice(0, options.limit);
     const progress =
-      options.logging === 'dynamic'
-        ? new DynamicProgressLogger()
-        : new TextProgressLogger();
+      options.logging === 'dynamic' ? new DynamicProgressLogger() : new TextProgressLogger();
     const appConcurrency =
       options.concurrency === 'auto'
         ? Math.floor(availableParallelism() * 0.8)
@@ -119,9 +110,7 @@ export async function generateCodeAndAssess(options: {
     if (promptsToProcess.length === 0) {
       throw new UserFacingError(
         `No prompts have been configured for environment '${env.displayName}'` +
-          (options.promptFilter
-            ? ` and filtered by '${options.promptFilter}'.`
-            : '.')
+          (options.promptFilter ? ` and filtered by '${options.promptFilter}'.` : '.'),
       );
     }
 
@@ -142,15 +131,12 @@ export async function generateCodeAndAssess(options: {
       env.mcpServerOptions.length &&
       env.llm.startMcpServerHost
     ) {
-      env.llm.startMcpServerHost(
-        `mcp-${env.clientSideFramework.id}`,
-        env.mcpServerOptions
-      );
+      env.llm.startMcpServerHost(`mcp-${env.clientSideFramework.id}`, env.mcpServerOptions);
     }
 
     progress.initialize(promptsToProcess.length);
 
-    const appConcurrencyQueue = new PQueue({ concurrency: appConcurrency });
+    const appConcurrencyQueue = new PQueue({concurrency: appConcurrency});
     const workerConcurrencyQueue = new PQueue({
       concurrency:
         options.concurrency === 'auto'
@@ -173,7 +159,7 @@ export async function generateCodeAndAssess(options: {
             try {
               return await callWithTimeout(
                 `Evaluation of ${rootPromptDef.name}`,
-                async (abortSignal) =>
+                async abortSignal =>
                   startEvaluationTask(
                     evalID,
                     env,
@@ -192,10 +178,10 @@ export async function generateCodeAndAssess(options: {
                     workerConcurrencyQueue,
                     progress,
                     options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME,
-                    options.a11yRepairAttempts ?? 0
+                    options.a11yRepairAttempts ?? 0,
                   ),
                 // 10min max per app evaluation.  We just want to make sure it never gets stuck.
-                10
+                10,
               );
             } catch (e: unknown) {
               failedPrompts.push({
@@ -209,12 +195,7 @@ export async function generateCodeAndAssess(options: {
                 details += `\nStack: ${e.stack}`;
               }
 
-              progress.log(
-                rootPromptDef,
-                'error',
-                'Failed to evaluate code',
-                details
-              );
+              progress.log(rootPromptDef, 'error', 'Failed to evaluate code', details);
               return [] satisfies AssessmentResult[];
             } finally {
               progress.log(rootPromptDef, 'done', 'Done');
@@ -222,8 +203,8 @@ export async function generateCodeAndAssess(options: {
               await env.gateway.finalizeEval(evalID);
             }
           },
-          { throwOnTimeout: true }
-        )
+          {throwOnTimeout: true},
+        ),
       );
     }
 
@@ -242,7 +223,7 @@ export async function generateCodeAndAssess(options: {
       env.llm.startMcpServerHost &&
       env.llm.flushMcpServerLogs
         ? {
-            servers: env.mcpServerOptions.map((m) => ({
+            servers: env.mcpServerOptions.map(m => ({
               name: m.name,
               command: m.command,
               args: m.args,
@@ -263,16 +244,12 @@ export async function generateCodeAndAssess(options: {
           allPromptsCount: promptsToProcess.length,
           failedPrompts,
         },
-        options
+        options,
       ),
       timestamp: timestamp.toISOString(),
       reportName: options.reportName,
-      systemPromptGeneration: env.classifyPrompts
-        ? 'Classified 🕵️'
-        : env.systemPromptGeneration(),
-      systemPromptRepair: env.classifyPrompts
-        ? 'Classified 🕵️'
-        : env.systemPromptRepair(),
+      systemPromptGeneration: env.classifyPrompts ? 'Classified 🕵️' : env.systemPromptGeneration(),
+      systemPromptRepair: env.classifyPrompts ? 'Classified 🕵️' : env.systemPromptRepair(),
       // Deduplicate labels before finalizing the report.
       labels: Array.from(new Set(options.labels)),
       mcp,
@@ -331,19 +308,18 @@ async function startEvaluationTask(
   workerConcurrencyQueue: PQueue,
   progress: ProgressLogger,
   autoraterModel: string,
-  a11yRepairAttempts: number
+  a11yRepairAttempts: number,
 ): Promise<AssessmentResult[]> {
   // Set up the project structure once for the root project.
-  const { directory, cleanup } = await setupProjectStructure(
+  const {directory, cleanup} = await setupProjectStructure(
     env,
     rootPromptDef,
     progress,
-    outputDirectory
+    outputDirectory,
   );
 
   const results: AssessmentResult[] = [];
-  const defsToExecute =
-    rootPromptDef.kind === 'single' ? [rootPromptDef] : rootPromptDef.steps;
+  const defsToExecute = rootPromptDef.kind === 'single' ? [rootPromptDef] : rootPromptDef.steps;
 
   for (const promptDef of defsToExecute) {
     const [fullPromptText, systemInstructions] = await Promise.all([
@@ -353,10 +329,7 @@ async function startEvaluationTask(
 
     // Resolve the context files from the root. We need to do this after the project is set up
     // and for each sub-prompt, because the project will be augmented on each iteration.
-    const contextFiles = await resolveContextFiles(
-      promptDef.contextFilePatterns,
-      directory
-    );
+    const contextFiles = await resolveContextFiles(promptDef.contextFilePatterns, directory);
 
     // Generate the initial set of files through the LLM.
     const initialResponse = await generateInitialFiles(
@@ -370,16 +343,14 @@ async function startEvaluationTask(
         systemInstructions,
         combinedPrompt: fullPromptText,
         executablePrompt: promptDef.prompt,
-        packageManager:
-          env instanceof LocalEnvironment ? env.packageManager : undefined,
-        buildCommand:
-          env instanceof LocalEnvironment ? env.buildCommand : undefined,
+        packageManager: env instanceof LocalEnvironment ? env.packageManager : undefined,
+        buildCommand: env instanceof LocalEnvironment ? env.buildCommand : undefined,
         possiblePackageManagers: getPossiblePackageManagers().slice(),
       },
       contextFiles,
       localMode,
       abortSignal,
-      progress
+      progress,
     );
 
     const toolLogs = initialResponse.toolLogs ?? [];
@@ -388,7 +359,7 @@ async function startEvaluationTask(
       progress.log(
         promptDef,
         'error',
-        'Failed to generate initial code using AI. Skipping this app.'
+        'Failed to generate initial code using AI. Skipping this app.',
       );
       await cleanup();
       break;
@@ -399,22 +370,12 @@ async function startEvaluationTask(
       // Note: This can fail when the LLM e.g. produced a wrong file name that is too large,
       // and results in a file system error. Gracefully handle this so we can continue testing.
       // Write the generated files to disk within the project directory.
-      await writeResponseFiles(
-        directory,
-        initialResponse.files,
-        env,
-        rootPromptDef.name
-      );
+      await writeResponseFiles(directory, initialResponse.files, env, rootPromptDef.name);
 
       // If we're in a multi-step prompt, also write out to dedicated directories
       // for each sub-prompt so that we can inspect the output along the way.
       if (rootPromptDef.kind === 'multi-step') {
-        await writeResponseFiles(
-          directory,
-          initialResponse.files,
-          env,
-          promptDef.name
-        );
+        await writeResponseFiles(directory, initialResponse.files, env, promptDef.name);
       }
     } catch (e) {
       let details = `Error: ${e}`;
@@ -427,7 +388,7 @@ async function startEvaluationTask(
         promptDef,
         'error',
         'Failed to generate initial code using AI. Skipping this app.',
-        details
+        details,
       );
 
       await cleanup();
@@ -439,18 +400,17 @@ async function startEvaluationTask(
       rootPromptDef.name,
       defsToExecute[0].prompt,
       initialResponse.files,
-      abortSignal
+      abortSignal,
     );
 
     // TODO: Only execute the serve command on the "final working attempt".
     // TODO: Incorporate usage.
-    const userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined =
-      enableUserJourneyTesting
-        ? {
-            userJourneys: userJourneys.result,
-            appPrompt: defsToExecute[0].prompt,
-          }
-        : undefined;
+    const userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined = enableUserJourneyTesting
+      ? {
+          userJourneys: userJourneys.result,
+          appPrompt: defsToExecute[0].prompt,
+        }
+      : undefined;
 
     const attemptDetails: AttemptDetails[] = []; // Store details for assessment.json
 
@@ -473,7 +433,7 @@ async function startEvaluationTask(
       skipAxeTesting,
       enableAutoCsp,
       userJourneyAgentTaskInput,
-      a11yRepairAttempts
+      a11yRepairAttempts,
     );
 
     if (!attempt) {
@@ -493,7 +453,7 @@ async function startEvaluationTask(
       attempt.axeRepairAttempts,
       abortSignal,
       progress,
-      autoraterModel
+      autoraterModel,
     );
 
     results.push({
@@ -540,24 +500,22 @@ async function generateInitialFiles(
   contextFiles: LlmContextFile[],
   localMode: boolean,
   abortSignal: AbortSignal,
-  progress: ProgressLogger
+  progress: ProgressLogger,
 ): Promise<LlmGenerateFilesResponse> {
   if (localMode) {
     const localFilesDirectory = join(LLM_OUTPUT_DIR, env.id, promptDef.name);
-    const filePaths = globSync('**/*', { cwd: localFilesDirectory });
+    const filePaths = globSync('**/*', {cwd: localFilesDirectory});
 
     if (filePaths.length === 0) {
-      throw new UserFacingError(
-        `Could not find pre-existing files in ${localFilesDirectory}`
-      );
+      throw new UserFacingError(`Could not find pre-existing files in ${localFilesDirectory}`);
     }
 
     return {
       files: await Promise.all(
-        filePaths.map(async (filePath) => ({
+        filePaths.map(async filePath => ({
           filePath,
           code: await readFile(join(localFilesDirectory, filePath), 'utf8'),
-        }))
+        })),
       ),
       usage: {
         inputTokens: 0,
@@ -576,7 +534,7 @@ async function generateInitialFiles(
     codegenContext,
     model,
     contextFiles,
-    abortSignal
+    abortSignal,
   );
 
   if (response.success) {
@@ -584,21 +542,14 @@ async function generateInitialFiles(
       promptDef,
       'codegen',
       'Received AI code generation response',
-      createLlmResponseTokenUsageMessage(response) ?? ''
+      createLlmResponseTokenUsageMessage(response) ?? '',
     );
   } else {
-    progress.log(
-      promptDef,
-      'error',
-      'Failed to generate code with AI',
-      response.errors.join(', ')
-    );
+    progress.log(promptDef, 'error', 'Failed to generate code with AI', response.errors.join(', '));
   }
 
   if (!response.success) {
-    throw new Error(
-      `Initial file generation failed: ${response.errors.join('\n')}`
-    );
+    throw new Error(`Initial file generation failed: ${response.errors.join('\n')}`);
   }
 
   return {
@@ -620,13 +571,13 @@ async function prepareSummary(
   env: Environment,
   assessments: AssessmentResult[],
   completionStats: CompletionStats,
-  opts: { skipAiSummary?: boolean }
+  opts: {skipAiSummary?: boolean},
 ): Promise<RunSummary> {
   let inputTokens = 0;
   let outputTokens = 0;
   let totalTokens = 0;
 
-  assessments.forEach((result) => {
+  assessments.forEach(result => {
     // Incorporate usage from running raters.
     if (result.score.tokenUsage) {
       inputTokens += result.score.tokenUsage.inputTokens;
@@ -635,7 +586,7 @@ async function prepareSummary(
     }
 
     // Incorporate usage numbers from all generate + build attempts.
-    result.attemptDetails.forEach((attempt) => {
+    result.attemptDetails.forEach(attempt => {
       if (attempt.usage) {
         inputTokens += attempt.usage.inputTokens ?? 0;
         outputTokens += attempt.usage.outputTokens ?? 0;
@@ -647,11 +598,7 @@ async function prepareSummary(
   let aiSummary: string | undefined = undefined;
   if (!opts.skipAiSummary) {
     try {
-      const result = await summarizeReportWithAI(
-        genkit,
-        abortSignal,
-        assessments
-      );
+      const result = await summarizeReportWithAI(genkit, abortSignal, assessments);
       inputTokens += result.usage.inputTokens;
       outputTokens += result.usage.outputTokens;
       totalTokens += result.usage.totalTokens;
@@ -687,8 +634,7 @@ async function prepareSummary(
     },
     runner: {
       id: env instanceof LocalEnvironment ? env.llm.id : 'remote',
-      displayName:
-        env instanceof LocalEnvironment ? env.llm.displayName : 'Remote',
+      displayName: env instanceof LocalEnvironment ? env.llm.displayName : 'Remote',
     },
   } satisfies RunSummary;
 }
@@ -697,7 +643,7 @@ async function prepareSummary(
 function getCandidateExecutablePrompts(
   env: Environment,
   localMode: boolean,
-  promptFilter: string | undefined
+  promptFilter: string | undefined,
 ): RootPromptDefinition[] {
   const envDir = join(LLM_OUTPUT_DIR, env.id);
   let result = env.executablePrompts;
@@ -708,10 +654,10 @@ function getCandidateExecutablePrompts(
     const localPromptNames = readdirSync(envDir, {
       withFileTypes: true,
     })
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => basename(entry.name));
+      .filter(entry => entry.isDirectory())
+      .map(entry => basename(entry.name));
 
-    result = result.filter(({ name }) => localPromptNames.includes(name));
+    result = result.filter(({name}) => localPromptNames.includes(name));
   }
 
   // If there's no prompt filter, shuffle the array to introduce some randomness.
@@ -721,7 +667,7 @@ function getCandidateExecutablePrompts(
 
   // Otherwise only filter by name, but don't shuffle since
   // the user appears to be targeting a specific prompt.
-  return result.filter(({ name }) => name.includes(promptFilter));
+  return result.filter(({name}) => name.includes(promptFilter));
 }
 
 let chromeInstallPromise: Promise<unknown> | null = null;
@@ -734,7 +680,7 @@ async function installChrome(): Promise<void> {
     chromeInstallPromise = executeCommand(
       'npx puppeteer browsers install chrome',
       // The command needs to run in a directory whose closest node_modules contain `puppeteer`.
-      import.meta.dirname
+      import.meta.dirname,
     );
   }
 

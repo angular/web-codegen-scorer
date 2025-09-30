@@ -1,10 +1,10 @@
-import { AxePuppeteer } from '@axe-core/puppeteer';
-import { Result } from 'axe-core';
+import {AxePuppeteer} from '@axe-core/puppeteer';
+import {Result} from 'axe-core';
 import puppeteer from 'puppeteer';
-import { callWithTimeout } from '../../utils/timeout.js';
-import { AutoCsp } from './auto-csp.js';
-import { CspViolation } from './auto-csp-types.js';
-import { ServeTestingProgressLogFn } from './worker-types.js';
+import {callWithTimeout} from '../../utils/timeout.js';
+import {AutoCsp} from './auto-csp.js';
+import {CspViolation} from './auto-csp-types.js';
+import {ServeTestingProgressLogFn} from './worker-types.js';
 
 /**
  * Uses Puppeteer to take a screenshot of the main page, perform Axe testing,
@@ -17,7 +17,7 @@ export async function runAppInPuppeteer(
   takeScreenshots: boolean,
   includeAxeTesting: boolean,
   progressLog: ServeTestingProgressLogFn,
-  enableAutoCsp: boolean
+  enableAutoCsp: boolean,
 ) {
   const runtimeErrors: string[] = [];
 
@@ -38,18 +38,15 @@ export async function runAppInPuppeteer(
     });
     const page = await browser.newPage();
 
-    page.on('console', async (message) => {
+    page.on('console', async message => {
       if (message.type() !== 'error') return;
 
       if (!message.text().includes('JSHandle@error')) {
-        progressLog(
-          'error',
-          `${message.type().substring(0, 3).toUpperCase()} ${message.text()}`
-        );
+        progressLog('error', `${message.type().substring(0, 3).toUpperCase()} ${message.text()}`);
         return;
       }
       const messages = await Promise.all(
-        message.args().map(async (arg) => {
+        message.args().map(async arg => {
           const [message, stack] = await Promise.all([
             arg.getProperty('message'),
             arg.getProperty('stack'),
@@ -63,24 +60,24 @@ export async function runAppInPuppeteer(
             result += (result.length ? '\n\n' : '') + stack;
           }
           return result;
-        })
+        }),
       );
       runtimeErrors.push(messages.filter(Boolean).join('\n'));
     });
 
-    page.on('pageerror', (error) => {
+    page.on('pageerror', error => {
       progressLog('error', 'Page error', error.message);
       runtimeErrors.push(error.toString());
     });
 
-    await page.setViewport({ width: 1280, height: 720 });
+    await page.setViewport({width: 1280, height: 720});
 
     // Set up auto-CSP handling if enabled for the environment.
     if (enableAutoCsp) {
       const autoCsp = new AutoCsp();
       await autoCsp.connectToDevTools(page);
       await page.setRequestInterception(true);
-      page.on('request', async (request) => {
+      page.on('request', async request => {
         if (request.isInterceptResolutionHandled()) {
           return;
         }
@@ -123,11 +120,7 @@ export async function runAppInPuppeteer(
           progressLog('success', `No Axe violations found.`);
         }
       } catch (axeError: any) {
-        progressLog(
-          'error',
-          'Could not perform Axe accessibility test',
-          axeError.message
-        );
+        progressLog('error', 'Could not perform Axe accessibility test', axeError.message);
       }
     }
 
@@ -142,7 +135,7 @@ export async function runAppInPuppeteer(
             fullPage: true,
             encoding: 'base64',
           }),
-        1 // 1 minute
+        1, // 1 minute
       );
       progressLog('success', 'Screenshot captured and encoded');
     }
@@ -157,5 +150,5 @@ export async function runAppInPuppeteer(
     progressLog('error', 'Could not take screenshot', details);
   }
 
-  return { screenshotBase64Data, runtimeErrors, axeViolations, cspViolations };
+  return {screenshotBase64Data, runtimeErrors, axeViolations, cspViolations};
 }

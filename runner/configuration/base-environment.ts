@@ -1,21 +1,21 @@
-import { readdirSync, readFileSync, statSync } from 'fs';
-import { basename, dirname, extname, join, resolve } from 'path';
-import { globSync } from 'tinyglobby';
+import {readdirSync, readFileSync, statSync} from 'fs';
+import {basename, dirname, extname, join, resolve} from 'path';
+import {globSync} from 'tinyglobby';
 import {
   FrameworkInfo,
   MultiStepPromptDefinition,
   PromptDefinition,
   RootPromptDefinition,
 } from '../shared-interfaces.js';
-import { Rating } from '../ratings/rating-types.js';
-import { renderHandlebarsTemplate } from './prompt-templating.js';
-import { lazy } from '../utils/lazy-creation.js';
-import { EnvironmentConfig } from './environment-config.js';
-import { MultiStepPrompt } from './multi-step-prompt.js';
-import { UserFacingError } from '../utils/errors.js';
-import { generateId } from '../utils/id-generation.js';
-import { Gateway } from '../orchestration/gateway.js';
-import { Environment } from './environment.js';
+import {Rating} from '../ratings/rating-types.js';
+import {renderHandlebarsTemplate} from './prompt-templating.js';
+import {lazy} from '../utils/lazy-creation.js';
+import {EnvironmentConfig} from './environment-config.js';
+import {MultiStepPrompt} from './multi-step-prompt.js';
+import {UserFacingError} from '../utils/errors.js';
+import {generateId} from '../utils/id-generation.js';
+import {Gateway} from '../orchestration/gateway.js';
+import {Environment} from './environment.js';
 
 /** Represents a single prompt evaluation environment. */
 export abstract class BaseEnvironment {
@@ -42,7 +42,7 @@ export abstract class BaseEnvironment {
 
   constructor(
     rootPath: string,
-    private readonly config: EnvironmentConfig
+    private readonly config: EnvironmentConfig,
   ) {
     this.rootPath = rootPath;
     this.id = config.id || this.generateId(config.displayName);
@@ -50,20 +50,18 @@ export abstract class BaseEnvironment {
     this.clientSideFramework = {
       id: config.clientSideFramework,
       displayName:
-        this.getFrameworkDisplayName(config.clientSideFramework) ||
-        config.clientSideFramework,
+        this.getFrameworkDisplayName(config.clientSideFramework) || config.clientSideFramework,
     };
     this.fullStackFramework = config.fullStackFramework
       ? {
           id: config.fullStackFramework,
           displayName:
-            this.getFrameworkDisplayName(config.fullStackFramework) ||
-            config.clientSideFramework,
+            this.getFrameworkDisplayName(config.fullStackFramework) || config.clientSideFramework,
         }
-      : { ...this.clientSideFramework };
+      : {...this.clientSideFramework};
     this.executablePrompts = this.resolveExecutablePrompts(
       config.executablePrompts,
-      config.ratings
+      config.ratings,
     );
     this.codeRatingPromptPath = config.codeRatingPrompt
       ? join(rootPath, config.codeRatingPrompt)
@@ -98,7 +96,7 @@ export abstract class BaseEnvironment {
   async getPrompt(
     type: 'generation' | 'editing',
     userPrompt: string,
-    ragEndpoint?: string
+    ragEndpoint?: string,
   ): Promise<string> {
     const systemPrompt =
       type === 'generation'
@@ -110,16 +108,12 @@ export abstract class BaseEnvironment {
     }
 
     if (!ragEndpoint.includes('PROMPT')) {
-      throw new UserFacingError(
-        'The ragEndpoint must include the "PROMPT" substring.'
-      );
+      throw new UserFacingError('The ragEndpoint must include the "PROMPT" substring.');
     }
     const url = ragEndpoint.replace('PROMPT', encodeURIComponent(userPrompt));
     const response = await fetch(url);
     if (!response.ok) {
-      throw new UserFacingError(
-        `Failed to fetch from ${url}: ${response.statusText}`
-      );
+      throw new UserFacingError(`Failed to fetch from ${url}: ${response.statusText}`);
     }
     const ragContent = await response.text();
     return `${systemPrompt}\n\n${ragContent}`;
@@ -135,7 +129,7 @@ export abstract class BaseEnvironment {
   renderPrompt(
     content: string,
     promptFilePath: string | null,
-    additionalContext: Record<string, string> = {}
+    additionalContext: Record<string, string> = {},
   ) {
     return renderHandlebarsTemplate(content, {
       rootDir: promptFilePath ? dirname(promptFilePath) : null,
@@ -176,7 +170,7 @@ export abstract class BaseEnvironment {
    */
   private resolveExecutablePrompts(
     prompts: EnvironmentConfig['executablePrompts'],
-    envRatings: Rating[]
+    envRatings: Rating[],
   ) {
     const result: RootPromptDefinition[] = [];
 
@@ -197,14 +191,14 @@ export abstract class BaseEnvironment {
           name = def.name;
         }
 
-        globSync(path, { cwd: this.rootPath }).forEach((relativePath) => {
+        globSync(path, {cwd: this.rootPath}).forEach(relativePath => {
           result.push(
             this.getStepPromptDefinition(
               name ?? basename(relativePath, extname(relativePath)),
               relativePath,
               ratings,
-              /* isEditing */ false
-            )
+              /* isEditing */ false,
+            ),
           );
         });
       }
@@ -226,9 +220,9 @@ export abstract class BaseEnvironment {
     name: string,
     relativePath: string,
     ratings: Rating[],
-    isEditing: boolean
+    isEditing: boolean,
   ): PromptDefinition {
-    const { result, contextFiles } = this.renderRelativePrompt(relativePath);
+    const {result, contextFiles} = this.renderRelativePrompt(relativePath);
 
     return {
       name: name,
@@ -248,7 +242,7 @@ export abstract class BaseEnvironment {
    */
   private getMultiStepPrompt(
     def: MultiStepPrompt,
-    envRatings: Rating[]
+    envRatings: Rating[],
   ): MultiStepPromptDefinition {
     const promptRoot = resolve(this.rootPath, def.directoryPath);
     const name = basename(promptRoot);
@@ -258,11 +252,11 @@ export abstract class BaseEnvironment {
 
     if (!statSync(promptRoot).isDirectory()) {
       throw new UserFacingError(
-        `Multi-step prompt root must point to a directory. "${promptRoot}" is not a directory.`
+        `Multi-step prompt root must point to a directory. "${promptRoot}" is not a directory.`,
       );
     }
 
-    const entities = readdirSync(promptRoot, { withFileTypes: true });
+    const entities = readdirSync(promptRoot, {withFileTypes: true});
 
     if (entities.length === 0) {
       throw new UserFacingError('Multi-step prompt directory cannot be empty.');
@@ -271,7 +265,7 @@ export abstract class BaseEnvironment {
     for (const current of entities) {
       if (!current.isFile()) {
         throw new UserFacingError(
-          `Multi-step prompt directory can only contain files. ${current.name} is not a file.`
+          `Multi-step prompt directory can only contain files. ${current.name} is not a file.`,
         );
       }
 
@@ -280,7 +274,7 @@ export abstract class BaseEnvironment {
       if (!match || !match[1]) {
         throw new UserFacingError(
           `Multi-step prompt name must be in the form of \`step-<number>\`, ` +
-            `but received '${current.name}'`
+            `but received '${current.name}'`,
         );
       }
 
@@ -298,7 +292,7 @@ export abstract class BaseEnvironment {
         `${name}-step-${stepNum}`,
         join(def.directoryPath, current.name),
         ratings,
-        /*isEditing */ stepNum !== 1
+        /*isEditing */ stepNum !== 1,
       );
 
       stepValues[step.name] = stepNum;
@@ -316,9 +310,7 @@ export abstract class BaseEnvironment {
     const id = generateId(displayName);
 
     if (id === null) {
-      throw new UserFacingError(
-        `Could not auto-generate an ID from "${displayName}"`
-      );
+      throw new UserFacingError(`Could not auto-generate an ID from "${displayName}"`);
     }
 
     return id;

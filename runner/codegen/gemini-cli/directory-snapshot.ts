@@ -1,17 +1,17 @@
-import { glob } from 'tinyglobby';
-import { readFile } from 'fs/promises';
-import { fileTypeFromBuffer } from 'file-type';
+import {glob} from 'tinyglobby';
+import {readFile} from 'fs/promises';
+import {fileTypeFromBuffer} from 'file-type';
 
 /** Represents a snapshot of a directory at a certain point in time. */
 export class DirectorySnapshot {
   private constructor(
     readonly files: ReadonlyMap<string, string>,
-    readonly directory: string
+    readonly directory: string,
   ) {}
 
   static async forDirectory(
     directory: string,
-    ignoredPatterns: string[]
+    ignoredPatterns: string[],
   ): Promise<DirectorySnapshot> {
     const paths = await glob('**/*', {
       cwd: directory,
@@ -22,7 +22,7 @@ export class DirectorySnapshot {
     const files = new Map<string, string>();
 
     await Promise.all(
-      paths.map(async (path) => {
+      paths.map(async path => {
         const buffer = await readFile(path);
         const binaryType = await fileTypeFromBuffer(buffer);
 
@@ -30,7 +30,7 @@ export class DirectorySnapshot {
         if (!binaryType) {
           files.set(path, buffer.toString());
         }
-      })
+      }),
     );
 
     return new DirectorySnapshot(files, directory);

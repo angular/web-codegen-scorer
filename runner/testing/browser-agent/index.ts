@@ -1,6 +1,6 @@
-import { spawn } from 'child_process';
-import { executeCommand } from '../../utils/exec.js';
-import { UserFacingError } from '../../utils/errors.js';
+import {spawn} from 'child_process';
+import {executeCommand} from '../../utils/exec.js';
+import {UserFacingError} from '../../utils/errors.js';
 
 let pendingDepInstall: Promise<void> | null = null;
 
@@ -8,7 +8,7 @@ export async function runPythonAgentScript(
   taskFile: string,
   hostUrl: string,
   abortSignal: AbortSignal,
-  opts?: { printLogOutput?: boolean }
+  opts?: {printLogOutput?: boolean},
 ): Promise<string> {
   const processDir = import.meta.dirname;
 
@@ -38,18 +38,18 @@ export async function runPythonAgentScript(
   });
 
   const output: Buffer[] = [];
-  child.stdio[3]!.on('data', (data) => {
+  child.stdio[3]!.on('data', data => {
     output.push(data);
   });
 
-  child.stdout!.on('data', (data) => {
+  child.stdout!.on('data', data => {
     if (opts?.printLogOutput) {
       process.stderr.write(data);
     }
   });
 
   const stderrOutput: Buffer[] = [];
-  child.stderr!.on('data', (data) => {
+  child.stderr!.on('data', data => {
     if (opts?.printLogOutput) {
       process.stderr.write(data);
     }
@@ -57,18 +57,16 @@ export async function runPythonAgentScript(
   });
 
   return await new Promise<string>((resolve, reject) => {
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code !== 0) {
         const stderr = Buffer.concat(stderrOutput).toString('utf8');
-        reject(
-          new Error(`Process exited with code ${code}.\n\nStderr:\n${stderr}`)
-        );
+        reject(new Error(`Process exited with code ${code}.\n\nStderr:\n${stderr}`));
         return;
       }
       const outputFd3 = Buffer.concat(output).toString('utf8');
       resolve(outputFd3);
     });
-    child.on('error', (err) => {
+    child.on('error', err => {
       reject(`Error when spawning: ${err}`);
     });
   });
@@ -77,13 +75,10 @@ export async function runPythonAgentScript(
 async function installPythonDependencies(processDir: string): Promise<void> {
   try {
     await executeCommand('uv pip install browser-use', processDir);
-    await executeCommand(
-      'uvx playwright install chromium --with-deps',
-      processDir
-    );
+    await executeCommand('uvx playwright install chromium --with-deps', processDir);
   } catch (e) {
     throw new UserFacingError(
-      `Failed to install user journey agent dependencies in ${processDir}\n` + e
+      `Failed to install user journey agent dependencies in ${processDir}\n` + e,
     );
   }
 }

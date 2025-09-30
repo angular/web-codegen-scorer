@@ -1,8 +1,8 @@
 import z from 'zod';
-import { ratingSchema } from '../ratings/rating-types.js';
-import { MultiStepPrompt } from './multi-step-prompt.js';
-import { mcpServerOptionsSchema } from '../codegen/llm-runner.js';
-import { getPossiblePackageManagers } from './environment-config.js';
+import {ratingSchema} from '../ratings/rating-types.js';
+import {MultiStepPrompt} from './multi-step-prompt.js';
+import {mcpServerOptionsSchema} from '../codegen/llm-runner.js';
+import {getPossiblePackageManagers} from './environment-config.js';
 
 export const baseEnvironmentConfigSchema = z.strictObject({
   /** Display name for the environment. */
@@ -40,8 +40,8 @@ export const baseEnvironmentConfigSchema = z.strictObject({
         name: z.string().optional(),
         ratings: z.array(ratingSchema).optional(),
       }),
-      z.custom<MultiStepPrompt>((data) => data instanceof MultiStepPrompt),
-    ])
+      z.custom<MultiStepPrompt>(data => data instanceof MultiStepPrompt),
+    ]),
   ),
   /**
    * ID of the fullstack framework used within the environment.

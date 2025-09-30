@@ -1,6 +1,6 @@
-import { marked } from 'marked';
-import { BuildResultStatus } from '../workers/builder/builder-types.js';
-import { GenkitRunner } from '../codegen/genkit/genkit-runner.js';
+import {marked} from 'marked';
+import {BuildResultStatus} from '../workers/builder/builder-types.js';
+import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 import {
   AssessmentResult,
   IndividualAssessment,
@@ -10,7 +10,7 @@ import {
 export async function summarizeReportWithAI(
   llm: GenkitRunner,
   abortSignal: AbortSignal,
-  assessments: AssessmentResult[]
+  assessments: AssessmentResult[],
 ) {
   const totalApps = assessments.length;
   const prompt = `\
@@ -63,47 +63,43 @@ Categorize the failures and provide a brief summary of the report. Keep it short
 function serializeReportForPrompt(assessments: AssessmentResult[]): string {
   return assessments
     .map(
-      (app) =>
+      app =>
         `\
 Name: ${app.promptDef.name}
 Score: ${app.score.totalPoints}/${app.score.maxOverallPoints}
 Failed checks: ${JSON.stringify(
           app.score.categories
-            .flatMap((category) => category.assessments)
+            .flatMap(category => category.assessments)
             .filter(
               (a): a is IndividualAssessment =>
-                a.state === IndividualAssessmentState.EXECUTED &&
-                a.successPercentage < 1
+                a.state === IndividualAssessmentState.EXECUTED && a.successPercentage < 1,
             )
-            .map((c) => ({
+            .map(c => ({
               description: c.description,
               points: `${(c.successPercentage * 100).toFixed(2)}/100`,
               message: c.message,
             })),
           null,
-          2
+          2,
         )}
 Build results: ${JSON.stringify(
-          app.attemptDetails.map((a) => ({
+          app.attemptDetails.map(a => ({
             buildResult: {
               message: a.buildResult.message,
-              status:
-                a.buildResult.status === BuildResultStatus.ERROR
-                  ? 'Error'
-                  : 'Success',
+              status: a.buildResult.status === BuildResultStatus.ERROR ? 'Error' : 'Success',
             },
             attempt: a.attempt,
           })),
           null,
-          2
+          2,
         )}
 Serve testing results: ${JSON.stringify(
-          app.attemptDetails.map((a) => ({
+          app.attemptDetails.map(a => ({
             serveTestingResult: {
               runtimeErrors: a.serveTestingResult?.runtimeErrors,
             },
-          }))
-        )}`
+          })),
+        )}`,
     )
     .join('\n------------\n');
 }

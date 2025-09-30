@@ -48,7 +48,7 @@ export function formatTokenCount(count: number | undefined | null): string {
  */
 export function formatAssessmentMessage(
   assessment: IndividualAssessment | SkippedIndividualAssessment,
-  message: string
+  message: string,
 ): string {
   if (assessment.state === IndividualAssessmentState.SKIPPED) {
     return chalk.gray(message);

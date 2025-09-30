@@ -1,5 +1,5 @@
-import { Clipboard } from '@angular/cdk/clipboard';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {DatePipe, DecimalPipe} from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -11,7 +11,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { NgxJsonViewerModule } from 'ngx-json-viewer';
+import {NgxJsonViewerModule} from 'ngx-json-viewer';
 import {
   BuildErrorType,
   BuildResultStatus,
@@ -27,25 +27,21 @@ import {
   ScoreBucket,
   SkippedIndividualAssessment,
 } from '../../../../../runner/shared-interfaces';
-import { CodeViewer } from '../../shared/code-viewer';
-import { ReportsFetcher } from '../../services/reports-fetcher';
+import {CodeViewer} from '../../shared/code-viewer';
+import {ReportsFetcher} from '../../services/reports-fetcher';
 import {
   StackedBarChart,
   StackedBarChartData,
 } from '../../shared/visualization/stacked-bar-chart/stacked-bar-chart';
-import { formatFile } from './formatter';
-import { FailedChecksFilter } from './failed-checks-filter';
-import { MessageSpinner } from '../../shared/message-spinner';
-import { createPromptDebuggingZip } from '../../shared/debugging-zip';
-import { Score } from '../../shared/score/score';
-import {
-  bucketToScoreVariable,
-  formatScore,
-  ScoreCssVariable,
-} from '../../shared/scoring';
-import { ExpansionPanel } from '../../shared/expansion-panel/expansion-panel';
-import { ExpansionPanelHeader } from '../../shared/expansion-panel/expansion-panel-header';
-import { ProviderLabel } from '../../shared/provider-label';
+import {formatFile} from './formatter';
+import {FailedChecksFilter} from './failed-checks-filter';
+import {MessageSpinner} from '../../shared/message-spinner';
+import {createPromptDebuggingZip} from '../../shared/debugging-zip';
+import {Score} from '../../shared/score/score';
+import {bucketToScoreVariable, formatScore, ScoreCssVariable} from '../../shared/scoring';
+import {ExpansionPanel} from '../../shared/expansion-panel/expansion-panel';
+import {ExpansionPanelHeader} from '../../shared/expansion-panel/expansion-panel-header';
+import {ProviderLabel} from '../../shared/provider-label';
 
 const localReportRegex = /-l\d+$/;
 
@@ -79,15 +75,14 @@ export class ReportViewer {
   }
 
   // Set by the router component input bindings.
-  protected reportGroupId = input.required<string>({ alias: 'id' });
+  protected reportGroupId = input.required<string>({alias: 'id'});
   protected formatted = signal<Map<LlmResponseFile, string>>(new Map());
   protected formatScore = formatScore;
   protected error = computed(() => this.selectedReport.error());
 
   private selectedReport = resource({
-    params: () => ({ groupId: this.reportGroupId() }),
-    loader: ({ params }) =>
-      this.reportsFetcher.getCombinedReport(params.groupId),
+    params: () => ({groupId: this.reportGroupId()}),
+    loader: ({params}) => this.reportsFetcher.getCombinedReport(params.groupId),
   });
 
   protected selectedReportWithSortedResults = computed<RunInfo | null>(() => {
@@ -99,15 +94,13 @@ export class ReportViewer {
       id: report.id,
       group: report.group,
       details: report.details,
-      results: [...report.results].sort((a, b) =>
-        a.promptDef.name.localeCompare(b.promptDef.name)
-      ),
+      results: [...report.results].sort((a, b) => a.promptDef.name.localeCompare(b.promptDef.name)),
     };
   });
 
   protected overview = computed(() => {
     const id = this.reportGroupId();
-    return this.reportsFetcher.reportGroups().find((group) => group.id === id);
+    return this.reportsFetcher.reportGroups().find(group => group.id === id);
   });
 
   protected selectedChecks = signal<Set<string>>(new Set());
@@ -133,20 +126,15 @@ export class ReportViewer {
           }
         }
         for (const checkName of failedChecksInApp) {
-          failedChecksMap.set(
-            checkName,
-            (failedChecksMap.get(checkName) || 0) + 1
-          );
+          failedChecksMap.set(checkName, (failedChecksMap.get(checkName) || 0) + 1);
         }
       }
     }
 
-    const failedChecksArray = Array.from(failedChecksMap.entries()).map(
-      ([name, count]) => ({
-        name,
-        count,
-      })
-    );
+    const failedChecksArray = Array.from(failedChecksMap.entries()).map(([name, count]) => ({
+      name,
+      count,
+    }));
 
     return failedChecksArray.sort((a, b) => a.name.localeCompare(b.name));
   });
@@ -163,7 +151,7 @@ export class ReportViewer {
       return report.results;
     }
 
-    return report.results.filter((result) => {
+    return report.results.filter(result => {
       if (result.score.totalPoints === result.score.maxOverallPoints) {
         return false;
       }
@@ -187,14 +175,8 @@ export class ReportViewer {
       return null;
     }
 
-    const initialFailures: Record<
-      string,
-      { testCase: string; message: string }[]
-    > = {};
-    const repairFailures: Record<
-      string,
-      { testCase: string; message: string }[]
-    > = {};
+    const initialFailures: Record<string, {testCase: string; message: string}[]> = {};
+    const repairFailures: Record<string, {testCase: string; message: string}[]> = {};
 
     for (const result of report.results) {
       const initialAttempt = result.attemptDetails[0];
@@ -226,12 +208,8 @@ export class ReportViewer {
       }
     }
 
-    const hasInitialFailures = Object.values(initialFailures).some(
-      (arr) => arr.length > 0
-    );
-    const hasRepairFailures = Object.values(repairFailures).some(
-      (arr) => arr.length > 0
-    );
+    const hasInitialFailures = Object.values(initialFailures).some(arr => arr.length > 0);
+    const hasRepairFailures = Object.values(repairFailures).some(arr => arr.length > 0);
 
     return {
       initialFailures: Object.entries(initialFailures),
@@ -287,7 +265,7 @@ export class ReportViewer {
   }
 
   protected checksAsGraphData(buckets: ScoreBucket[]): StackedBarChartData {
-    return buckets.map((b) => ({
+    return buckets.map(b => ({
       label: b.nameWithLabels,
       color: bucketToScoreVariable(b),
       value: b.appsCount,
@@ -309,10 +287,7 @@ export class ReportViewer {
     ];
   }
 
-  protected securityStatsAsGraphData(stats: {
-    appsWithErrors: number;
-    appsWithoutErrors: number;
-  }) {
+  protected securityStatsAsGraphData(stats: {appsWithErrors: number; appsWithoutErrors: number}) {
     return [
       {
         label: 'No exceptions',
@@ -369,7 +344,7 @@ export class ReportViewer {
   }
 
   protected isSkippedAssessment(
-    value: IndividualAssessment | SkippedIndividualAssessment
+    value: IndividualAssessment | SkippedIndividualAssessment,
   ): value is SkippedIndividualAssessment {
     return value.state === IndividualAssessmentState.SKIPPED;
   }
@@ -378,16 +353,13 @@ export class ReportViewer {
 
   protected closeDropdownIfOpen(event: MouseEvent): void {
     const detailsElement = this.dropdownRef()?.nativeElement;
-    if (
-      detailsElement?.hasAttribute('open') &&
-      !detailsElement.contains(event.target)
-    ) {
+    if (detailsElement?.hasAttribute('open') && !detailsElement.contains(event.target)) {
       detailsElement.removeAttribute('open');
     }
   }
 
   protected toggleCheckFilter(check: string): void {
-    this.selectedChecks.update((currentChecks) => {
+    this.selectedChecks.update(currentChecks => {
       const checks = new Set(currentChecks);
       if (checks.has(check)) {
         checks.delete(check);
@@ -399,12 +371,9 @@ export class ReportViewer {
   }
 
   protected async format(file: LlmResponseFile): Promise<void> {
-    const result = await formatFile(
-      file,
-      this.selectedReport.value()!.details.summary.framework
-    );
+    const result = await formatFile(file, this.selectedReport.value()!.details.summary.framework);
     if (typeof result === 'string') {
-      this.formatted.update((oldMap) => {
+      this.formatted.update(oldMap => {
         const newMap = new Map(oldMap);
         newMap.set(file, result);
         return newMap;
@@ -422,10 +391,7 @@ export class ReportViewer {
    * @param app The assessment result for which to create the debugging zip.
    */
   protected async downloadDebuggingZip(app: AssessmentResult): Promise<void> {
-    const blob = await createPromptDebuggingZip(
-      this.selectedReport.value()!,
-      app
-    );
+    const blob = await createPromptDebuggingZip(this.selectedReport.value()!, app);
 
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
@@ -445,10 +411,7 @@ export class ReportViewer {
     }
   }
 
-  protected getDebugCommand(
-    report: RunInfo,
-    result: AssessmentResult
-  ): string | null {
+  protected getDebugCommand(report: RunInfo, result: AssessmentResult): string | null {
     // Only show the command for local reports.
     if (!localReportRegex.test(report.group)) {
       return null;

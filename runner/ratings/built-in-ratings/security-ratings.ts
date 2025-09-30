@@ -1,10 +1,5 @@
-import {
-  PerBuildRating,
-  RatingCategory,
-  RatingKind,
-  RatingState,
-} from '../rating-types.js';
-import { CspViolation } from '../../workers/serve-testing/auto-csp-types.js';
+import {PerBuildRating, RatingCategory, RatingKind, RatingState} from '../rating-types.js';
+import {CspViolation} from '../../workers/serve-testing/auto-csp-types.js';
 
 /**
  * Formats an array of CSP violations into a readable string for the report.
@@ -17,7 +12,7 @@ function formatViolations(violations: CspViolation[]): string {
   }
   return violations
     .map(
-      (v) =>
+      v =>
         `- Violated Directive: ${v['violated-directive']}
 ` +
         `  Source File: ${v['source-file']}:${v['line-number']}
@@ -28,7 +23,7 @@ function formatViolations(violations: CspViolation[]): string {
 ---
 ${v.codeSnippet || v['script-sample'] || 'Not available'}
 ---
-`
+`,
     )
     .join('\n\n');
 }
@@ -40,12 +35,11 @@ ${v.codeSnippet || v['script-sample'] || 'Not available'}
 export const cspViolationsRating: PerBuildRating = {
   kind: RatingKind.PER_BUILD,
   name: 'CSP Violations',
-  description:
-    'Checks for Content Security Policy violations, excluding Trusted Types.',
+  description: 'Checks for Content Security Policy violations, excluding Trusted Types.',
   id: 'csp-violations',
   category: RatingCategory.HIGH_IMPACT,
   scoreReduction: '50%',
-  rate: ({ serveResult }) => {
+  rate: ({serveResult}) => {
     if (!serveResult?.cspViolations) {
       return {
         state: RatingState.SKIPPED,
@@ -54,7 +48,7 @@ export const cspViolationsRating: PerBuildRating = {
     }
 
     const violations = serveResult.cspViolations?.filter(
-      (v) => v['violated-directive'] !== 'require-trusted-types-for'
+      v => v['violated-directive'] !== 'require-trusted-types-for',
     );
     if (!violations || violations.length === 0) {
       return {
@@ -85,7 +79,7 @@ export const trustedTypesViolationsRating: PerBuildRating = {
   id: 'trusted-types-violations',
   category: RatingCategory.HIGH_IMPACT,
   scoreReduction: '50%',
-  rate: ({ serveResult }) => {
+  rate: ({serveResult}) => {
     if (!serveResult?.cspViolations) {
       return {
         state: RatingState.SKIPPED,
@@ -94,7 +88,7 @@ export const trustedTypesViolationsRating: PerBuildRating = {
     }
 
     const violations = serveResult?.cspViolations?.filter(
-      (v) => v['violated-directive'] === 'require-trusted-types-for'
+      v => v['violated-directive'] === 'require-trusted-types-for',
     );
 
     if (!violations || violations.length === 0) {

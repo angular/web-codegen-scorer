@@ -1,5 +1,5 @@
-import { greenCheckmark, redX } from '../reporting/format.js';
-import { RootPromptDefinition } from '../shared-interfaces.js';
+import {greenCheckmark, redX} from '../reporting/format.js';
+import {RootPromptDefinition} from '../shared-interfaces.js';
 
 /** Possible progress event types. */
 export type ProgressType =
@@ -50,10 +50,5 @@ export interface ProgressLogger {
    * @param message Message associated with the event.
    * @param details Additional information about the event.
    */
-  log(
-    prompt: RootPromptDefinition,
-    type: ProgressType,
-    message: string,
-    details?: string
-  ): void;
+  log(prompt: RootPromptDefinition, type: ProgressType, message: string, details?: string): void;
 }

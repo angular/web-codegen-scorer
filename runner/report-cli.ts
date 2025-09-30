@@ -1,9 +1,9 @@
-import { Arguments, Argv, CommandModule } from 'yargs';
-import { join, relative } from 'path';
-import { executeCommand } from './utils/exec.js';
-import { REPORTS_ROOT_DIR } from './configuration/constants.js';
-import { toProcessAbsolutePath } from './file-system-utils.js';
-import { formatTitleCard } from './reporting/format.js';
+import {Arguments, Argv, CommandModule} from 'yargs';
+import {join, relative} from 'path';
+import {executeCommand} from './utils/exec.js';
+import {REPORTS_ROOT_DIR} from './configuration/constants.js';
+import {toProcessAbsolutePath} from './file-system-utils.js';
+import {formatTitleCard} from './reporting/format.js';
 
 export const ReportModule = {
   builder,
@@ -54,9 +54,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
   };
 
   if (cliArgs.reportsLoader) {
-    environmentVariables['CODEGEN_REPORTS_LOADER'] = toProcessAbsolutePath(
-      cliArgs.reportsLoader
-    );
+    environmentVariables['CODEGEN_REPORTS_LOADER'] = toProcessAbsolutePath(cliArgs.reportsLoader);
   }
 
   await executeCommand(
@@ -74,11 +72,11 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
               [
                 `View your reports at http://localhost:${cliArgs.port}`,
                 `Reports are served from ${relative(process.cwd(), reportsDir)}`,
-              ].join('\n')
-            )
+              ].join('\n'),
+            ),
           );
         },
       },
-    }
+    },
   );
 }

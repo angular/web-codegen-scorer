@@ -1,21 +1,17 @@
-import { readFileSync } from 'node:fs';
-import { z } from 'zod';
-import { prepareContextFilesMessage } from '../../orchestration/codegen.js';
-import { Environment } from '../../configuration/environment.js';
+import {readFileSync} from 'node:fs';
+import {z} from 'zod';
+import {prepareContextFilesMessage} from '../../orchestration/codegen.js';
+import {Environment} from '../../configuration/environment.js';
 import {
   IndividualAssessment,
   IndividualAssessmentState,
   LlmResponseFile,
   SkippedIndividualAssessment,
 } from '../../shared-interfaces.js';
-import {
-  AutoRateResult,
-  getCoefficient,
-  MAX_RATING,
-} from './auto-rate-shared.js';
-import { GenkitRunner } from '../../codegen/genkit/genkit-runner.js';
+import {AutoRateResult, getCoefficient, MAX_RATING} from './auto-rate-shared.js';
+import {GenkitRunner} from '../../codegen/genkit/genkit-runner.js';
 import defaultCodeRaterPrompt from './code-rating-prompt.js';
-import { RatingsResult } from '../rating-types.js';
+import {RatingsResult} from '../rating-types.js';
 
 /** Framework-specific hints for the rating prompt. */
 const FW_HINTS: Record<string, string | undefined> = {
@@ -48,13 +44,13 @@ export async function autoRateCode(
   environment: Environment,
   files: LlmResponseFile[],
   appPrompt: string,
-  ratingsResult: RatingsResult
+  ratingsResult: RatingsResult,
 ): Promise<AutoRateResult> {
   const contextMessage = prepareContextFilesMessage(
-    files.map((o) => ({
+    files.map(o => ({
       relativePath: o.filePath,
       content: o.code,
-    }))
+    })),
   );
 
   let promptText: string;
@@ -62,7 +58,7 @@ export async function autoRateCode(
   if (environment.codeRatingPromptPath) {
     CACHED_RATING_PROMPTS[environment.codeRatingPromptPath] ??= readFileSync(
       environment.codeRatingPromptPath,
-      'utf8'
+      'utf8',
     );
     promptText = CACHED_RATING_PROMPTS[environment.codeRatingPromptPath];
   } else {
@@ -78,16 +74,11 @@ export async function autoRateCode(
       ? JSON.stringify(safetyRating, null, 2)
       : '';
 
-  const prompt = environment.renderPrompt(
-    promptText,
-    environment.codeRatingPromptPath,
-    {
-      APP_PROMPT: appPrompt,
-      FRAMEWORK_SPECIFIC_HINTS:
-        FW_HINTS[environment.fullStackFramework.id] ?? '',
-      SAFETY_WEB_RESULTS_JSON: safetyWebResultsJson,
-    }
-  ).result;
+  const prompt = environment.renderPrompt(promptText, environment.codeRatingPromptPath, {
+    APP_PROMPT: appPrompt,
+    FRAMEWORK_SPECIFIC_HINTS: FW_HINTS[environment.fullStackFramework.id] ?? '',
+    SAFETY_WEB_RESULTS_JSON: safetyWebResultsJson,
+  }).result;
 
   const result = await llm.generateConstrained({
     abortSignal,
@@ -96,15 +87,13 @@ export async function autoRateCode(
     prompt,
     skipMcp: true,
     schema: z.object({
-      rating: z
-        .number()
-        .describe(`Rating from 1-${MAX_RATING}. Best is ${MAX_RATING}.`),
+      rating: z.number().describe(`Rating from 1-${MAX_RATING}. Best is ${MAX_RATING}.`),
       summary: z.string().describe('Summary of the overall code quality.'),
       categories: z.array(
         z.object({
           name: z.string().describe('Category name'),
           message: z.string().describe('Short description of the problem.'),
-        })
+        }),
       ),
     }),
   });

@@ -1,13 +1,13 @@
-import { Component, computed, inject, linkedSignal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
-import { ComparisonScoreDistribution } from '../../shared/comparison/comparison-score-distribution';
-import { ComparisonBuildDistribution } from '../../shared/comparison/comparison-build-distribution';
-import { ModelComparisonData } from '../../shared/comparison/comparison-data';
-import { ReportsFetcher } from '../../services/reports-fetcher';
-import { ReportSelect } from '../../shared/report-select/report-select';
-import { ComparisonRuntimeDistribution } from '../../shared/comparison/comparison-runtime-distribution';
-import { ActivatedRoute } from '@angular/router';
+import {Component, computed, inject, linkedSignal} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {map} from 'rxjs';
+import {ComparisonScoreDistribution} from '../../shared/comparison/comparison-score-distribution';
+import {ComparisonBuildDistribution} from '../../shared/comparison/comparison-build-distribution';
+import {ModelComparisonData} from '../../shared/comparison/comparison-data';
+import {ReportsFetcher} from '../../services/reports-fetcher';
+import {ReportSelect} from '../../shared/report-select/report-select';
+import {ComparisonRuntimeDistribution} from '../../shared/comparison/comparison-runtime-distribution';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   templateUrl: './comparison.html',
@@ -31,10 +31,10 @@ export class ComparisonPage {
     }),
     computation: () => {
       const allGroups = this.groups();
-      const results: { reportName: string; groupId: string | null }[] = [];
+      const results: {reportName: string; groupId: string | null}[] = [];
 
-      this.selectedGroups().forEach((id) => {
-        const correspondingGroup = allGroups.find((group) => group.id === id);
+      this.selectedGroups().forEach(id => {
+        const correspondingGroup = allGroups.find(group => group.id === id);
 
         if (correspondingGroup) {
           results.push({
@@ -50,22 +50,22 @@ export class ComparisonPage {
 
   readonly selectedGroups = toSignal<string[]>(
     this.route.queryParams.pipe(
-      map((params) => {
+      map(params => {
         const ids = params['groups'];
         return ids && Array.isArray(ids) ? ids : [];
-      })
+      }),
     ),
-    { requireSync: true }
+    {requireSync: true},
   );
 
   readonly comparisonModelData = computed(() => {
     const allGroups = this.groups();
     const selectedGroups = this.groupsToCompare()
-      .map((g) => ({
+      .map(g => ({
         reportName: g.reportName,
-        group: allGroups.find((current) => current.id === g.groupId)!,
+        group: allGroups.find(current => current.id === g.groupId)!,
       }))
-      .filter((g) => !!g.group);
+      .filter(g => !!g.group);
 
     if (selectedGroups.length < 2) {
       return null;
@@ -73,11 +73,10 @@ export class ComparisonPage {
 
     return {
       averageAppsCount: Math.floor(
-        selectedGroups.reduce((acc, r) => r.group.appsCount + acc, 0) /
-          selectedGroups.length
+        selectedGroups.reduce((acc, r) => r.group.appsCount + acc, 0) / selectedGroups.length,
       ),
       series: [
-        ...selectedGroups.map((r) => ({
+        ...selectedGroups.map(r => ({
           name: r.reportName,
           stats: r.group.stats,
           appsCount: r.group.appsCount,
@@ -86,7 +85,7 @@ export class ComparisonPage {
     } satisfies ModelComparisonData;
   });
 
-  protected updateReportName(report: { reportName: string }, newName: string) {
+  protected updateReportName(report: {reportName: string}, newName: string) {
     report.reportName = newName;
     this.groupsToCompare.set([...this.groupsToCompare()]);
   }
@@ -94,7 +93,7 @@ export class ComparisonPage {
   protected setSelectedGroup(index: number, groupId: string | undefined) {
     const allGroups = this.groups();
     const current = this.groupsToCompare();
-    const correspondingGroup = allGroups.find((group) => group.id === groupId);
+    const correspondingGroup = allGroups.find(group => group.id === groupId);
 
     if (correspondingGroup) {
       current[index] = {

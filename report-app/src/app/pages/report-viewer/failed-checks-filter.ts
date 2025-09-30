@@ -1,4 +1,4 @@
-import { Component, output, input } from '@angular/core';
+import {Component, output, input} from '@angular/core';
 
 @Component({
   selector: 'failed-checks-filter',
@@ -28,7 +28,7 @@ import { Component, output, input } from '@angular/core';
   `,
 })
 export class FailedChecksFilter {
-  allFailedChecks = input.required<{ name: string; count: number }[]>();
+  allFailedChecks = input.required<{name: string; count: number}[]>();
   selectedChecks = input.required<Set<string>>();
   toggleCheck = output<string>();
 }

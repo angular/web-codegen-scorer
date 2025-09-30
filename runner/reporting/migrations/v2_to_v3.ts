@@ -24,7 +24,7 @@ export function convertV2ReportToV3Report(doc: any) {
       axeViolations: origBuildResult.axeViolations,
     };
 
-    return { buildResult, serveTestingResult };
+    return {buildResult, serveTestingResult};
   };
 
   for (const result of doc.results) {

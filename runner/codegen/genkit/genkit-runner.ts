@@ -1,13 +1,7 @@
-import {
-  DynamicResourceAction,
-  GenerateResponse,
-  genkit,
-  ModelReference,
-  ToolAction,
-} from 'genkit';
-import { GenkitMcpHost, McpServerConfig, createMcpHost } from '@genkit-ai/mcp';
-import { GenkitPlugin, GenkitPluginV2 } from 'genkit/plugin';
-import { z } from 'zod';
+import {DynamicResourceAction, GenerateResponse, genkit, ModelReference, ToolAction} from 'genkit';
+import {GenkitMcpHost, McpServerConfig, createMcpHost} from '@genkit-ai/mcp';
+import {GenkitPlugin, GenkitPluginV2} from 'genkit/plugin';
+import {z} from 'zod';
 import {
   McpServerOptions,
   LlmConstrainedOutputGenerateRequestOptions,
@@ -18,17 +12,14 @@ import {
   LlmGenerateTextRequestOptions,
   LlmGenerateFilesRequestOptions,
 } from '../llm-runner.js';
-import { setTimeout } from 'node:timers/promises';
-import { callWithTimeout } from '../../utils/timeout.js';
-import { logger } from 'genkit/logging';
-import { GenkitLogger } from './genkit-logger.js';
-import { MODEL_PROVIDERS } from './models.js';
-import { UserFacingError } from '../../utils/errors.js';
-import {
-  GenkitModelProvider,
-  PromptDataForCounting,
-} from './model-provider.js';
-import { ToolLogEntry } from '../../shared-interfaces.js';
+import {setTimeout} from 'node:timers/promises';
+import {callWithTimeout} from '../../utils/timeout.js';
+import {logger} from 'genkit/logging';
+import {GenkitLogger} from './genkit-logger.js';
+import {MODEL_PROVIDERS} from './models.js';
+import {UserFacingError} from '../../utils/errors.js';
+import {GenkitModelProvider, PromptDataForCounting} from './model-provider.js';
+import {ToolLogEntry} from '../../shared-interfaces.js';
 
 const globalLogger = new GenkitLogger();
 logger.init(globalLogger);
@@ -43,9 +34,9 @@ export class GenkitRunner implements LlmRunner {
   private toolLogs: ToolLogEntry[] = [];
 
   async generateConstrained<T extends z.ZodTypeAny = z.ZodTypeAny>(
-    options: LlmConstrainedOutputGenerateRequestOptions<T>
+    options: LlmConstrainedOutputGenerateRequestOptions<T>,
   ): Promise<LlmConstrainedOutputGenerateResponse<T>> {
-    const { provider, model } = this.resolveModel(options.model);
+    const {provider, model} = this.resolveModel(options.model);
     const result = await this._genkitRequest(provider, model, options);
 
     return {
@@ -55,25 +46,21 @@ export class GenkitRunner implements LlmRunner {
     };
   }
 
-  async generateFiles(
-    options: LlmGenerateFilesRequestOptions
-  ): Promise<LlmGenerateFilesResponse> {
+  async generateFiles(options: LlmGenerateFilesRequestOptions): Promise<LlmGenerateFilesResponse> {
     const requestOptions: LlmConstrainedOutputGenerateRequestOptions = {
       ...options,
       prompt: options.context.combinedPrompt,
       schema: z.object({
         outputFiles: z.array(
           z.object({
-            filePath: z
-              .string()
-              .describe('Name of the file that is being changed'),
+            filePath: z.string().describe('Name of the file that is being changed'),
             code: z.string().describe('New code of the file'),
-          })
+          }),
         ),
       }),
     };
 
-    const { provider, model } = this.resolveModel(options.model);
+    const {provider, model} = this.resolveModel(options.model);
     const result = await this._genkitRequest(provider, model, requestOptions);
     const files = result.output.outputFiles || [];
 
@@ -93,10 +80,8 @@ export class GenkitRunner implements LlmRunner {
     return this.toolLogs.splice(0);
   }
 
-  async generateText(
-    options: LlmGenerateTextRequestOptions
-  ): Promise<LlmGenerateTextResponse> {
-    const { provider, model } = this.resolveModel(options.model);
+  async generateText(options: LlmGenerateTextRequestOptions): Promise<LlmGenerateTextResponse> {
+    const {provider, model} = this.resolveModel(options.model);
     const result = await this._genkitRequest(provider, model, options);
 
     return {
@@ -108,24 +93,20 @@ export class GenkitRunner implements LlmRunner {
   }
 
   getSupportedModels(): string[] {
-    return MODEL_PROVIDERS.flatMap((p) => p.getSupportedModels());
+    return MODEL_PROVIDERS.flatMap(p => p.getSupportedModels());
   }
 
   private async _genkitRequest(
     provider: GenkitModelProvider,
     model: ModelReference<any>,
-    options:
-      | LlmGenerateTextRequestOptions
-      | LlmConstrainedOutputGenerateRequestOptions
+    options: LlmGenerateTextRequestOptions | LlmConstrainedOutputGenerateRequestOptions,
   ) {
     return await rateLimitLLMRequest(
       provider,
       model,
-      { messages: options.messages || [], prompt: options.prompt },
+      {messages: options.messages || [], prompt: options.prompt},
       () => {
-        const schema = (
-          options as Partial<LlmConstrainedOutputGenerateRequestOptions>
-        ).schema;
+        const schema = (options as Partial<LlmConstrainedOutputGenerateRequestOptions>).schema;
         const performRequest = async () => {
           let tools: ToolAction[] | undefined;
           let resources: DynamicResourceAction[] | undefined;
@@ -152,10 +133,9 @@ export class GenkitRunner implements LlmRunner {
               : undefined,
             config: provider.getModelSpecificConfig(
               {
-                includeThoughts:
-                  options.thinkingConfig?.includeThoughts ?? false,
+                includeThoughts: options.thinkingConfig?.includeThoughts ?? false,
               },
-              options.model
+              options.model,
             ),
             messages: options.messages,
             tools,
@@ -172,10 +152,10 @@ export class GenkitRunner implements LlmRunner {
           ? callWithTimeout(
               options.timeout.description,
               performRequest,
-              options.timeout.durationInMins
+              options.timeout.durationInMins,
             )
           : performRequest();
-      }
+      },
     );
   }
 
@@ -190,15 +170,9 @@ export class GenkitRunner implements LlmRunner {
         }
         for (const contentPart of message.content) {
           if (contentPart.toolRequest) {
-            toolRequests.set(
-              contentPart.toolRequest.ref || '0',
-              contentPart.toolRequest
-            );
+            toolRequests.set(contentPart.toolRequest.ref || '0', contentPart.toolRequest);
           } else if (contentPart.toolResponse) {
-            toolResponses.set(
-              contentPart.toolResponse.ref || '0',
-              contentPart.toolResponse
-            );
+            toolResponses.set(contentPart.toolResponse.ref || '0', contentPart.toolResponse);
           }
         }
       }
@@ -222,24 +196,22 @@ export class GenkitRunner implements LlmRunner {
 
     const mcpServers = servers.reduce(
       (result, current) => {
-        const { name, ...config } = current;
+        const {name, ...config} = current;
         result[name] = config;
 
         return result;
       },
-      {} as Record<string, McpServerConfig>
+      {} as Record<string, McpServerConfig>,
     );
 
     globalLogger.startCapturingLogs();
-    this.mcpHost = createMcpHost({ name: hostName, mcpServers });
+    this.mcpHost = createMcpHost({name: hostName, mcpServers});
   }
 
   flushMcpServerLogs(): string[] {
     return globalLogger
       .flushCapturedLogs()
-      .filter(
-        (log): log is string => typeof log === 'string' && log.includes('[MCP')
-      );
+      .filter((log): log is string => typeof log === 'string' && log.includes('[MCP'));
   }
 
   async dispose() {
@@ -255,15 +227,15 @@ export class GenkitRunner implements LlmRunner {
       const model = provider.createModel(name);
 
       if (model) {
-        return { provider: provider as GenkitModelProvider, model };
+        return {provider: provider as GenkitModelProvider, model};
       }
     }
 
     throw new UserFacingError(
       `Unrecognized model '${name}'. The configured models are:\n` +
         this.getSupportedModels()
-          .map((m) => `- ${m}`)
-          .join('\n')
+          .map(m => `- ${m}`)
+          .join('\n'),
     );
   }
 
@@ -285,11 +257,11 @@ export class GenkitRunner implements LlmRunner {
       throw new UserFacingError(
         `No LLM providers have been configured. You must set at least one of the ` +
           `following environment variables:\n` +
-          environmentVars.map((e) => `- ${e}`).join('\n')
+          environmentVars.map(e => `- ${e}`).join('\n'),
       );
     }
 
-    return genkit({ plugins });
+    return genkit({plugins});
   }
 }
 
@@ -301,10 +273,10 @@ async function rateLimitLLMRequest<T>(
   model: ModelReference<any>,
   prompt: string | PromptDataForCounting,
   requestFn: () => Promise<T>,
-  retryCount = 0
+  retryCount = 0,
 ): Promise<T> {
   if (typeof prompt === 'string') {
-    prompt = { messages: [], prompt };
+    prompt = {messages: [], prompt};
   }
 
   provider.rateLimit(prompt, model);
@@ -322,16 +294,9 @@ async function rateLimitLLMRequest<T>(
           throw e;
         }
         // Exponential backoff with randomness to avoid retrying at the same times with other requests.
-        const backoffSeconds =
-          (25 + 10 * 1.35 ** retryCount++) * (0.8 + Math.random() * 0.4);
+        const backoffSeconds = (25 + 10 * 1.35 ** retryCount++) * (0.8 + Math.random() * 0.4);
         await setTimeout(1000 * backoffSeconds);
-        return rateLimitLLMRequest(
-          provider,
-          model,
-          prompt,
-          requestFn,
-          retryCount
-        );
+        return rateLimitLLMRequest(provider, model, prompt, requestFn, retryCount);
       }
     }
     throw e;

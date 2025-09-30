@@ -1,9 +1,9 @@
 /// <reference types="google.visualization" />
 
-import { isPlatformBrowser } from '@angular/common';
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
+import {inject, Injectable, PLATFORM_ID} from '@angular/core';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class GoogleChartsLoader {
   private _resolveReadyPromise: (() => void) | null = null;
   private platformId = inject(PLATFORM_ID);
@@ -12,7 +12,7 @@ export class GoogleChartsLoader {
   ready: Promise<void>;
 
   constructor() {
-    this.ready = new Promise((resolve) => {
+    this.ready = new Promise(resolve => {
       this._resolveReadyPromise = resolve;
     });
   }
@@ -21,7 +21,7 @@ export class GoogleChartsLoader {
   initialize() {
     if (isPlatformBrowser(this.platformId)) {
       // Load the Visualization API and the corechart package.
-      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.load('current', {packages: ['corechart']});
 
       // Set a callback to run when the Google Visualization API is loaded.
       google.charts.setOnLoadCallback(() => {

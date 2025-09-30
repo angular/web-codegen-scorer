@@ -1,7 +1,7 @@
-import { readFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { RunGroup, RunInfo } from '../shared-interfaces.js';
-import { glob } from 'tinyglobby';
+import {readFile} from 'node:fs/promises';
+import {dirname, join} from 'node:path';
+import {RunGroup, RunInfo} from '../shared-interfaces.js';
+import {glob} from 'tinyglobby';
 
 /** Type describing a map from group report IDs to their runs. */
 export type FetchedLocalReports = Map<
@@ -13,9 +13,7 @@ export type FetchedLocalReports = Map<
 >;
 
 /** Fetches local report data from the given directory. */
-export async function fetchReportsFromDisk(
-  directory: string
-): Promise<FetchedLocalReports> {
+export async function fetchReportsFromDisk(directory: string): Promise<FetchedLocalReports> {
   const data: FetchedLocalReports = new Map();
   const groupFiles = await glob('**/groups.json', {
     cwd: directory,
@@ -39,8 +37,8 @@ export async function fetchReportsFromDisk(
       // were part of the same invocation. Add a unique suffix to the ID to
       // prevent further grouping.
       run.group = group.id = `${group.id}-l${index}`;
-      data.set(group.id, { group, run });
-    })
+      data.set(group.id, {group, run});
+    }),
   );
 
   return data;

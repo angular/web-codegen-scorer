@@ -1,4 +1,4 @@
-import { Component, input, model } from '@angular/core';
+import {Component, input, model} from '@angular/core';
 
 @Component({
   selector: 'expansion-panel',

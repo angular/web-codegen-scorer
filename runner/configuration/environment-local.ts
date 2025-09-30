@@ -1,17 +1,10 @@
-import { join } from 'path';
+import {join} from 'path';
 import z from 'zod';
-import {
-  LlmRunner,
-  McpServerOptions,
-  mcpServerOptionsSchema,
-} from '../codegen/llm-runner.js';
-import { LocalGateway } from '../orchestration/gateways/local_gateway.js';
-import { BaseEnvironment } from './base-environment.js';
-import {
-  EnvironmentConfig,
-  getPossiblePackageManagers,
-} from './environment-config.js';
-import { baseEnvironmentConfigSchema } from './base-environment-config.js';
+import {LlmRunner, McpServerOptions, mcpServerOptionsSchema} from '../codegen/llm-runner.js';
+import {LocalGateway} from '../orchestration/gateways/local_gateway.js';
+import {BaseEnvironment} from './base-environment.js';
+import {EnvironmentConfig, getPossiblePackageManagers} from './environment-config.js';
+import {baseEnvironmentConfigSchema} from './base-environment-config.js';
 
 export const localEnvironmentConfigSchema = baseEnvironmentConfigSchema.extend({
   /** MCP servers that can be started for this environment. */
@@ -42,9 +35,7 @@ export const localEnvironmentConfigSchema = baseEnvironmentConfigSchema.extend({
   skipInstall: z.boolean().optional(),
 });
 
-export type LocalEnvironmentConfig = z.infer<
-  typeof localEnvironmentConfigSchema
->;
+export type LocalEnvironmentConfig = z.infer<typeof localEnvironmentConfigSchema>;
 
 /** Represents a single prompt evaluation environment. */
 export class LocalEnvironment extends BaseEnvironment {
@@ -76,7 +67,7 @@ export class LocalEnvironment extends BaseEnvironment {
   constructor(
     rootPath: string,
     config: LocalEnvironmentConfig,
-    readonly llm: LlmRunner
+    readonly llm: LlmRunner,
   ) {
     super(rootPath, config);
 
@@ -86,23 +77,18 @@ export class LocalEnvironment extends BaseEnvironment {
     const projectTemplatePath = config.projectTemplate
       ? join(rootPath, config.projectTemplate)
       : null;
-    const sourceDirectory = config.sourceDirectory
-      ? join(rootPath, config.sourceDirectory)
-      : null;
+    const sourceDirectory = config.sourceDirectory ? join(rootPath, config.sourceDirectory) : null;
     this.packageManager = packageManager;
     this.installCommand = `${packageManager} install --silent`;
     this.buildCommand = config.buildCommand || `${packageManager} run build`;
-    this.serveCommand =
-      config.serveCommand || this.getDefaultServeCommand(packageManager);
+    this.serveCommand = config.serveCommand || this.getDefaultServeCommand(packageManager);
     this.projectTemplatePath = projectTemplatePath;
     this.sourceDirectory = sourceDirectory;
     this.mcpServerOptions = config.mcpServers || [];
     this.skipInstall = config.skipInstall ?? false;
   }
 
-  private getDefaultServeCommand(
-    packageManager: LocalEnvironmentConfig['packageManager']
-  ): string {
+  private getDefaultServeCommand(packageManager: LocalEnvironmentConfig['packageManager']): string {
     const flags = '--port 0';
 
     // npm needs -- to pass flags to the command.

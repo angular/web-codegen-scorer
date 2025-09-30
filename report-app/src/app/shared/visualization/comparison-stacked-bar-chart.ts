@@ -7,13 +7,13 @@ import {
   input,
   viewChild,
 } from '@angular/core';
-import { GoogleChartsLoader } from '../../services/google-charts-loader';
-import { AppResizeNotifier } from '../../services/app-resize-notifier';
-import { AppColorMode } from '../../services/app-color-mode';
+import {GoogleChartsLoader} from '../../services/google-charts-loader';
+import {AppResizeNotifier} from '../../services/app-resize-notifier';
+import {AppColorMode} from '../../services/app-color-mode';
 
 export interface ComparisonStackedBarChartData {
   title: string;
-  seriesColumns: Array<{ name: string; color: string }>;
+  seriesColumns: Array<{name: string; color: string}>;
   series: Array<{
     name: string;
     values: Array<{
@@ -52,7 +52,7 @@ export class ComparisonStackedBarChart {
 
     for (const column of data.seriesColumns) {
       table.addColumn('number', column.name);
-      table.addColumn({ role: 'annotation' });
+      table.addColumn({role: 'annotation'});
     }
 
     for (const s of data.series) {
@@ -68,24 +68,22 @@ export class ComparisonStackedBarChart {
 
     // The chart library seems to ignore CSS variable colors so we need to hardcode them.
     const textColor = colorMode === 'dark' ? '#f9fafb' : '#1e293b';
-    const chart = new google.visualization.BarChart(
-      this.chartEl().nativeElement
-    );
+    const chart = new google.visualization.BarChart(this.chartEl().nativeElement);
 
     chart.draw(table, {
       title: data.title,
-      titleTextStyle: { color: textColor },
+      titleTextStyle: {color: textColor},
       backgroundColor: 'transparent',
       hAxis: {
         minTextSpacing: 20,
-        textStyle: { fontSize: 10, color: textColor },
+        textStyle: {fontSize: 10, color: textColor},
         format: 'percent',
       },
-      legend: { textStyle: { color: textColor } },
+      legend: {textStyle: {color: textColor}},
       isStacked: 'percent',
       series: data.seriesColumns.reduce(
-        (res, s, index) => ({ ...res, [index]: { color: s.color } }),
-        {}
+        (res, s, index) => ({...res, [index]: {color: s.color}}),
+        {},
       ),
       chartArea: {
         left: 250,
@@ -108,7 +106,7 @@ export class ComparisonStackedBarChart {
         minTextSpacing: 20,
         viewWindowMode: 'maximized',
         showTextEvery: 1,
-        textStyle: { color: textColor },
+        textStyle: {color: textColor},
       },
       // TODO: Consider enabling trendlines.
       // trendlines: { 0: {}, 1: {} },

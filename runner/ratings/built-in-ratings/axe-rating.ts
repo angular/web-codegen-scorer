@@ -1,10 +1,5 @@
-import { Result } from 'axe-core';
-import {
-  PerBuildRating,
-  RatingCategory,
-  RatingKind,
-  RatingState,
-} from '../rating-types.js';
+import {Result} from 'axe-core';
+import {PerBuildRating, RatingCategory, RatingKind, RatingState} from '../rating-types.js';
 
 // Define the scoring weights for each violation impact level as a coefficient penalty.
 const IMPACT_COEFFICIENTS = {
@@ -27,7 +22,7 @@ export const axeRating: PerBuildRating = {
   category: RatingCategory.MEDIUM_IMPACT,
   id: 'axe-a11y',
   scoreReduction: '10%',
-  rate: ({ serveResult, axeRepairAttempts }) => {
+  rate: ({serveResult, axeRepairAttempts}) => {
     const violations = serveResult?.axeViolations as Result[] | undefined;
     // Start with a perfect score.
     let coefficient = 1.0;
@@ -50,9 +45,7 @@ export const axeRating: PerBuildRating = {
       const formattedViolations = violations
         .map((v, i) => formatAxeViolation(v, i, violations.length))
         .join('\n\n');
-      message += `Found ${
-        violations.length
-      } accessibility violations:\n\n${formattedViolations}`;
+      message += `Found ${violations.length} accessibility violations:\n\n${formattedViolations}`;
     }
 
     // Apply penalties for repair attempts.
@@ -77,11 +70,7 @@ export const axeRating: PerBuildRating = {
 /**
  * Formats a single Axe violation into a more concise, readable string.
  */
-function formatAxeViolation(
-  violation: Result,
-  index: number,
-  total: number
-): string {
+function formatAxeViolation(violation: Result, index: number, total: number): string {
   // Consolidate all violating selectors into a single line for brevity.
   const violationNum = total > 1 ? `${index + 1}.` : '';
   const firstNodeHtml = violation.nodes[0]?.html;

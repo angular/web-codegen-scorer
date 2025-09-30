@@ -6,12 +6,12 @@ import {
   LlmResponseFile,
   RootPromptDefinition,
 } from '../shared-interfaces.js';
-import { Environment } from '../configuration/environment.js';
-import { repairCodeWithAI } from './codegen.js';
-import { writeResponseFiles } from './file-system.js';
-import { runBuild } from './build-worker.js';
-import { ProgressLogger } from '../progress/progress-logger.js';
-import { EvalID, Gateway } from './gateway.js';
+import {Environment} from '../configuration/environment.js';
+import {repairCodeWithAI} from './codegen.js';
+import {writeResponseFiles} from './file-system.js';
+import {runBuild} from './build-worker.js';
+import {ProgressLogger} from '../progress/progress-logger.js';
+import {EvalID, Gateway} from './gateway.js';
 
 /**
  * Calls the LLM to repair code, handles the response, and attempts to build the project again.
@@ -45,7 +45,7 @@ export async function repairAndBuild(
   abortSignal: AbortSignal,
   workerConcurrencyQueue: PQueue,
   attempts: number,
-  progress: ProgressLogger
+  progress: ProgressLogger,
 ): Promise<AttemptDetails> {
   const repairResponse = await repairCodeWithAI(
     evalID,
@@ -59,7 +59,7 @@ export async function repairAndBuild(
     errorContext,
     contextFiles,
     abortSignal,
-    progress
+    progress,
   );
 
   return await handleRepairResponse(
@@ -73,7 +73,7 @@ export async function repairAndBuild(
     workerConcurrencyQueue,
     abortSignal,
     attempts,
-    progress
+    progress,
   );
 }
 
@@ -92,24 +92,22 @@ async function handleRepairResponse(
   workerConcurrencyQueue: PQueue,
   abortSignal: AbortSignal,
   attempts: number,
-  progress: ProgressLogger
+  progress: ProgressLogger,
 ) {
   if (!repairResponse.success) {
     progress.log(
       rootPromptDef,
       'error',
-      `AI failed to generate a response for repair attempt #${attempts + 1}`
+      `AI failed to generate a response for repair attempt #${attempts + 1}`,
     );
 
     // Stop trying to repair if AI can't suggest a fix (API request fails)
-    throw new Error(
-      `Repair request failed: ${repairResponse.errors.join('\n')}`
-    );
+    throw new Error(`Repair request failed: ${repairResponse.errors.join('\n')}`);
   }
 
   // Clone the previous files because `mergeRepairFiles` mutates the attempt files.
   // We don't want to change files of a previous attempt.
-  const newAttemptFiles = previousAttemptFiles.map((f) => ({ ...f }));
+  const newAttemptFiles = previousAttemptFiles.map(f => ({...f}));
 
   mergeRepairFiles(repairResponse.outputFiles, newAttemptFiles);
   writeResponseFiles(directory, newAttemptFiles, env, rootPromptDef.name);
@@ -122,7 +120,7 @@ async function handleRepairResponse(
     rootPromptDef,
     abortSignal,
     workerConcurrencyQueue,
-    progress
+    progress,
   );
 
   return {
@@ -141,15 +139,12 @@ async function handleRepairResponse(
  * @param repairOutputFiles The array of new or updated files to merge.
  * @param finalFiles The array of files to be updated.
  */
-function mergeRepairFiles(
-  repairOutputFiles: LlmResponseFile[],
-  finalFiles: LlmResponseFile[]
-) {
+function mergeRepairFiles(repairOutputFiles: LlmResponseFile[], finalFiles: LlmResponseFile[]) {
   // Merge the repair response into the original files. Otherwise we may end up dropping
   // files that were valid in the initial response and the LLM decided not to touch, because
   // they're still valid.
   for (const file of repairOutputFiles) {
-    const existingFile = finalFiles.find((f) => f.filePath === file.filePath);
+    const existingFile = finalFiles.find(f => f.filePath === file.filePath);
 
     if (existingFile) {
       existingFile.code = file.code;

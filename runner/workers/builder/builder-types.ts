@@ -1,4 +1,4 @@
-import { PackageSummary } from '@safety-web/types';
+import {PackageSummary} from '@safety-web/types';
 
 /**
  * Represents the message structure used for communication between

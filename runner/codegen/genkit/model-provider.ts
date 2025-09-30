@@ -1,8 +1,8 @@
-import { ModelReference } from 'genkit';
-import { GenkitPlugin, GenkitPluginV2 } from 'genkit/plugin';
-import { RateLimiter } from 'limiter';
-import { PromptDataMessage } from '../llm-runner.js';
-import { LlmResponseFile } from '../../shared-interfaces.js';
+import {ModelReference} from 'genkit';
+import {GenkitPlugin, GenkitPluginV2} from 'genkit/plugin';
+import {RateLimiter} from 'limiter';
+import {PromptDataMessage} from '../llm-runner.js';
+import {LlmResponseFile} from '../../shared-interfaces.js';
 
 export interface RateLimitConfig {
   requestPerMinute: RateLimiter;
@@ -53,19 +53,11 @@ export abstract class GenkitModelProvider {
    */
   abstract validateGeneratedFiles(files: LlmResponseFile[]): boolean;
 
-  protected abstract pluginFactory(
-    apiKey: string
-  ): GenkitPlugin | GenkitPluginV2;
+  protected abstract pluginFactory(apiKey: string): GenkitPlugin | GenkitPluginV2;
 
-  abstract getModelSpecificConfig(
-    opts: { includeThoughts?: boolean },
-    modelName: string
-  ): object;
+  abstract getModelSpecificConfig(opts: {includeThoughts?: boolean}, modelName: string): object;
 
-  async rateLimit(
-    prompt: PromptDataForCounting,
-    model: ModelReference<any>
-  ): Promise<void> {
+  async rateLimit(prompt: PromptDataForCounting, model: ModelReference<any>): Promise<void> {
     const config = this.rateLimitConfig[model.name];
 
     if (config) {

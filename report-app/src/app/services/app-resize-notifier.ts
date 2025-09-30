@@ -1,18 +1,12 @@
-import { isPlatformBrowser } from '@angular/common';
-import {
-  ApplicationRef,
-  DestroyRef,
-  inject,
-  Injectable,
-  PLATFORM_ID,
-} from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
+import {ApplicationRef, DestroyRef, inject, Injectable, PLATFORM_ID} from '@angular/core';
 
 /**
  * This service will be init at the first injection.
  *
  * It can be used after the root component is created.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AppResizeNotifier {
   constructor() {
     if (this.isBrowser) {
@@ -24,7 +18,7 @@ export class AppResizeNotifier {
   private _listeners: Array<() => void> = [];
 
   notify() {
-    this._listeners.forEach((l) => l());
+    this._listeners.forEach(l => l());
   }
 
   register(listener: () => void) {

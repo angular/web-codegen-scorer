@@ -1,8 +1,5 @@
-import { BuildResultStatus } from '../../../../runner/workers/builder/builder-types';
-import {
-  AssessmentResult,
-  RunInfo,
-} from '../../../../runner/shared-interfaces';
+import {BuildResultStatus} from '../../../../runner/workers/builder/builder-types';
+import {AssessmentResult, RunInfo} from '../../../../runner/shared-interfaces';
 import JsZip from 'jszip';
 
 /**
@@ -12,16 +9,10 @@ import JsZip from 'jszip';
  * @param app The assessment result for which to create the debugging zip.
  * @returns A promise that resolves with the generated ZIP file as a Blob.
  */
-export async function createPromptDebuggingZip(
-  run: RunInfo,
-  app: AssessmentResult
-): Promise<Blob> {
+export async function createPromptDebuggingZip(run: RunInfo, app: AssessmentResult): Promise<Blob> {
   const zip = new JsZip();
 
-  zip.file(
-    'prompt.md',
-    `${run.details.systemPromptGeneration}\n\n${app.promptDef.prompt}`
-  );
+  zip.file('prompt.md', `${run.details.systemPromptGeneration}\n\n${app.promptDef.prompt}`);
 
   let generatedFiles = ``;
   for (const file of app.outputFiles) {

@@ -1,9 +1,4 @@
-import {
-  PerBuildRating,
-  RatingCategory,
-  RatingKind,
-  RatingState,
-} from '../rating-types.js';
+import {PerBuildRating, RatingCategory, RatingKind, RatingState} from '../rating-types.js';
 
 /** Rating which verifies that the LLM produced at least one file. */
 export const sufficientGeneratedFilesRating: PerBuildRating = {
@@ -13,7 +8,7 @@ export const sufficientGeneratedFilesRating: PerBuildRating = {
   id: 'common-generated-file-count',
   scoreReduction: '100%',
   kind: RatingKind.PER_BUILD,
-  rate: ({ generatedFileCount }) => ({
+  rate: ({generatedFileCount}) => ({
     state: RatingState.EXECUTED,
     coefficient: generatedFileCount > 0 ? 1 : 0,
   }),

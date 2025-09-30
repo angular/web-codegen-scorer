@@ -1,12 +1,8 @@
-import { xAI } from '@genkit-ai/compat-oai/xai';
-import { GenkitPlugin, GenkitPluginV2 } from 'genkit/plugin';
-import { RateLimiter } from 'limiter';
+import {xAI} from '@genkit-ai/compat-oai/xai';
+import {GenkitPlugin, GenkitPluginV2} from 'genkit/plugin';
+import {RateLimiter} from 'limiter';
 import fetch from 'node-fetch';
-import {
-  GenkitModelProvider,
-  PromptDataForCounting,
-  RateLimitConfig,
-} from '../model-provider.js';
+import {GenkitModelProvider, PromptDataForCounting, RateLimitConfig} from '../model-provider.js';
 
 export class GrokModelProvider extends GenkitModelProvider {
   readonly apiKeyVariableName = 'XAI_API_KEY';
@@ -16,9 +12,7 @@ export class GrokModelProvider extends GenkitModelProvider {
     'grok-code-fast-1': () => xAI.model('grok-code-fast-1'),
   };
 
-  private async countTokensWithXaiApi(
-    prompt: PromptDataForCounting
-  ): Promise<number | null> {
+  private async countTokensWithXaiApi(prompt: PromptDataForCounting): Promise<number | null> {
     const apiKey = this.getApiKey();
     if (!apiKey) {
       return null;
@@ -27,7 +21,7 @@ export class GrokModelProvider extends GenkitModelProvider {
     try {
       // Use xAI's tokenize API for accurate token counting
       const messages = this.genkitPromptToXaiFormat(prompt);
-      const text = messages.map((m) => `${m.role}: ${m.content}`).join('\n');
+      const text = messages.map(m => `${m.role}: ${m.content}`).join('\n');
 
       const response = await fetch('https://api.x.ai/v1/tokenize', {
         method: 'POST',
@@ -35,11 +29,11 @@ export class GrokModelProvider extends GenkitModelProvider {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${apiKey}`,
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({text}),
       });
 
       if (response.ok) {
-        const data = (await response.json()) as { tokens: unknown[] };
+        const data = (await response.json()) as {tokens: unknown[]};
         return data.tokens?.length || 0;
       }
       return null;
@@ -51,7 +45,7 @@ export class GrokModelProvider extends GenkitModelProvider {
 
   private async countTokensForModel(
     _modelName: string,
-    prompt: PromptDataForCounting
+    prompt: PromptDataForCounting,
   ): Promise<number> {
     const xaiTokenCount = await this.countTokensWithXaiApi(prompt);
     if (xaiTokenCount !== null) {
@@ -71,7 +65,7 @@ export class GrokModelProvider extends GenkitModelProvider {
         tokensPerInterval: 2_000_000 * 0.75,
         interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side
       }),
-      countTokens: (prompt) => this.countTokensForModel('grok-4', prompt),
+      countTokens: prompt => this.countTokensForModel('grok-4', prompt),
     },
     'xai/grok-code-fast-1': {
       requestPerMinute: new RateLimiter({
@@ -82,13 +76,12 @@ export class GrokModelProvider extends GenkitModelProvider {
         tokensPerInterval: 2_000_000 * 0.75,
         interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side
       }),
-      countTokens: (prompt) =>
-        this.countTokensForModel('grok-code-fast-1', prompt),
+      countTokens: prompt => this.countTokensForModel('grok-code-fast-1', prompt),
     },
   };
 
   protected pluginFactory(apiKey: string): GenkitPlugin | GenkitPluginV2 {
-    return xAI({ apiKey });
+    return xAI({apiKey});
   }
 
   getModelSpecificConfig(): object {
@@ -101,9 +94,9 @@ export class GrokModelProvider extends GenkitModelProvider {
   }
 
   private genkitPromptToXaiFormat(
-    prompt: PromptDataForCounting
-  ): Array<{ role: string; content: string }> {
-    const xaiPrompt: Array<{ role: string; content: string }> = [];
+    prompt: PromptDataForCounting,
+  ): Array<{role: string; content: string}> {
+    const xaiPrompt: Array<{role: string; content: string}> = [];
     for (const part of prompt.messages) {
       for (const c of part.content) {
         xaiPrompt.push({
@@ -112,6 +105,6 @@ export class GrokModelProvider extends GenkitModelProvider {
         });
       }
     }
-    return [...xaiPrompt, { role: 'user', content: prompt.prompt }];
+    return [...xaiPrompt, {role: 'user', content: prompt.prompt}];
   }
 }

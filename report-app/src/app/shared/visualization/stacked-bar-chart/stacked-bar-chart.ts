@@ -1,4 +1,4 @@
-import { Component, computed, input, signal } from '@angular/core';
+import {Component, computed, input, signal} from '@angular/core';
 
 export type StackedBarChartData = Array<{
   label: string;
@@ -16,9 +16,7 @@ export class StackedBarChart {
   compact = input(false);
   showLegend = input(true);
 
-  total = computed(() =>
-    this.data().reduce((acc, item) => acc + item.value, 0)
-  );
+  total = computed(() => this.data().reduce((acc, item) => acc + item.value, 0));
 
   protected displayPercentage = signal(false);
 
@@ -29,13 +27,11 @@ export class StackedBarChart {
   }
 
   toggleDisplayMode(): void {
-    this.displayPercentage.update((current) => !current);
+    this.displayPercentage.update(current => !current);
   }
 
   getItemDisplayValue(item: StackedBarChartData[0]): string {
     if (item.value === 0) return '';
-    return this.displayPercentage()
-      ? `${this.asPercent(item.value)}%`
-      : `${item.value}`;
+    return this.displayPercentage() ? `${this.asPercent(item.value)}%` : `${item.value}`;
   }
 }

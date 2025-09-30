@@ -1,8 +1,8 @@
-import { Component, inject, PLATFORM_ID } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ReportsFetcher } from './services/reports-fetcher';
-import { isPlatformServer } from '@angular/common';
-import { AppColorMode } from './services/app-color-mode';
+import {Component, inject, PLATFORM_ID} from '@angular/core';
+import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {ReportsFetcher} from './services/reports-fetcher';
+import {isPlatformServer} from '@angular/common';
+import {AppColorMode} from './services/app-color-mode';
 
 @Component({
   selector: 'app-root',
@@ -21,8 +21,6 @@ export class App {
   protected groupsError = this.reportsFetcher.reportGroupsError;
 
   protected toggleColorMode() {
-    this.colorModeService.setColorMode(
-      this.colorMode() === 'light' ? 'dark' : 'light'
-    );
+    this.colorModeService.setColorMode(this.colorMode() === 'light' ? 'dark' : 'light');
   }
 }

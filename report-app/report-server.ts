@@ -5,14 +5,11 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import {
-  FetchedLocalReports,
-  fetchReportsFromDisk,
-} from '../runner/reporting/report-local-disk';
-import { RunInfo } from '../runner/shared-interfaces';
-import { convertV2ReportToV3Report } from '../runner/reporting/migrations/v2_to_v3';
+import {dirname, isAbsolute, join, resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {FetchedLocalReports, fetchReportsFromDisk} from '../runner/reporting/report-local-disk';
+import {RunInfo} from '../runner/shared-interfaces';
+import {convertV2ReportToV3Report} from '../runner/reporting/migrations/v2_to_v3';
 
 const app = express();
 const reportsLoader = await getReportLoader();
@@ -50,7 +47,7 @@ app.get('/api/reports/:id', async (req, res) => {
   }
 
   // Convert potential older v2 reports.
-  result = result.map((r) => convertV2ReportToV3Report(r));
+  result = result.map(r => convertV2ReportToV3Report(r));
 
   res.json(result);
 });
@@ -60,13 +57,13 @@ app.use(
     maxAge: '1y',
     index: false,
     redirect: false,
-  })
+  }),
 );
 
 app.use('/**', (req, res, next) => {
   angularApp
     .handle(req)
-    .then((response) => {
+    .then(response => {
       return response ? writeResponseToNodeResponse(response, res) : next();
     })
     .catch(next);
@@ -85,7 +82,7 @@ export const reqHandler = createNodeRequestHandler(app);
 
 interface ReportLoader {
   getGroupedReports: (groupId: string) => Promise<RunInfo[]>;
-  getGroupsList: () => Promise<{ id: string }[]>;
+  getGroupsList: () => Promise<{id: string}[]>;
   configureEndpoints?: (expressApp: typeof app) => Promise<void>;
 }
 
@@ -93,14 +90,11 @@ interface ReportLoader {
 function getOptions() {
   const defaultPort = 4200;
   const envPort = process.env['CODEGEN_REPORTS_PORT'];
-  const reportsRoot =
-    process.env['CODEGEN_REPORTS_DIR'] || './.web-codegen-scorer/reports';
+  const reportsRoot = process.env['CODEGEN_REPORTS_DIR'] || './.web-codegen-scorer/reports';
 
   return {
     port: envPort ? parseInt(envPort) || defaultPort : defaultPort,
-    reportsRoot: isAbsolute(reportsRoot)
-      ? reportsRoot
-      : join(process.cwd(), reportsRoot),
+    reportsRoot: isAbsolute(reportsRoot) ? reportsRoot : join(process.cwd(), reportsRoot),
   };
 }
 
@@ -118,9 +112,7 @@ async function getReportLoader() {
   const loaderImportPath = isAbsolute(reportLoaderPath)
     ? reportLoaderPath
     : join(process.cwd(), reportLoaderPath);
-  const importResult: { default: ReportLoader } = await import(
-    /* @vite-ignore */ loaderImportPath
-  );
+  const importResult: {default: ReportLoader} = await import(/* @vite-ignore */ loaderImportPath);
 
   if (
     !importResult.default ||
@@ -129,7 +121,7 @@ async function getReportLoader() {
   ) {
     throw new Error(
       'Invalid remote import loader. The file must have a default export ' +
-        'with `getGroupedReports` and `getGroupsList` functions.'
+        'with `getGroupedReports` and `getGroupsList` functions.',
     );
   }
 
@@ -140,7 +132,7 @@ async function resolveLocalData(directory: string) {
   // Reuse the same promise so that concurrent requests get the same response.
   if (!localDataPromise) {
     let resolveFn: (data: FetchedLocalReports) => void;
-    localDataPromise = new Promise((resolve) => (resolveFn = resolve));
+    localDataPromise = new Promise(resolve => (resolveFn = resolve));
     resolveFn!(await fetchReportsFromDisk(directory));
   }
 

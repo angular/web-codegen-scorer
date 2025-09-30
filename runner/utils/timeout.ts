@@ -6,7 +6,7 @@ export class TimeoutError extends Error {}
 export async function callWithTimeout<T>(
   description: string,
   fn: (signal: AbortSignal) => Promise<T>,
-  timeoutInMin: number
+  timeoutInMin: number,
 ): Promise<T> {
   const abortController = new AbortController();
   let timeoutID: NodeJS.Timeout | null = null;
@@ -18,7 +18,7 @@ export async function callWithTimeout<T>(
         // Trigger abort signal to cleanup/kill e.g. processes behind a timeout.
         abortController.abort();
       },
-      1000 * 60 * timeoutInMin
+      1000 * 60 * timeoutInMin,
     );
   });
 

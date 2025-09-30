@@ -1,5 +1,5 @@
-import { BuildResult } from '../workers/builder/builder-types.js';
-import { extname } from 'path';
+import {BuildResult} from '../workers/builder/builder-types.js';
+import {extname} from 'path';
 import {
   IndividualAssessment,
   CodeAssessmentScore,
@@ -22,12 +22,12 @@ import {
   CATEGORY_NAMES,
   RatingsResult,
 } from './rating-types.js';
-import { extractEmbeddedCodeFromTypeScript } from './embedded-languages.js';
-import { Environment } from '../configuration/environment.js';
-import { GenkitRunner } from '../codegen/genkit/genkit-runner.js';
-import { ProgressLogger } from '../progress/progress-logger.js';
-import { UserFacingError } from '../utils/errors.js';
-import { ServeTestingResult } from '../workers/serve-testing/worker-types.js';
+import {extractEmbeddedCodeFromTypeScript} from './embedded-languages.js';
+import {Environment} from '../configuration/environment.js';
+import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
+import {ProgressLogger} from '../progress/progress-logger.js';
+import {UserFacingError} from '../utils/errors.js';
+import {ServeTestingResult} from '../workers/serve-testing/worker-types.js';
 
 interface FileOrEmbeddedSyntheticFile {
   /**
@@ -41,10 +41,7 @@ interface FileOrEmbeddedSyntheticFile {
   code: string;
 }
 
-type CategorizedFiles = Record<
-  PerFileRatingContentType,
-  FileOrEmbeddedSyntheticFile[]
->;
+type CategorizedFiles = Record<PerFileRatingContentType, FileOrEmbeddedSyntheticFile[]>;
 
 export async function rateGeneratedCode(
   llm: GenkitRunner,
@@ -58,7 +55,7 @@ export async function rateGeneratedCode(
   axeRepairAttempts: number,
   abortSignal: AbortSignal,
   progress: ProgressLogger,
-  autoraterModel: string
+  autoraterModel: string,
 ): Promise<CodeAssessmentScore> {
   let categorizedFiles: CategorizedFiles | null = null;
   let totalPoints = 0;
@@ -78,7 +75,7 @@ export async function rateGeneratedCode(
     RatingCategory.HIGH_IMPACT,
     RatingCategory.MEDIUM_IMPACT,
     RatingCategory.LOW_IMPACT,
-  ].map((category) => ({
+  ].map(category => ({
     id: category,
     name: CATEGORY_NAMES[category],
     points: 0,
@@ -98,15 +95,11 @@ export async function rateGeneratedCode(
           repairAttempts,
           outputFiles.length,
           axeRepairAttempts,
-          ratingsResult
+          ratingsResult,
         );
       } else if (current.kind === RatingKind.PER_FILE) {
         categorizedFiles ??= splitFilesIntoCategories(outputFiles);
-        result = await runPerFileRating(
-          current,
-          categorizedFiles,
-          ratingsResult
-        );
+        result = await runPerFileRating(current, categorizedFiles, ratingsResult);
       } else if (current.kind === RatingKind.LLM_BASED) {
         result = await runLlmBasedRating(
           environment,
@@ -121,16 +114,13 @@ export async function rateGeneratedCode(
           axeRepairAttempts,
           abortSignal,
           autoraterModel,
-          ratingsResult
+          ratingsResult,
         );
       } else {
         throw new UserFacingError(`Unsupported rating type ${current}`);
       }
     } catch (error) {
-      result = getSkippedAssessment(
-        current,
-        `Error during execution:\n${error}`
-      );
+      result = getSkippedAssessment(current, `Error during execution:\n${error}`);
     }
 
     if (result.state === IndividualAssessmentState.EXECUTED && result.usage) {
@@ -139,11 +129,11 @@ export async function rateGeneratedCode(
       tokenUsage.totalTokens += result.usage.totalTokens ?? 0;
     }
 
-    const category = categories.find((c) => c.id === result.category);
+    const category = categories.find(c => c.id === result.category);
 
     if (!category) {
       throw new UserFacingError(
-        `Could not find category for rating "${result.id}" with category "${result.category}"`
+        `Could not find category for rating "${result.id}" with category "${result.category}"`,
       );
     }
 
@@ -158,17 +148,14 @@ export async function rateGeneratedCode(
     for (const result of category.assessments) {
       if (result.state === IndividualAssessmentState.EXECUTED) {
         const reduction =
-          parsePercentString(result.scoreReduction) *
-          (1 - result.successPercentage);
+          parsePercentString(result.scoreReduction) * (1 - result.successPercentage);
         multiplier = Math.max(0, multiplier - reduction);
       }
     }
 
     // Round the number to two decimals.
     // via: https://stackoverflow.com/questions/11832914/how-to-round-to-at-most-2-decimal-places-if-necessary
-    category.points =
-      Math.round((category.maxPoints * multiplier + Number.EPSILON) * 100) /
-      100;
+    category.points = Math.round((category.maxPoints * multiplier + Number.EPSILON) * 100) / 100;
     maxOverallPoints += category.maxPoints;
     totalPoints += category.points;
   }
@@ -188,7 +175,7 @@ function runPerBuildRating(
   repairAttempts: number,
   generatedFileCount: number,
   axeRepairAttempts: number,
-  ratingsResult: RatingsResult
+  ratingsResult: RatingsResult,
 ): IndividualAssessment | SkippedIndividualAssessment {
   const rateResult = rating.rate({
     buildResult,
@@ -206,8 +193,7 @@ function runPerBuildRating(
   }
 
   const message =
-    getMessage(rateResult.coefficient) +
-    (rateResult.message ? `\n${rateResult.message}` : '');
+    getMessage(rateResult.coefficient) + (rateResult.message ? `\n${rateResult.message}` : '');
 
   return getIndividualAssessment(rating, rateResult.coefficient, message);
 }
@@ -215,7 +201,7 @@ function runPerBuildRating(
 async function runPerFileRating(
   rating: PerFileRating,
   categorizedFiles: CategorizedFiles,
-  ratingsResult: RatingsResult
+  ratingsResult: RatingsResult,
 ): Promise<IndividualAssessment | SkippedIndividualAssessment> {
   const errorMessages: string[] = [];
   let contentType: PerFileRatingContentType;
@@ -239,8 +225,7 @@ async function runPerFileRating(
   for (const file of files) {
     const matchesFilePattern =
       contentFilterPattern === null || contentFilterPattern.test(file.code);
-    const matchesPathPattern =
-      pathFilterPattern === null || pathFilterPattern.test(file.filePath);
+    const matchesPathPattern = pathFilterPattern === null || pathFilterPattern.test(file.filePath);
 
     if (matchesFilePattern && matchesPathPattern) {
       // Remove comments from the code to avoid false-detection of bad patterns.
@@ -269,11 +254,7 @@ async function runPerFileRating(
   let message = getMessage(average);
 
   if (errorMessages.length) {
-    message += [
-      '',
-      'Errors:',
-      errorMessages.join(`\n ${'-'.repeat(50)} \n`),
-    ].join('\n');
+    message += ['', 'Errors:', errorMessages.join(`\n ${'-'.repeat(50)} \n`)].join('\n');
   }
 
   return getIndividualAssessment(rating, average, message);
@@ -292,7 +273,7 @@ async function runLlmBasedRating(
   axeRepairAttempts: number,
   abortSignal: AbortSignal,
   autoraterModel: string,
-  ratingsResult: RatingsResult
+  ratingsResult: RatingsResult,
 ): Promise<IndividualAssessment | SkippedIndividualAssessment> {
   const result = await rating.rate({
     environment,
@@ -316,11 +297,7 @@ async function runLlmBasedRating(
   let message = `${getMessage(result.coefficient)}\n${result.details.summary}`;
 
   if (result.coefficient < 1) {
-    message +=
-      ':\n' +
-      result.details.categories
-        .map((category) => category.message)
-        .join('\n  ');
+    message += ':\n' + result.details.categories.map(category => category.message).join('\n  ');
   }
 
   return getIndividualAssessment(rating, result.coefficient, message);
@@ -329,7 +306,7 @@ async function runLlmBasedRating(
 function getIndividualAssessment(
   rating: Rating,
   rateResult: number,
-  message: string
+  message: string,
 ): IndividualAssessment {
   return {
     state: IndividualAssessmentState.EXECUTED,
@@ -343,10 +320,7 @@ function getIndividualAssessment(
   };
 }
 
-function getSkippedAssessment(
-  rating: Rating,
-  message: string
-): SkippedIndividualAssessment {
+function getSkippedAssessment(rating: Rating, message: string): SkippedIndividualAssessment {
   return {
     state: IndividualAssessmentState.SKIPPED,
     name: rating.name,
@@ -385,9 +359,7 @@ function getMessage(coefficient: number) {
   return `Partial Pass (${Math.round(coefficient * 100)}%)`;
 }
 
-function splitFilesIntoCategories(
-  outputFiles: LlmResponseFile[]
-): CategorizedFiles {
+function splitFilesIntoCategories(outputFiles: LlmResponseFile[]): CategorizedFiles {
   const ts: FileOrEmbeddedSyntheticFile[] = [];
   const css: FileOrEmbeddedSyntheticFile[] = [];
   const html: FileOrEmbeddedSyntheticFile[] = [];
@@ -400,8 +372,7 @@ function splitFilesIntoCategories(
     all.push(file);
 
     if (extension === '.ts' || extension === '.tsx') {
-      const embedded =
-        extension === '.ts' ? extractEmbeddedCodeFromTypeScript(file) : null;
+      const embedded = extension === '.ts' ? extractEmbeddedCodeFromTypeScript(file) : null;
 
       if (embedded !== null) {
         css.push(...embedded.stylesheets);

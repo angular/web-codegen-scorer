@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 
 const exactMatches: Record<string, string> = {
   angular: 'frameworks/angular.png',
@@ -51,9 +51,7 @@ export class ProviderLabel {
       return null;
     }
 
-    return exactMatches.hasOwnProperty(id)
-      ? exactMatches[id]
-      : getModelLogoURL(id);
+    return exactMatches.hasOwnProperty(id) ? exactMatches[id] : getModelLogoURL(id);
   });
 }
 

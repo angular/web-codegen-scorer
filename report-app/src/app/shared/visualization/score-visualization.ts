@@ -1,14 +1,7 @@
-import {
-  afterRenderEffect,
-  Component,
-  ElementRef,
-  inject,
-  input,
-  viewChild,
-} from '@angular/core';
-import { RunGroup } from '../../../../../runner/shared-interfaces';
-import { GoogleChartsLoader } from '../../services/google-charts-loader';
-import { AppResizeNotifier } from '../../services/app-resize-notifier';
+import {afterRenderEffect, Component, ElementRef, inject, input, viewChild} from '@angular/core';
+import {RunGroup} from '../../../../../runner/shared-interfaces';
+import {GoogleChartsLoader} from '../../services/google-charts-loader';
+import {AppResizeNotifier} from '../../services/app-resize-notifier';
 
 @Component({
   selector: 'score-visualization',
@@ -50,21 +43,20 @@ export class ScoreVisualization {
         timestamp: dayDate,
       };
       dataRows[dayKey].buildQualityPercentages.push(
-        (buildStats.successfulBuildsAfterRepair +
-          buildStats.successfulInitialBuilds) /
-          group.appsCount
+        (buildStats.successfulBuildsAfterRepair + buildStats.successfulInitialBuilds) /
+          group.appsCount,
       );
       dataRows[dayKey].overallQualityPercentages.push(overallQuality);
       appsCount += group.appsCount;
     }
 
-    return { dataRows, averageAppsCount: appsCount / this.groups().length };
+    return {dataRows, averageAppsCount: appsCount / this.groups().length};
   }
 
   private async _renderChart() {
     // Note: we need to call `_processData` synchronously
     // so the wrapping effect picks up the data dependency.
-    const { dataRows, averageAppsCount } = this._processData();
+    const {dataRows, averageAppsCount} = this._processData();
 
     await this.googleChartsLoader.ready;
 
@@ -75,19 +67,16 @@ export class ScoreVisualization {
     table.addColumn('number', 'Overall Quality');
 
     table.addRows(
-      Object.values(dataRows).map((r) => [
+      Object.values(dataRows).map(r => [
         r.timestamp,
         // TODO: Consider incorporating build quality scores.
         //   r.buildQualityPercentages.reduce((a, b) => a + b) /
         //     r.buildQualityPercentages.length,
-        r.overallQualityPercentages.reduce((a, b) => a + b) /
-          r.overallQualityPercentages.length,
-      ])
+        r.overallQualityPercentages.reduce((a, b) => a + b) / r.overallQualityPercentages.length,
+      ]),
     );
 
-    const chart = new google.visualization.LineChart(
-      this.chartContainer().nativeElement
-    );
+    const chart = new google.visualization.LineChart(this.chartContainer().nativeElement);
     chart.draw(table, {
       curveType: 'function',
       title: `Score average over time (~${averageAppsCount.toFixed(0)} apps generated per day)`,
@@ -96,7 +85,7 @@ export class ScoreVisualization {
       },
       hAxis: {
         minTextSpacing: 20,
-        textStyle: { fontSize: 10 },
+        textStyle: {fontSize: 10},
       },
       chartArea: {
         left: 50,

@@ -1,18 +1,11 @@
-import { join } from 'path';
+import {join} from 'path';
 import chalk from 'chalk';
 import boxen from 'boxen';
-import {
-  IndividualAssessmentState,
-  RunInfo,
-  ScoreBucket,
-} from '../shared-interfaces.js';
-import {
-  DEFAULT_AUTORATER_MODEL_NAME,
-  REPORTS_ROOT_DIR,
-} from '../configuration/constants.js';
-import { calculateBuildAndCheckStats } from '../ratings/stats.js';
-import { safeWriteFile } from '../file-system-utils.js';
-import { BuildResultStatus } from '../workers/builder/builder-types.js';
+import {IndividualAssessmentState, RunInfo, ScoreBucket} from '../shared-interfaces.js';
+import {DEFAULT_AUTORATER_MODEL_NAME, REPORTS_ROOT_DIR} from '../configuration/constants.js';
+import {calculateBuildAndCheckStats} from '../ratings/stats.js';
+import {safeWriteFile} from '../file-system-utils.js';
+import {BuildResultStatus} from '../workers/builder/builder-types.js';
 import {
   formatTokenCount,
   greenCheckmark,
@@ -22,10 +15,10 @@ import {
   formatScore,
   formatTitleCard,
 } from './format.js';
-import { Environment } from '../configuration/environment.js';
-import { LlmRunner } from '../codegen/llm-runner.js';
-import { groupSimilarReports } from '../orchestration/grouping.js';
-import { LocalEnvironment } from '../configuration/environment-local.js';
+import {Environment} from '../configuration/environment.js';
+import {LlmRunner} from '../codegen/llm-runner.js';
+import {groupSimilarReports} from '../orchestration/grouping.js';
+import {LocalEnvironment} from '../configuration/environment-local.js';
 
 /**
  * Generates a structured report on fs, based on the assessment run information.
@@ -48,17 +41,11 @@ import { LocalEnvironment } from '../configuration/environment-local.js';
  * @param id ID of the environment that was used for the eval.
  * @returns The original `runInfo` object, allowing for chaining.
  */
-export async function writeReportToDisk(
-  runInfo: RunInfo,
-  id: string
-): Promise<void> {
+export async function writeReportToDisk(runInfo: RunInfo, id: string): Promise<void> {
   // Sanitize report name: allow only a-z, A-Z, 0-9, and hyphens. Replace others with a hyphen.
-  const sanitizedReportName = runInfo.details.reportName.replace(
-    /[^a-zA-Z0-9-]/g,
-    '-'
-  );
+  const sanitizedReportName = runInfo.details.reportName.replace(/[^a-zA-Z0-9-]/g, '-');
 
-  const { results } = runInfo;
+  const {results} = runInfo;
   const reportBaseDir = join(REPORTS_ROOT_DIR, id, sanitizedReportName);
 
   // Write `summary.json` file, which contains **all** available info.
@@ -84,10 +71,7 @@ export async function writeReportToDisk(
 
       // Write file with stats
       const statsJson = {
-        fileSize: attempt.outputFiles.reduce(
-          (total, current) => (total += current.code.length),
-          0
-        ),
+        fileSize: attempt.outputFiles.reduce((total, current) => (total += current.code.length), 0),
         buildResult: attempt.buildResult,
         serveTestingResult: attempt.serveTestingResult,
       };
@@ -95,17 +79,12 @@ export async function writeReportToDisk(
       await safeWriteFile(statsCodePath, printJson(statsJson));
 
       await Promise.all(
-        result.outputFiles.map((file) =>
-          safeWriteFile(join(attemptPath, file.filePath), file.code)
-        )
+        result.outputFiles.map(file => safeWriteFile(join(attemptPath, file.filePath), file.code)),
       );
 
       // Write build.log for failed builds
       if (attempt.buildResult.status === BuildResultStatus.ERROR) {
-        await safeWriteFile(
-          join(attemptPath, 'build.log'),
-          attempt.buildResult.message
-        );
+        await safeWriteFile(join(attemptPath, 'build.log'), attempt.buildResult.message);
       }
 
       // Write screenshot to fs first, since we'll remove this info
@@ -127,7 +106,7 @@ export async function writeReportToDisk(
         const reportFilePath = join(attemptPath, 'safety-web.json');
         await safeWriteFile(
           reportFilePath,
-          JSON.stringify(attempt.buildResult.safetyWebReportJson, null, 2)
+          JSON.stringify(attempt.buildResult.safetyWebReportJson, null, 2),
         );
       }
 
@@ -139,7 +118,7 @@ export async function writeReportToDisk(
         const reportFilePath = join(attemptPath, 'csp-violations.json');
         await safeWriteFile(
           reportFilePath,
-          JSON.stringify(attempt.serveTestingResult.cspViolations, null, 2)
+          JSON.stringify(attempt.serveTestingResult.cspViolations, null, 2),
         );
       }
     }
@@ -151,7 +130,7 @@ export async function writeReportToDisk(
       `${greenCheckmark()} Full report has been saved to the '${reportBaseDir}' directory.`,
       '🚀 Run `web-codegen-scorer report` to view the report in your browser!',
       '',
-    ].join('\n')
+    ].join('\n'),
   );
 }
 
@@ -165,15 +144,14 @@ export function logReportHeader(
     labels: string[];
     startMcp?: boolean;
     autoraterModel?: string;
-  }
+  },
 ): void {
   const titleCardText = [
     'Running a codegen evaluation with configuration:',
     '',
     ` - Environment: ${env.displayName}`,
     ` - Model: ${options.model}`,
-    options.autoraterModel &&
-    options.autoraterModel !== DEFAULT_AUTORATER_MODEL_NAME
+    options.autoraterModel && options.autoraterModel !== DEFAULT_AUTORATER_MODEL_NAME
       ? ` - Autorater model: ${options.autoraterModel}`
       : null,
     ` - Runner: ${env instanceof LocalEnvironment ? env.llm.displayName : 'Remote'}`,
@@ -186,58 +164,55 @@ export function logReportHeader(
     ` - Start time: ${new Date().toLocaleString()}`,
     ` - Number of prompts: ${promptsToProcess}`,
   ]
-    .filter((line) => line != null)
+    .filter(line => line != null)
     .join('\n');
 
   console.log(formatTitleCard(titleCardText));
 }
 
 export function logReportToConsole(runInfo: RunInfo): void {
-  const { details, results } = runInfo;
-  const { builds, buckets } = calculateBuildAndCheckStats(results);
-  const { usage } = details.summary;
-  const { successfulInitialBuilds, successfulBuildsAfterRepair } = builds;
+  const {details, results} = runInfo;
+  const {builds, buckets} = calculateBuildAndCheckStats(results);
+  const {usage} = details.summary;
+  const {successfulInitialBuilds, successfulBuildsAfterRepair} = builds;
   const totalResults = results.length || 1; // Avoid division by zero if results is empty
 
   results.forEach((result, index) => {
     console.log(` Prompt #${index}: ${chalk.bold(result.promptDef.name)}`);
     console.log(` Text: ${result.promptDef.prompt}`);
 
-    const { maxOverallPoints, totalPoints } = result.score;
+    const {maxOverallPoints, totalPoints} = result.score;
     const scorePercentage = (totalPoints / maxOverallPoints) * 100;
 
     const scoreMessage = `${Math.round(totalPoints)} / ${maxOverallPoints} points (${scorePercentage.toFixed(2)}%)`;
     console.log(
-      ` Code Quality Score: ${formatScore(totalPoints / maxOverallPoints, scoreMessage)}`
+      ` Code Quality Score: ${formatScore(totalPoints / maxOverallPoints, scoreMessage)}`,
     );
 
     console.log(' Scoring Details');
-    result.score.categories.forEach((category) => {
-      console.log(
-        `  ${category.name} (${category.points}/${category.maxPoints} points):`
-      );
+    result.score.categories.forEach(category => {
+      console.log(`  ${category.name} (${category.points}/${category.maxPoints} points):`);
 
       if (category.assessments.length === 0) {
         console.log('   No assessments');
       }
 
-      category.assessments.forEach((assessment) => {
+      category.assessments.forEach(assessment => {
         let statusIcon: string;
         if (assessment.state === IndividualAssessmentState.SKIPPED) {
           statusIcon = '-';
         } else {
-          statusIcon =
-            assessment.successPercentage === 1
-              ? `${greenCheckmark()}`
-              : `${redX()}`;
+          statusIcon = assessment.successPercentage === 1 ? `${greenCheckmark()}` : `${redX()}`;
         }
 
-        const potentialMultilineAssessmentMessage =
-          assessment.message.replaceAll('\n', '\n       ');
+        const potentialMultilineAssessmentMessage = assessment.message.replaceAll(
+          '\n',
+          '\n       ',
+        );
 
         const formattedMessage = formatAssessmentMessage(
           assessment,
-          potentialMultilineAssessmentMessage
+          potentialMultilineAssessmentMessage,
         );
 
         console.log(`   ${statusIcon} ${assessment.name}: ${formattedMessage}`);
@@ -250,17 +225,14 @@ export function logReportToConsole(runInfo: RunInfo): void {
     }
   });
 
-  const failedBuilds =
-    results.length - successfulInitialBuilds - successfulBuildsAfterRepair;
+  const failedBuilds = results.length - successfulInitialBuilds - successfulBuildsAfterRepair;
 
   const summaryLines = [
     'Run info:',
     ` - Environment: ${runInfo.details.summary.displayName}`,
     ` - Model: ${runInfo.details.summary.model}`,
     ` - Runner: ${runInfo.details.summary.runner?.displayName}`,
-    runInfo.details.labels?.length
-      ? ` - Labels: ${runInfo.details.labels.join(', ')}`
-      : null,
+    runInfo.details.labels?.length ? ` - Labels: ${runInfo.details.labels.join(', ')}` : null,
     ` - Framework: ${runInfo.details.summary.framework.clientSideFramework.displayName}`,
     ` - End time: ${new Date().toLocaleString()}`,
     ` - Total prompts processed: ${results.length}`,
@@ -270,42 +242,42 @@ export function logReportToConsole(runInfo: RunInfo): void {
       'Successful initial builds',
       successfulInitialBuilds,
       totalResults,
-      chalk.green
+      chalk.green,
     ),
     formatSummaryLine(
       'Successful builds after repair',
       successfulBuildsAfterRepair,
       totalResults,
-      chalk.yellow
+      chalk.yellow,
     ),
     formatSummaryLine('Failed builds', failedBuilds, totalResults, chalk.red),
     '',
     'Code quality stats:',
-    ...buckets.map((bucket) =>
+    ...buckets.map(bucket =>
       formatSummaryLine(
         bucket.nameWithLabels,
         bucket.appsCount,
         totalResults,
-        bucketToChalkFn(bucket)
-      )
+        bucketToChalkFn(bucket),
+      ),
     ),
     '',
     'Usage info:',
     ` - Input tokens: ${formatTokenCount(usage.inputTokens)}`,
     ` - Output tokens: ${formatTokenCount(usage.outputTokens)}`,
     ` - Total tokens: ${formatTokenCount(usage.totalTokens)}`,
-  ].filter((line) => line != null);
+  ].filter(line => line != null);
 
   console.log(
     boxen(summaryLines.join('\n'), {
       padding: 1,
-      margin: { top: 2 },
+      margin: {top: 2},
       width: Math.min(80, process.stdout.columns),
       borderColor: 'cyan',
       borderStyle: 'double',
       title: 'Assessment Summary',
       titleAlignment: 'center',
-    })
+    }),
   );
 }
 
@@ -321,7 +293,7 @@ function formatSummaryLine(
   label: string,
   count: number,
   total: number,
-  colorFn: (value: string) => string
+  colorFn: (value: string) => string,
 ): string {
   const percentage = total > 0 ? (count / total) * 100 : 0;
   return ` - ${label}: ${colorFn(`${count} (${percentage.toFixed(1)}%)`)}`;

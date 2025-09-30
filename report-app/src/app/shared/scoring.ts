@@ -1,6 +1,6 @@
-import { isPlatformServer } from '@angular/common';
-import { ScoreBucket } from '../../../../runner/shared-interfaces';
-import { ColorMode } from '../services/app-color-mode';
+import {isPlatformServer} from '@angular/common';
+import {ScoreBucket} from '../../../../runner/shared-interfaces';
+import {ColorMode} from '../services/app-color-mode';
 
 export enum ScoreCssVariable {
   excellent = 'var(--status-fill-excellent)',
@@ -32,7 +32,7 @@ export function bucketToScoreVariable(bucket: ScoreBucket): ScoreCssVariable {
 export function getHardcodedColor(
   platformId: Object,
   color: `var(${string})`,
-  colorMode: ColorMode
+  colorMode: ColorMode,
 ): string {
   const varName = getValueInParens(color);
 
@@ -42,16 +42,12 @@ export function getHardcodedColor(
   }
 
   if (!CACHED_COLORS[colorMode][varName]) {
-    const computed = window
-      .getComputedStyle(document.body)
-      .getPropertyValue(varName);
+    const computed = window.getComputedStyle(document.body).getPropertyValue(varName);
     let value: string;
 
     if (computed.startsWith('light-dark')) {
       const inner = getValueInParens(computed) || 'transparent, transparent';
-      value = inner.split(',').map((part) => part.trim())[
-        colorMode === 'light' ? 0 : 1
-      ];
+      value = inner.split(',').map(part => part.trim())[colorMode === 'light' ? 0 : 1];
     } else {
       value = computed;
     }

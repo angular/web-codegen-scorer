@@ -1,17 +1,14 @@
-import { Arguments, Argv, CommandModule } from 'yargs';
+import {Arguments, Argv, CommandModule} from 'yargs';
 import chalk from 'chalk';
 import {
   BUILT_IN_ENVIRONMENTS,
   DEFAULT_AUTORATER_MODEL_NAME,
   DEFAULT_MODEL_NAME,
 } from './configuration/constants.js';
-import { generateCodeAndAssess } from './orchestration/generate.js';
-import {
-  logReportToConsole,
-  writeReportToDisk,
-} from './reporting/report-logging.js';
-import { RunnerName } from './codegen/runner-creation.js';
-import { UserFacingError } from './utils/errors.js';
+import {generateCodeAndAssess} from './orchestration/generate.js';
+import {logReportToConsole, writeReportToDisk} from './reporting/report-logging.js';
+import {RunnerName} from './codegen/runner-creation.js';
+import {UserFacingError} from './utils/errors.js';
 
 export const EvalModule = {
   builder,
@@ -66,8 +63,7 @@ function builder(argv: Argv): Argv<Options> {
       .option('local', {
         type: 'boolean',
         default: false,
-        description:
-          'Whether to run the evaluation against locally-cached LLM output',
+        description: 'Whether to run the evaluation against locally-cached LLM output',
       })
       .option('limit', {
         type: 'number',
@@ -77,14 +73,13 @@ function builder(argv: Argv): Argv<Options> {
       .option('concurrency', {
         type: 'string',
         default: 'auto',
-        coerce: (v) => (v === 'auto' ? 'auto' : Number(v)),
+        coerce: v => (v === 'auto' ? 'auto' : Number(v)),
         description: 'Maximum number of evaluations to run concurrently',
       })
       .option('output-directory', {
         type: 'string',
         alias: ['output-dir'],
-        description:
-          'Directory in which to output the generated code for debugging',
+        description: 'Directory in which to output the generated code for debugging',
       })
       .option('prompt-filter', {
         type: 'string',
@@ -114,10 +109,7 @@ function builder(argv: Argv): Argv<Options> {
       })
       .option('logging', {
         type: 'string',
-        default:
-          process.env['CI'] === '1'
-            ? ('text-only' as const)
-            : ('dynamic' as const),
+        default: process.env['CI'] === '1' ? ('text-only' as const) : ('dynamic' as const),
         defaultDescription: '`dynamic` (or `text-only` when `CI=1`)',
         requiresArg: true,
         choices: ['text-only', 'dynamic'] as const,
@@ -143,8 +135,7 @@ function builder(argv: Argv): Argv<Options> {
         type: 'boolean',
         default: false,
         alias: ['user-journeys'],
-        description:
-          'Whether to enable user journey testing through browser automation',
+        description: 'Whether to enable user journey testing through browser automation',
       })
       .option('enable-auto-csp', {
         type: 'boolean',
@@ -178,8 +169,8 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
           ' - Pass a path to an environment config file using the `--env` flag.',
           ' - Pass `--env=angular-example` or `--env=solid-example` to use one of our built-in example environments.',
           ' - Pass `--help` to see all available options.',
-        ].join('\n')
-      )
+        ].join('\n'),
+      ),
     );
     process.exit(0);
   }
@@ -188,8 +179,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
     const runInfo = await generateCodeAndAssess({
       runner: cliArgs.runner,
       model: cliArgs.model,
-      environmentConfigPath:
-        BUILT_IN_ENVIRONMENTS.get(cliArgs.environment) || cliArgs.environment,
+      environmentConfigPath: BUILT_IN_ENVIRONMENTS.get(cliArgs.environment) || cliArgs.environment,
       localMode: cliArgs.local,
       limit: cliArgs.limit,
       concurrency: cliArgs.concurrency as number,
@@ -215,9 +205,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
     if (error instanceof UserFacingError) {
       console.error(chalk.red(error.message));
     } else {
-      console.error(
-        chalk.red('An error occurred during the assessment process:')
-      );
+      console.error(chalk.red('An error occurred during the assessment process:'));
       console.error(chalk.red(error));
       if ((error as Partial<Error>).stack) {
         console.error(chalk.red((error as Error).stack));

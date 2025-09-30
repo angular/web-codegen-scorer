@@ -7,9 +7,9 @@ import {
   signal,
   ViewEncapsulation,
 } from '@angular/core';
-import { SafeHtml } from '@angular/platform-browser';
-import { CodeHighligher } from '../services/code-highligher';
-import { AppColorMode } from '../services/app-color-mode';
+import {SafeHtml} from '@angular/platform-browser';
+import {CodeHighligher} from '../services/code-highligher';
+import {AppColorMode} from '../services/app-color-mode';
 
 @Component({
   selector: 'app-code-viewer',

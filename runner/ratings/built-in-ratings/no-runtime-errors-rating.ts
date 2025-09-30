@@ -1,10 +1,5 @@
-import { BuildResultStatus } from '../../workers/builder/builder-types.js';
-import {
-  PerBuildRating,
-  RatingKind,
-  RatingCategory,
-  RatingState,
-} from '../rating-types.js';
+import {BuildResultStatus} from '../../workers/builder/builder-types.js';
+import {PerBuildRating, RatingKind, RatingCategory, RatingState} from '../rating-types.js';
 
 /** Rating which verifies that there are no runtime errors. */
 export const noRuntimeExceptionsRating: PerBuildRating = {
@@ -14,7 +9,7 @@ export const noRuntimeExceptionsRating: PerBuildRating = {
   category: RatingCategory.HIGH_IMPACT,
   scoreReduction: '50%',
   id: 'common-no-runtime-errors',
-  rate: ({ buildResult, serveResult }) => ({
+  rate: ({buildResult, serveResult}) => ({
     state: RatingState.EXECUTED,
     coefficient:
       // If we can't build - we can't run it as well.

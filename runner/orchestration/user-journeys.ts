@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import { LlmResponseFile, Usage } from '../shared-interfaces.js';
-import { GenkitRunner } from '../codegen/genkit/genkit-runner.js';
-import { UserFacingError } from '../utils/errors.js';
+import {z} from 'zod';
+import {LlmResponseFile, Usage} from '../shared-interfaces.js';
+import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
+import {UserFacingError} from '../utils/errors.js';
 
 // NOTE: When changing this, also change `browser-agent`'s prompt!
 const USER_JOURNEY_SCHEMA = z.object({
@@ -29,7 +29,7 @@ export async function generateUserJourneysForApp(
   appName: string,
   appPrompt: string,
   appFiles: LlmResponseFile[],
-  abortSignal: AbortSignal
+  abortSignal: AbortSignal,
 ): Promise<UserJourneysResult> {
   const result = await llm.generateConstrained({
     prompt: `
@@ -102,14 +102,14 @@ Create a modern, single-page web application that allows users to find recipes b
     messages: [
       {
         role: 'user',
-        content: [{ text: `Below is the user's prompt:\n\n${appPrompt}` }],
+        content: [{text: `Below is the user's prompt:\n\n${appPrompt}`}],
       },
       {
         role: 'user',
         content: [
           {
             text: `Below is the source code of an app generated for the above prompt:\n\n${appFiles
-              .map((file) => `${file.filePath}:\n\`\`\`\n${file.code}\`\`\``)
+              .map(file => `${file.filePath}:\n\`\`\`\n${file.code}\`\`\``)
               .join('\n\n')}`,
           },
         ],

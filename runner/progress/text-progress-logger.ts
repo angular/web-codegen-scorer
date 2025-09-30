@@ -1,9 +1,5 @@
-import { RootPromptDefinition } from '../shared-interfaces.js';
-import {
-  ProgressLogger,
-  ProgressType,
-  progressTypeToIcon,
-} from './progress-logger.js';
+import {RootPromptDefinition} from '../shared-interfaces.js';
+import {ProgressLogger, ProgressType, progressTypeToIcon} from './progress-logger.js';
 
 /** A progress logger that logs the progression as a flat stream of text. */
 export class TextProgressLogger implements ProgressLogger {
@@ -19,12 +15,7 @@ export class TextProgressLogger implements ProgressLogger {
     this.total = this.done = 0;
   }
 
-  log(
-    prompt: RootPromptDefinition,
-    type: ProgressType,
-    message: string,
-    details?: string
-  ): void {
+  log(prompt: RootPromptDefinition, type: ProgressType, message: string, details?: string): void {
     const icon = progressTypeToIcon(type);
 
     if (type === 'done') {

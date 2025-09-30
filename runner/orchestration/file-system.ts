@@ -1,25 +1,21 @@
-import { tmpdir } from 'os';
-import { LLM_OUTPUT_DIR } from '../configuration/constants.js';
-import { Environment } from '../configuration/environment.js';
+import {tmpdir} from 'os';
+import {LLM_OUTPUT_DIR} from '../configuration/constants.js';
+import {Environment} from '../configuration/environment.js';
 import {
   copyFolderExcept,
   createSymlinkIfNotExists,
   removeFolderWithSymlinks,
   safeWriteFile,
 } from '../file-system-utils.js';
-import {
-  LlmContextFile,
-  LlmResponseFile,
-  RootPromptDefinition,
-} from '../shared-interfaces.js';
-import { join } from 'path';
-import { existsSync } from 'fs';
-import { mkdir, mkdtemp, readFile } from 'fs/promises';
-import { globSync } from 'tinyglobby';
-import { executeCommand } from '../utils/exec.js';
-import { UserFacingError } from '../utils/errors.js';
-import { ProgressLogger } from '../progress/progress-logger.js';
-import { LocalEnvironment } from '../configuration/environment-local.js';
+import {LlmContextFile, LlmResponseFile, RootPromptDefinition} from '../shared-interfaces.js';
+import {join} from 'path';
+import {existsSync} from 'fs';
+import {mkdir, mkdtemp, readFile} from 'fs/promises';
+import {globSync} from 'tinyglobby';
+import {executeCommand} from '../utils/exec.js';
+import {UserFacingError} from '../utils/errors.js';
+import {ProgressLogger} from '../progress/progress-logger.js';
+import {LocalEnvironment} from '../configuration/environment-local.js';
 
 const SYMLINK_PROJECT_PATHS = new Set(['node_modules']);
 const PENDING_INSTALLS = new Map<string, Promise<void>>();
@@ -36,7 +32,7 @@ export async function setupProjectStructure(
   env: Environment,
   rootPromptDef: RootPromptDefinition,
   progress: ProgressLogger,
-  outputDirectory?: string
+  outputDirectory?: string,
 ) {
   let directory: string;
   let cleanup: () => Promise<void>;
@@ -46,15 +42,13 @@ export async function setupProjectStructure(
     // is specified since the main use case is debugging.
     directory = join(outputDirectory, env.id, rootPromptDef.name);
 
-    await mkdir(directory, { recursive: true });
+    await mkdir(directory, {recursive: true});
 
     // Don't clean up the custom output directory so it can be inspected.
     cleanup = () => Promise.resolve();
   } else {
     // When outputting to the temporary directory, make sure that the directory is unique.
-    directory = await mkdtemp(
-      join(tmpdir(), `fw-${env.id}-build-${rootPromptDef.name}`)
-    );
+    directory = await mkdtemp(join(tmpdir(), `fw-${env.id}-build-${rootPromptDef.name}`));
 
     cleanup = async () => {
       try {
@@ -73,12 +67,7 @@ export async function setupProjectStructure(
     // evals can reuse the same dependencies. It also allows pnpm workspaces to work
     // properly since we might not have copied the `pnpm-workspaces.yml`.
     if (!env.isBuiltIn) {
-      await installDependenciesInDirectory(
-        env,
-        rootPromptDef,
-        env.projectTemplatePath,
-        progress
-      );
+      await installDependenciesInDirectory(env, rootPromptDef, env.projectTemplatePath, progress);
     }
   }
 
@@ -89,12 +78,7 @@ export async function setupProjectStructure(
     // Also try to install dependencies in the source directory,
     // because it may be overriding the ones from the template.
     if (!env.isBuiltIn) {
-      await installDependenciesInDirectory(
-        env,
-        rootPromptDef,
-        env.sourceDirectory,
-        progress
-      );
+      await installDependenciesInDirectory(env, rootPromptDef, env.sourceDirectory, progress);
     }
   }
 
@@ -103,10 +87,7 @@ export async function setupProjectStructure(
 
     if (!env.isBuiltIn) {
       for (const symlinkPath of SYMLINK_PROJECT_PATHS) {
-        await createSymlinkIfNotExists(
-          join(dirToCopy, symlinkPath),
-          join(directory, symlinkPath)
-        );
+        await createSymlinkIfNotExists(join(dirToCopy, symlinkPath), join(directory, symlinkPath));
       }
     }
   }
@@ -115,15 +96,10 @@ export async function setupProjectStructure(
   // Since running an installation inside `node_modules` can be problematic, we install
   // in the temporary directory instead. This can be slower, but is more reliable.
   if (env instanceof LocalEnvironment && env.isBuiltIn) {
-    await installDependenciesInDirectory(
-      env,
-      rootPromptDef,
-      directory,
-      progress
-    );
+    await installDependenciesInDirectory(env, rootPromptDef, directory, progress);
   }
 
-  return { directory, cleanup };
+  return {directory, cleanup};
 }
 
 /** Run the package manager install command in a specific directory. */
@@ -131,7 +107,7 @@ function installDependenciesInDirectory(
   env: LocalEnvironment,
   rootPromptDef: RootPromptDefinition,
   directory: string,
-  progress: ProgressLogger
+  progress: ProgressLogger,
 ): Promise<void> {
   // The install script will error out if there's no `package.json`.
   if (env.skipInstall || !existsSync(join(directory, 'package.json'))) {
@@ -155,9 +131,7 @@ function installDependenciesInDirectory(
       return undefined;
     })
     .catch(() => {
-      throw new UserFacingError(
-        `Failed to install dependencies in ${directory}`
-      );
+      throw new UserFacingError(`Failed to install dependencies in ${directory}`);
     })
     .finally(() => {
       PENDING_INSTALLS.delete(key);
@@ -174,7 +148,7 @@ function installDependenciesInDirectory(
  */
 export async function resolveContextFiles(
   patterns: string[],
-  directory: string
+  directory: string,
 ): Promise<LlmContextFile[]> {
   if (patterns.length === 0) {
     return Promise.resolve([]);
@@ -193,10 +167,10 @@ export async function resolveContextFiles(
   });
 
   return Promise.all(
-    paths.map(async (relativePath) => ({
+    paths.map(async relativePath => ({
       relativePath,
       content: await readFile(join(directory, relativePath), 'utf8'),
-    }))
+    })),
   );
 }
 
@@ -211,10 +185,10 @@ export async function writeResponseFiles(
   directory: string,
   files: LlmResponseFile[],
   env: Environment,
-  promptName: string
+  promptName: string,
 ): Promise<void> {
   const llmOutputDir = join(LLM_OUTPUT_DIR, env.id, promptName);
-  const filePromises = files.map(async (file) => {
+  const filePromises = files.map(async file => {
     // Write file to a tmp folder first for debugging
     await safeWriteFile(join(llmOutputDir, file.filePath), file.code);
 

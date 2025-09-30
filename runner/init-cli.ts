@@ -1,19 +1,18 @@
-import { Argv, CommandModule, Options } from 'yargs';
-import { input, confirm } from '@inquirer/prompts';
+import {Argv, CommandModule, Options} from 'yargs';
+import {input, confirm} from '@inquirer/prompts';
 import chalk from 'chalk';
-import { join, relative, dirname } from 'path';
-import { cp } from 'fs/promises';
-import { formatTitleCard } from './reporting/format.js';
-import { generateId } from './utils/id-generation.js';
-import { safeWriteFile, toProcessAbsolutePath } from './file-system-utils.js';
-import { MODEL_PROVIDERS } from './codegen/genkit/models.js';
+import {join, relative, dirname} from 'path';
+import {cp} from 'fs/promises';
+import {formatTitleCard} from './reporting/format.js';
+import {generateId} from './utils/id-generation.js';
+import {safeWriteFile, toProcessAbsolutePath} from './file-system-utils.js';
+import {MODEL_PROVIDERS} from './codegen/genkit/models.js';
 
 export const InitModule = {
   builder,
   handler,
   command: 'init',
-  describe:
-    'Interactive guide through the process of creating an eval environment',
+  describe: 'Interactive guide through the process of creating an eval environment',
 } satisfies CommandModule<{}, Options>;
 
 interface InitOptions {
@@ -50,20 +49,20 @@ async function getAnswers(): Promise<InitOptions | null> {
       [
         'Welcome LLM enthusiast! 🎉',
         'Answer the following questions to create an eval environment',
-      ].join('\n')
-    )
+      ].join('\n'),
+    ),
   );
 
   // Add some spaces at the end to align to the text of the line above.
   const newLineSeparator = '\n  ';
-  const apiKeyVariables = MODEL_PROVIDERS.map((p) => p.apiKeyVariableName);
+  const apiKeyVariables = MODEL_PROVIDERS.map(p => p.apiKeyVariableName);
 
-  if (!apiKeyVariables.some((name) => process.env[name])) {
+  if (!apiKeyVariables.some(name => process.env[name])) {
     const hasConfirmed = await confirm({
       message: chalk.red(
         `Could not detect an API key in any of the following environment variables: ${apiKeyVariables.join(', ')}` +
           newLineSeparator +
-          'You may not be able to run the evals. Do you want to continue generating an environment anyway?'
+          'You may not be able to run the evals. Do you want to continue generating an environment anyway?',
       ),
     });
 
@@ -81,10 +80,8 @@ async function getAnswers(): Promise<InitOptions | null> {
     message: 'Where should we place the environment config file?',
     required: true,
     default: join(generateId(displayName) || 'env', 'config.mjs'),
-    validate: (value) =>
-      value.endsWith('.js') || value.endsWith('.mjs')
-        ? true
-        : 'Config must be a .mjs or .js file',
+    validate: value =>
+      value.endsWith('.js') || value.endsWith('.mjs') ? true : 'Config must be a .mjs or .js file',
   });
   const clientSideFramework = await input({
     message: 'What client-side framework will it be using?',
@@ -131,20 +128,17 @@ async function writeConfig(options: InitOptions) {
   if (options.generationSystemPrompt) {
     generationPromptPath = relative(
       configDir,
-      toProcessAbsolutePath(options.generationSystemPrompt)
+      toProcessAbsolutePath(options.generationSystemPrompt),
     );
   } else {
     generationPromptPath = './example-system-instructions.md';
-    await safeWriteFile(
-      join(configDir, generationPromptPath),
-      getExampleSystemInstructions()
-    );
+    await safeWriteFile(join(configDir, generationPromptPath), getExampleSystemInstructions());
   }
 
   if (options.executablePrompts) {
     executablePromptsPattern = relative(
       configDir,
-      toProcessAbsolutePath(options.executablePrompts)
+      toProcessAbsolutePath(options.executablePrompts),
     );
   } else {
     const executablePromptDir = './example-prompts';
@@ -153,7 +147,7 @@ async function writeConfig(options: InitOptions) {
     await cp(
       join(import.meta.dirname, '../examples/prompts'),
       join(configDir, executablePromptDir),
-      { recursive: true }
+      {recursive: true},
     );
   }
 
@@ -196,7 +190,7 @@ async function writeConfig(options: InitOptions) {
       `  // you can specify a different full-stack framework here.`,
       `  // fullStackFramework: '',`,
       `};`,
-    ].join('\n')
+    ].join('\n'),
   );
 
   console.log(
@@ -204,8 +198,8 @@ async function writeConfig(options: InitOptions) {
       [
         'Done! 🎉 You can run your eval with the following command:',
         `web-codegen-scorer eval --env=${options.configPath}`,
-      ].join('\n')
-    )
+      ].join('\n'),
+    ),
   );
 }
 

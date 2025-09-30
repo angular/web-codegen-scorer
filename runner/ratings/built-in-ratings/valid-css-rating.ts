@@ -15,7 +15,7 @@ export const validCssRating: PerFileRating = {
   kind: RatingKind.PER_FILE,
   id: 'common-valid-css',
   filter: PerFileRatingContentType.CSS,
-  rate: async (code) => {
+  rate: async code => {
     const linterResult = await stylelint.lint({
       code: code,
       cwd: import.meta.dirname,
@@ -53,8 +53,7 @@ export const validCssRating: PerFileRating = {
 
     // One file processed produces one result.
     const lintResult = linterResult.results[0];
-    const warningCount =
-      lintResult.warnings.length + lintResult.deprecations.length;
+    const warningCount = lintResult.warnings.length + lintResult.deprecations.length;
 
     if (warningCount == 0) {
       return 1;

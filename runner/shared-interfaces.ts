@@ -1,12 +1,9 @@
-import type {
-  BuildErrorType,
-  BuildResult,
-} from './workers/builder/builder-types.js';
-import type { REPORT_VERSION } from './configuration/constants.js';
-import type { UserJourneysResult } from './orchestration/user-journeys.js';
-import type { AutoRateResult } from './ratings/autoraters/auto-rate-shared.js';
-import type { Rating, RatingCategory } from './ratings/rating-types.js';
-import type { ServeTestingResult } from './workers/serve-testing/worker-types.js';
+import type {BuildErrorType, BuildResult} from './workers/builder/builder-types.js';
+import type {REPORT_VERSION} from './configuration/constants.js';
+import type {UserJourneysResult} from './orchestration/user-journeys.js';
+import type {AutoRateResult} from './ratings/autoraters/auto-rate-shared.js';
+import type {Rating, RatingCategory} from './ratings/rating-types.js';
+import type {ServeTestingResult} from './workers/serve-testing/worker-types.js';
 
 /**
  * Represents a single prompt definition and extra metadata for it.
@@ -277,7 +274,7 @@ export interface AggregatedRunStats {
     appsWithoutErrorsAfterRepair: number;
     appsWithoutErrors: number;
   };
-  security?: { appsWithErrors: number; appsWithoutErrors: number };
+  security?: {appsWithErrors: number; appsWithoutErrors: number};
 }
 
 export interface CompletionStats {
@@ -361,7 +358,7 @@ export interface RunDetails {
   /** Information about configured MCP servers, if any. */
   mcp?: {
     /** MCP servers that were configured. */
-    servers: { name: string; command: string; args: string[] }[];
+    servers: {name: string; command: string; args: string[]}[];
 
     /** Logs produced by all of the servers. */
     logs: string;

@@ -2,7 +2,7 @@
  * IMPORTANT: KEEP these interfaces in sync WITH `main.py` and `models.py`.
  */
 
-import { UserJourneyDefinition } from '../../orchestration/user-journeys.js';
+import {UserJourneyDefinition} from '../../orchestration/user-journeys.js';
 
 export interface BrowserAgentTaskInput {
   userJourneys: UserJourneyDefinition[];

@@ -1,4 +1,4 @@
-import { join } from 'path';
+import {join} from 'path';
 
 // Extracted out for convenience, do NOT export.
 const rootDir = join(process.cwd(), '.web-codegen-scorer');
@@ -37,12 +37,6 @@ export const REPORT_VERSION = 3;
 
 /** Environments that are shipped together with the eval tool. */
 export const BUILT_IN_ENVIRONMENTS = new Map<string, string>([
-  [
-    'angular-example',
-    join(import.meta.dirname, '../../examples/environments/angular/config.js'),
-  ],
-  [
-    'solid-example',
-    join(import.meta.dirname, '../../examples/environments/solid/config.js'),
-  ],
+  ['angular-example', join(import.meta.dirname, '../../examples/environments/angular/config.js')],
+  ['solid-example', join(import.meta.dirname, '../../examples/environments/solid/config.js')],
 ]);

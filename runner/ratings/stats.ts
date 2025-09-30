@@ -1,8 +1,5 @@
-import {
-  BuildErrorType,
-  BuildResultStatus,
-} from '../workers/builder/builder-types.js';
-import { UserFacingError } from '../utils/errors.js';
+import {BuildErrorType, BuildResultStatus} from '../workers/builder/builder-types.js';
+import {UserFacingError} from '../utils/errors.js';
 import {
   AggregatedRunStats,
   AssessmentResult,
@@ -12,10 +9,10 @@ import {
 
 /** Possible buckets that scores can be categorized into. */
 const BUCKET_CONFIG = [
-  { name: 'Excellent', min: 98, max: 100, id: 'excellent' },
-  { name: 'Great', min: 85, max: 97, id: 'great' },
-  { name: 'Good', min: 71, max: 84, id: 'good' },
-  { name: 'Poor', min: 0, max: 70, id: 'poor' },
+  {name: 'Excellent', min: 98, max: 100, id: 'excellent'},
+  {name: 'Great', min: 85, max: 97, id: 'great'},
+  {name: 'Good', min: 71, max: 84, id: 'good'},
+  {name: 'Poor', min: 0, max: 70, id: 'poor'},
 ];
 
 /**
@@ -24,9 +21,7 @@ const BUCKET_CONFIG = [
  * @param assessments - An array of `AssessmentResult` objects.
  * @returns An object containing aggregated build and check statistics.
  */
-export function calculateBuildAndCheckStats(
-  assessments: AssessmentResult[]
-): AggregatedRunStats {
+export function calculateBuildAndCheckStats(assessments: AssessmentResult[]): AggregatedRunStats {
   let successfulInitialBuilds = 0;
   let successfulBuildsAfterRepair = 0;
   let failedBuilds = 0;
@@ -38,11 +33,9 @@ export function calculateBuildAndCheckStats(
         appsWithoutErrors: number;
       }
     | undefined;
-  let securityStats:
-    | { appsWithErrors: number; appsWithoutErrors: number }
-    | undefined;
+  let securityStats: {appsWithErrors: number; appsWithoutErrors: number} | undefined;
   const errorDistribution: Partial<Record<BuildErrorType, number>> = {};
-  const buckets: ScoreBucket[] = BUCKET_CONFIG.map((b) => ({
+  const buckets: ScoreBucket[] = BUCKET_CONFIG.map(b => ({
     name: b.name,
     nameWithLabels: `${b.name} (${b.min === b.max ? b.max : `${b.min}-${b.max}`}%)`,
     min: b.min,
@@ -51,7 +44,7 @@ export function calculateBuildAndCheckStats(
     appsCount: 0,
   }));
 
-  assessments.forEach((result) => {
+  assessments.forEach(result => {
     if (result.finalAttempt.buildResult.status === BuildResultStatus.SUCCESS) {
       if (result.repairAttempts === 0) {
         successfulInitialBuilds++;
@@ -62,13 +55,12 @@ export function calculateBuildAndCheckStats(
       failedBuilds++;
       if (result.finalAttempt.buildResult.errorType) {
         errorDistribution[result.finalAttempt.buildResult.errorType] =
-          (errorDistribution[result.finalAttempt.buildResult.errorType] || 0) +
-          1;
+          (errorDistribution[result.finalAttempt.buildResult.errorType] || 0) + 1;
       }
     }
 
     if (result.finalAttempt.serveTestingResult?.runtimeErrors != undefined) {
-      runtimeStats ??= { appsWithErrors: 0, appsWithoutErrors: 0 };
+      runtimeStats ??= {appsWithErrors: 0, appsWithoutErrors: 0};
       if (result.finalAttempt.serveTestingResult.runtimeErrors.trim() != '') {
         runtimeStats.appsWithErrors++;
       }
@@ -89,8 +81,8 @@ export function calculateBuildAndCheckStats(
         }
       }
     }
-    securityStats ??= { appsWithErrors: 0, appsWithoutErrors: 0 };
-    const { numCspViolations, numTrustedTypesViolations } = (
+    securityStats ??= {appsWithErrors: 0, appsWithoutErrors: 0};
+    const {numCspViolations, numTrustedTypesViolations} = (
       result.finalAttempt.serveTestingResult?.cspViolations || []
     ).reduce(
       (acc, v) => {
@@ -101,12 +93,11 @@ export function calculateBuildAndCheckStats(
         }
         return acc;
       },
-      { numCspViolations: 0, numTrustedTypesViolations: 0 }
+      {numCspViolations: 0, numTrustedTypesViolations: 0},
     );
 
     const hasSafetyViolations =
-      (result.finalAttempt.buildResult.safetyWebReportJson?.[0]?.violations
-        ?.length ?? 0) > 0;
+      (result.finalAttempt.buildResult.safetyWebReportJson?.[0]?.violations?.length ?? 0) > 0;
     // TODO: Consider numTrustedTypesViolations once we update autoCsp and re-enable the rating.
     if (hasSafetyViolations || numCspViolations > 0) {
       securityStats.appsWithErrors++;
@@ -115,16 +106,12 @@ export function calculateBuildAndCheckStats(
     }
 
     const scorePercentage = Math.floor(
-      (result.score.totalPoints / result.score.maxOverallPoints) * 100
+      (result.score.totalPoints / result.score.maxOverallPoints) * 100,
     );
-    const bucket = buckets.find(
-      (b) => scorePercentage >= b.min && scorePercentage <= b.max
-    );
+    const bucket = buckets.find(b => scorePercentage >= b.min && scorePercentage <= b.max);
 
     if (!bucket) {
-      throw new UserFacingError(
-        `Score ${scorePercentage} did not fit into any bucket`
-      );
+      throw new UserFacingError(`Score ${scorePercentage} did not fit into any bucket`);
     }
 
     bucket.appsCount++;
@@ -135,19 +122,14 @@ export function calculateBuildAndCheckStats(
       successfulInitialBuilds,
       successfulBuildsAfterRepair,
       failedBuilds,
-      errorDistribution:
-        Object.keys(errorDistribution).length > 0
-          ? errorDistribution
-          : undefined,
+      errorDistribution: Object.keys(errorDistribution).length > 0 ? errorDistribution : undefined,
     },
     buckets,
     runtime: runtimeStats
       ? {
           appsWithErrors: runtimeStats.appsWithErrors,
           appsWithoutErrors:
-            successfulInitialBuilds +
-            successfulBuildsAfterRepair -
-            runtimeStats.appsWithErrors,
+            successfulInitialBuilds + successfulBuildsAfterRepair - runtimeStats.appsWithErrors,
         }
       : undefined,
     accessibility: accessibilityStats,

@@ -1,4 +1,4 @@
-import { exec } from 'node:child_process';
+import {exec} from 'node:child_process';
 
 /**
  * Runs a command in a specific directory.
@@ -13,9 +13,9 @@ export function executeCommand(
   opts: {
     forwardStderrToParent?: boolean;
     forwardStdoutToParent?: boolean;
-    notifyWhenMatchingStdout?: { notifyFn: () => void; pattern: RegExp };
+    notifyWhenMatchingStdout?: {notifyFn: () => void; pattern: RegExp};
     abortSignal?: AbortSignal;
-  } = {}
+  } = {},
 ): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const proc = exec(command, {
@@ -31,24 +31,21 @@ export function executeCommand(
     let stderr = '';
     let notifyWhenMatchingStdout = opts.notifyWhenMatchingStdout;
 
-    proc.on('error', (err) => {
+    proc.on('error', err => {
       reject(err);
     });
 
-    proc.stdout!.on('data', (c) => {
+    proc.stdout!.on('data', c => {
       stdout += c;
       if (opts.forwardStdoutToParent) {
         process.stdout.write(c);
       }
-      if (
-        notifyWhenMatchingStdout &&
-        notifyWhenMatchingStdout.pattern.test(stdout)
-      ) {
+      if (notifyWhenMatchingStdout && notifyWhenMatchingStdout.pattern.test(stdout)) {
         notifyWhenMatchingStdout.notifyFn();
         notifyWhenMatchingStdout = undefined;
       }
     });
-    proc.stderr!.on('data', (c) => {
+    proc.stderr!.on('data', c => {
       stderr += c;
       if (opts.forwardStderrToParent) {
         process.stderr.write(c);

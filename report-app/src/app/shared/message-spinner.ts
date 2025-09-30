@@ -1,5 +1,5 @@
-import { Component, input } from '@angular/core';
-import { Spinner } from './spinner/spinner';
+import {Component, input} from '@angular/core';
+import {Spinner} from './spinner/spinner';
 
 @Component({
   selector: 'message-spinner',

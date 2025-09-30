@@ -1,4 +1,4 @@
-import { Rating } from './rating-types.js';
+import {Rating} from './rating-types.js';
 import {
   successfulBuildRating,
   noRuntimeExceptionsRating,

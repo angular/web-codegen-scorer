@@ -1,20 +1,14 @@
-import {
-  PerBuildRating,
-  RatingKind,
-  RatingCategory,
-  RatingState,
-} from '../rating-types.js';
+import {PerBuildRating, RatingKind, RatingCategory, RatingState} from '../rating-types.js';
 
 /** Rating that verifies the interactivity of the generated app. */
 export const userJourneysRating: PerBuildRating = {
   id: 'user-journey-tests',
   name: 'User Journey validation',
-  description:
-    'Ensures that all User Journeys are working in the generated app',
+  description: 'Ensures that all User Journeys are working in the generated app',
   kind: RatingKind.PER_BUILD,
   category: RatingCategory.MEDIUM_IMPACT,
   scoreReduction: '30%',
-  rate: ({ serveResult }) => {
+  rate: ({serveResult}) => {
     if (serveResult === null || serveResult.userJourneyAgentOutput === null) {
       return {
         state: RatingState.SKIPPED,
@@ -40,23 +34,23 @@ export const userJourneysRating: PerBuildRating = {
       };
     }
 
-    const failingCount = output.analysis.filter((c) => c.passing).length;
+    const failingCount = output.analysis.filter(c => c.passing).length;
     const percentagePassing = failingCount / output.analysis.length;
 
     let message: string;
     if (percentagePassing === 1) {
-      message = `All validations passed.\n${output.analysis.map((c) => `- ${c.journey}`).join('\n')}`;
+      message = `All validations passed.\n${output.analysis.map(c => `- ${c.journey}`).join('\n')}`;
     } else {
       const failureMsg = output.analysis
         .map(
-          (c) =>
+          c =>
             `- ${c.journey}${
               c.passing
                 ? ''
                 : `(Failing)\n
 Expected: ${c.failure?.expected}
 Observed: ${c.failure?.observed}`
-            }`
+            }`,
         )
         .join('\n');
       message = `${failingCount}/${output.analysis.length} passed.\n${failureMsg}`;

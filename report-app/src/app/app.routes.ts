@@ -1,7 +1,7 @@
-import { Routes } from '@angular/router';
-import { ReportViewer } from './pages/report-viewer/report-viewer';
-import { ComparisonPage } from './pages/comparison/comparison';
-import { ReportListComponent } from './pages/report-list/report-list';
+import {Routes} from '@angular/router';
+import {ReportViewer} from './pages/report-viewer/report-viewer';
+import {ComparisonPage} from './pages/comparison/comparison';
+import {ReportListComponent} from './pages/report-list/report-list';
 
 export const routes: Routes = [
   {

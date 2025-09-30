@@ -1,14 +1,8 @@
 import z from 'zod';
-import { createMessageBuilder, fromError } from 'zod-validation-error/v3';
-import { UserFacingError } from '../utils/errors.js';
-import {
-  LocalEnvironmentConfig,
-  localEnvironmentConfigSchema,
-} from './environment-local.js';
-import {
-  RemoteEnvironmentConfig,
-  remoteEnvironmentConfigSchema,
-} from './environment-remote.js';
+import {createMessageBuilder, fromError} from 'zod-validation-error/v3';
+import {UserFacingError} from '../utils/errors.js';
+import {LocalEnvironmentConfig, localEnvironmentConfigSchema} from './environment-local.js';
+import {RemoteEnvironmentConfig, remoteEnvironmentConfigSchema} from './environment-remote.js';
 
 const environmentConfigSchema = z.union([
   localEnvironmentConfigSchema,
@@ -27,9 +21,7 @@ export function getPossiblePackageManagers() {
 }
 
 /** Asserts that the specified data is a valid environment config. */
-export function assertIsEnvironmentConfig(
-  value: unknown
-): asserts value is EnvironmentConfig {
+export function assertIsEnvironmentConfig(value: unknown): asserts value is EnvironmentConfig {
   const validationResult = environmentConfigSchema.safeParse(value);
 
   if (!validationResult.success) {
@@ -48,7 +40,7 @@ export function assertIsEnvironmentConfig(
 }
 
 export function isLocalEnvironmentConfig(
-  config: EnvironmentConfig
+  config: EnvironmentConfig,
 ): config is LocalEnvironmentConfig {
   return (config as Partial<RemoteEnvironmentConfig>).gateway === undefined;
 }

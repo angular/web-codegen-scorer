@@ -1,26 +1,23 @@
-import { ChildProcess, fork } from 'node:child_process';
+import {ChildProcess, fork} from 'node:child_process';
 import {
   BuildResult,
   BuildWorkerMessage,
   BuildWorkerResponseMessage,
 } from '../../workers/builder/builder-types.js';
-import {
-  LlmGenerateFilesContext,
-  LlmRunner,
-} from '../../codegen/llm-runner.js';
+import {LlmGenerateFilesContext, LlmRunner} from '../../codegen/llm-runner.js';
 import {
   RootPromptDefinition,
   LlmContextFile,
   LlmResponse,
   LlmResponseFile,
 } from '../../shared-interfaces.js';
-import { generateCodeWithAI } from '../codegen.js';
-import { EvalID, Gateway } from '../gateway.js';
+import {generateCodeWithAI} from '../codegen.js';
+import {EvalID, Gateway} from '../gateway.js';
 import path from 'node:path';
-import { killChildProcessGracefully } from '../../utils/kill-gracefully.js';
-import { ProgressLogger } from '../../progress/progress-logger.js';
-import { serveApp } from '../../workers/serve-testing/serve-app.js';
-import { LocalEnvironment } from '../../configuration/environment-local.js';
+import {killChildProcessGracefully} from '../../utils/kill-gracefully.js';
+import {ProgressLogger} from '../../progress/progress-logger.js';
+import {serveApp} from '../../workers/serve-testing/serve-app.js';
+import {LocalEnvironment} from '../../configuration/environment-local.js';
 import PQueue from 'p-queue';
 
 let uniqueIDs = 0;
@@ -37,15 +34,9 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
     requestCtx: LlmGenerateFilesContext,
     model: string,
     contextFiles: LlmContextFile[],
-    abortSignal: AbortSignal
+    abortSignal: AbortSignal,
   ): Promise<LlmResponse> {
-    return await generateCodeWithAI(
-      this.llm,
-      model,
-      requestCtx,
-      contextFiles,
-      abortSignal
-    );
+    return await generateCodeWithAI(this.llm, model, requestCtx, contextFiles, abortSignal);
   }
 
   async repairBuild(
@@ -55,15 +46,9 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
     errorMessage: string,
     appFiles: LlmResponseFile[],
     contextFiles: LlmContextFile[],
-    abortSignal: AbortSignal
+    abortSignal: AbortSignal,
   ): Promise<LlmResponse> {
-    return await generateCodeWithAI(
-      this.llm,
-      model,
-      requestCtx,
-      contextFiles,
-      abortSignal
-    );
+    return await generateCodeWithAI(this.llm, model, requestCtx, contextFiles, abortSignal);
   }
 
   tryBuild(
@@ -73,7 +58,7 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
     rootPromptDef: RootPromptDefinition,
     workerConcurrencyQueue: PQueue,
     abortSignal: AbortSignal,
-    progress: ProgressLogger
+    progress: ProgressLogger,
   ): Promise<BuildResult> {
     const buildParams: BuildWorkerMessage = {
       directory: appDirectoryPath,
@@ -85,11 +70,8 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
       () =>
         new Promise<BuildResult>((resolve, reject) => {
           const child: ChildProcess = fork(
-            path.resolve(
-              import.meta.dirname,
-              '../../workers/builder/worker.js'
-            ),
-            { signal: abortSignal }
+            path.resolve(import.meta.dirname, '../../workers/builder/worker.js'),
+            {signal: abortSignal},
           );
           child.send(buildParams);
 
@@ -97,12 +79,12 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
             await killChildProcessGracefully(child);
             resolve(result.payload);
           });
-          child.on('error', async (err) => {
+          child.on('error', async err => {
             await killChildProcessGracefully(child);
             reject(err);
           });
         }),
-      { throwOnTimeout: true }
+      {throwOnTimeout: true},
     );
   }
 
@@ -112,14 +94,14 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
     appDirectoryPath: string,
     rootPromptDef: RootPromptDefinition,
     progress: ProgressLogger,
-    logicWhileServing: (serveUrl: string) => Promise<T>
+    logicWhileServing: (serveUrl: string) => Promise<T>,
   ): Promise<T> {
     return await serveApp(
       env.serveCommand,
       rootPromptDef,
       appDirectoryPath,
       progress,
-      logicWhileServing
+      logicWhileServing,
     );
   }
 

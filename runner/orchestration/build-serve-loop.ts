@@ -1,19 +1,15 @@
 import PQueue from 'p-queue';
-import { LlmGenerateFilesResponse } from '../codegen/llm-runner.js';
-import { BuildResultStatus } from '../workers/builder/builder-types.js';
-import { Environment } from '../configuration/environment.js';
-import {
-  AttemptDetails,
-  LlmContextFile,
-  RootPromptDefinition,
-} from '../shared-interfaces.js';
-import { DEFAULT_MAX_REPAIR_ATTEMPTS } from '../configuration/constants.js';
-import { ProgressLogger } from '../progress/progress-logger.js';
-import { runBuild } from './build-worker.js';
-import { repairAndBuild } from './build-repair.js';
-import { EvalID, Gateway } from './gateway.js';
-import { serveAndTestApp } from './serve-testing-worker.js';
-import { BrowserAgentTaskInput } from '../testing/browser-agent/models.js';
+import {LlmGenerateFilesResponse} from '../codegen/llm-runner.js';
+import {BuildResultStatus} from '../workers/builder/builder-types.js';
+import {Environment} from '../configuration/environment.js';
+import {AttemptDetails, LlmContextFile, RootPromptDefinition} from '../shared-interfaces.js';
+import {DEFAULT_MAX_REPAIR_ATTEMPTS} from '../configuration/constants.js';
+import {ProgressLogger} from '../progress/progress-logger.js';
+import {runBuild} from './build-worker.js';
+import {repairAndBuild} from './build-repair.js';
+import {EvalID, Gateway} from './gateway.js';
+import {serveAndTestApp} from './serve-testing-worker.js';
+import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
 
 /**
  * Attempts to build the code that an LLM generated. If the build fails, attempts
@@ -51,7 +47,7 @@ export async function attemptBuild(
   skipAxeTesting: boolean,
   enableAutoCsp: boolean,
   userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined,
-  maxAxeRepairAttempts: number
+  maxAxeRepairAttempts: number,
 ) {
   const initialBuildResult = await runBuild(
     evalID,
@@ -61,7 +57,7 @@ export async function attemptBuild(
     rootPromptDef,
     abortSignal,
     workerConcurrencyQueue,
-    progress
+    progress,
   );
   let repairAttempts = 0;
   const maxRepairAttempts = gateway.shouldRetryFailedBuilds(evalID)
@@ -71,7 +67,7 @@ export async function attemptBuild(
   const initialAttempt = {
     outputFiles: initialResponse.files,
     usage: {
-      ...{ inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+      ...{inputTokens: 0, outputTokens: 0, totalTokens: 0},
       ...initialResponse.usage,
     },
     reasoning: initialResponse.reasoning,
@@ -90,7 +86,7 @@ export async function attemptBuild(
     progress.log(
       rootPromptDef,
       'build',
-      `Trying to repair app build (attempt #${repairAttempts + 1})`
+      `Trying to repair app build (attempt #${repairAttempts + 1})`,
     );
 
     const attempt = await repairAndBuild(
@@ -107,7 +103,7 @@ export async function attemptBuild(
       abortSignal,
       workerConcurrencyQueue,
       repairAttempts,
-      progress
+      progress,
     );
 
     attemptDetails.push(attempt);
@@ -129,7 +125,7 @@ export async function attemptBuild(
       skipScreenshots,
       skipAxeTesting,
       enableAutoCsp,
-      userJourneyAgentTaskInput
+      userJourneyAgentTaskInput,
     );
   }
 
@@ -146,13 +142,13 @@ export async function attemptBuild(
     progress.log(
       rootPromptDef,
       'build',
-      `Trying to repair axe accessibility violations (attempt #${axeRepairAttempts + 1})...`
+      `Trying to repair axe accessibility violations (attempt #${axeRepairAttempts + 1})...`,
     );
 
     const axeViolationsError = JSON.stringify(
       lastAttempt.serveTestingResult.axeViolations,
       null,
-      2
+      2,
     );
 
     progress.log(rootPromptDef, 'error', 'Found Axe accessibility violations');
@@ -171,7 +167,7 @@ export async function attemptBuild(
       abortSignal,
       workerConcurrencyQueue,
       axeRepairAttempts + repairAttempts,
-      progress
+      progress,
     );
 
     attemptDetails.push(attempt);
@@ -198,15 +194,11 @@ export async function attemptBuild(
       skipScreenshots,
       skipAxeTesting,
       enableAutoCsp,
-      userJourneyAgentTaskInput
+      userJourneyAgentTaskInput,
     );
 
     if (attempt.serveTestingResult.axeViolations?.length === 0) {
-      progress.log(
-        rootPromptDef,
-        'success',
-        `Successfully fixed all Axe accessibility violations`
-      );
+      progress.log(rootPromptDef, 'success', `Successfully fixed all Axe accessibility violations`);
     }
   }
 

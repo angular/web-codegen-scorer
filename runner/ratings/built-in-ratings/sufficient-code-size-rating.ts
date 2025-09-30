@@ -8,8 +8,7 @@ import {
 /** Rating that verifies that the LLM didn't generate empty files. */
 export const sufficientCodeSizeRating: PerFileRating = {
   name: 'Sufficient Code Size (over 50b)',
-  description:
-    'Ensures the generated code is not trivially small (e.g. < 50b).',
+  description: 'Ensures the generated code is not trivially small (e.g. < 50b).',
   category: RatingCategory.HIGH_IMPACT,
   id: 'common-generated-code-size',
   scoreReduction: '30%',

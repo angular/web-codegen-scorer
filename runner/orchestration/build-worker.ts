@@ -1,11 +1,8 @@
-import {
-  BuildResult,
-  BuildResultStatus,
-} from '../workers/builder/builder-types.js';
-import { Environment } from '../configuration/environment.js';
-import { ProgressLogger } from '../progress/progress-logger.js';
-import { RootPromptDefinition } from '../shared-interfaces.js';
-import { EvalID, Gateway } from './gateway.js';
+import {BuildResult, BuildResultStatus} from '../workers/builder/builder-types.js';
+import {Environment} from '../configuration/environment.js';
+import {ProgressLogger} from '../progress/progress-logger.js';
+import {RootPromptDefinition} from '../shared-interfaces.js';
+import {EvalID, Gateway} from './gateway.js';
 import PQueue from 'p-queue';
 
 /** Attempts to build the code. */
@@ -17,7 +14,7 @@ export async function runBuild(
   rootPromptDef: RootPromptDefinition,
   abortSignal: AbortSignal,
   workerConcurrencyQueue: PQueue,
-  progress: ProgressLogger
+  progress: ProgressLogger,
 ): Promise<BuildResult> {
   progress.log(rootPromptDef, 'build', `Building the app`);
 
@@ -29,7 +26,7 @@ export async function runBuild(
       rootPromptDef,
       workerConcurrencyQueue,
       abortSignal,
-      progress
+      progress,
     );
     if (result.status === BuildResultStatus.SUCCESS) {
       progress.log(rootPromptDef, 'success', 'Build is successful');
@@ -38,12 +35,7 @@ export async function runBuild(
     }
     return result;
   } catch (err) {
-    progress.log(
-      rootPromptDef,
-      'error',
-      `Error during build process`,
-      err + ''
-    );
+    progress.log(rootPromptDef, 'error', `Error during build process`, err + '');
     throw err;
   }
 }

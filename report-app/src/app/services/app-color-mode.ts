@@ -1,11 +1,11 @@
-import { isPlatformBrowser } from '@angular/common';
-import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
+import {inject, Injectable, PLATFORM_ID, signal} from '@angular/core';
 
 const colorModeStorageKey = 'wcs-color-mode';
 
 export type ColorMode = 'light' | 'dark';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AppColorMode {
   private currentColorMode = signal<ColorMode>('light');
   readonly colorMode = this.currentColorMode.asReadonly();
@@ -16,15 +16,11 @@ export class AppColorMode {
 
       try {
         // In some cases accessing localStorage can throw.
-        colorMode = localStorage.getItem(
-          colorModeStorageKey
-        ) as ColorMode | null;
+        colorMode = localStorage.getItem(colorModeStorageKey) as ColorMode | null;
       } catch {}
 
       if (!colorMode) {
-        colorMode = matchMedia('(prefers-color-scheme: dark)')
-          ? 'dark'
-          : 'light';
+        colorMode = matchMedia('(prefers-color-scheme: dark)') ? 'dark' : 'light';
       }
 
       this.setColorMode(colorMode);

@@ -1,6 +1,6 @@
-import { Component, computed, input, model } from '@angular/core';
-import { RunGroup } from '../../../../../runner/shared-interfaces';
-import { DatePipe } from '@angular/common';
+import {Component, computed, input, model} from '@angular/core';
+import {RunGroup} from '../../../../../runner/shared-interfaces';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'report-select',
@@ -22,14 +22,14 @@ export class ReportSelect {
         acc[dateGroup].push(group);
         return acc;
       },
-      {} as { [key: string]: RunGroup[] }
+      {} as {[key: string]: RunGroup[]},
     );
 
     const sortedDateGroups = Object.keys(grouped).sort(
-      (a, b) => new Date(b).getTime() - new Date(a).getTime()
+      (a, b) => new Date(b).getTime() - new Date(a).getTime(),
     );
 
-    return sortedDateGroups.map((dateGroup) => {
+    return sortedDateGroups.map(dateGroup => {
       const options = grouped[dateGroup];
       options.sort((a, b) => {
         const timeA = new Date(a.timestamp).getTime();
@@ -44,7 +44,7 @@ export class ReportSelect {
   });
 
   readonly selectedReport = computed(() => {
-    return this.reports().find((r) => r.id === this.selection());
+    return this.reports().find(r => r.id === this.selection());
   });
 
   onSelect(event: Event) {

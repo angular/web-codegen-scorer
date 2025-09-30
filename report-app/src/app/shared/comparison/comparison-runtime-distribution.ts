@@ -6,14 +6,14 @@ import {
   input,
   PLATFORM_ID,
 } from '@angular/core';
-import { AggregatedRunStats } from '../../../../../runner/shared-interfaces';
+import {AggregatedRunStats} from '../../../../../runner/shared-interfaces';
 import {
   ComparisonStackedBarChart,
   ComparisonStackedBarChartData,
 } from '../visualization/comparison-stacked-bar-chart';
-import { ModelComparisonData } from './comparison-data';
-import { getHardcodedColor, ScoreCssVariable } from '../scoring';
-import { AppColorMode } from '../../services/app-color-mode';
+import {ModelComparisonData} from './comparison-data';
+import {getHardcodedColor, ScoreCssVariable} from '../scoring';
+import {AppColorMode} from '../../services/app-color-mode';
 
 @Component({
   selector: 'comparison-runtime-distribution',
@@ -36,48 +36,32 @@ export class ComparisonRuntimeDistribution {
       seriesColumns: [
         {
           name: 'No runtime errors',
-          color: getHardcodedColor(
-            this.platformId,
-            ScoreCssVariable.excellent,
-            colorMode
-          ),
+          color: getHardcodedColor(this.platformId, ScoreCssVariable.excellent, colorMode),
         },
         {
           name: 'With runtime errors',
-          color: getHardcodedColor(
-            this.platformId,
-            ScoreCssVariable.poor,
-            colorMode
-          ),
+          color: getHardcodedColor(this.platformId, ScoreCssVariable.poor, colorMode),
         },
         {
           name: 'Did not run',
-          color: getHardcodedColor(
-            this.platformId,
-            ScoreCssVariable.neutral,
-            colorMode
-          ),
+          color: getHardcodedColor(this.platformId, ScoreCssVariable.neutral, colorMode),
         },
       ],
       series: [],
     };
 
-    const addSeriesData = (
-      type: string,
-      stats: AggregatedRunStats,
-      total: number
-    ) => {
+    const addSeriesData = (type: string, stats: AggregatedRunStats, total: number) => {
       // TODO: We should make `runtime` error collection required at this point.
       if (!stats.runtime) {
         console.error('No runtime stats for report in comparison. Skipping');
         return;
       }
 
-      const { appsWithoutErrors, appsWithErrors } = stats.runtime;
+      const {appsWithoutErrors, appsWithErrors} = stats.runtime;
       const withoutErrors = parseFloat((appsWithoutErrors / total).toFixed(3));
       const withErrors = parseFloat((appsWithErrors / total).toFixed(3));
       const remainder = parseFloat(
-        ((total - (appsWithErrors + appsWithoutErrors)) / total).toFixed(3)
+        ((total - (appsWithErrors + appsWithoutErrors)) / total).toFixed(3),
       );
 
       result.series.push({
@@ -85,10 +69,7 @@ export class ComparisonRuntimeDistribution {
         values: [
           {
             value: withoutErrors,
-            label:
-              withoutErrors > 0.05
-                ? `${(withoutErrors * 100).toFixed(1)}%`
-                : '',
+            label: withoutErrors > 0.05 ? `${(withoutErrors * 100).toFixed(1)}%` : '',
           },
           {
             value: withErrors,

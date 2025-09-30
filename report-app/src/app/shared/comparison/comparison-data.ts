@@ -1,4 +1,4 @@
-import { AggregatedRunStats } from '../../../../../runner/shared-interfaces';
+import {AggregatedRunStats} from '../../../../../runner/shared-interfaces';
 
 export interface ModelComparisonData {
   series: Array<{

@@ -24,7 +24,7 @@ export const NoInnerHtmlBindingsRating: PerFileRating = {
   rate: async (code, filePath) => {
     const matches = [...code.matchAll(ANGULAR_BINDING_REGEX)];
     if (matches.length > 0) {
-      const violations = matches.map((match) => `Binding to "[${match[1]}]"`);
+      const violations = matches.map(match => `Binding to "[${match[1]}]"`);
       return {
         rating: 0,
         errorMessage: `Found security vulnerabilities in ${filePath}:\n- ${violations.join('\n- ')}`,

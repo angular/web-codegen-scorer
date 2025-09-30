@@ -1,6 +1,6 @@
-import { provideServerRendering, RenderMode, withRoutes } from '@angular/ssr';
-import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
-import { appConfig } from './app.config';
+import {provideServerRendering, RenderMode, withRoutes} from '@angular/ssr';
+import {mergeApplicationConfig, ApplicationConfig} from '@angular/core';
+import {appConfig} from './app.config';
 
 const ssrAppConfig: ApplicationConfig = {
   providers: [
@@ -11,7 +11,7 @@ const ssrAppConfig: ApplicationConfig = {
           path: '**',
           renderMode: RenderMode.Server,
         },
-      ])
+      ]),
     ),
   ],
 };

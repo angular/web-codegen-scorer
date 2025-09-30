@@ -1,16 +1,16 @@
 import PQueue from 'p-queue';
-import { LlmGenerateFilesContext } from '../codegen/llm-runner.js';
-import { Environment } from '../configuration/environment.js';
-import { ProgressLogger } from '../progress/progress-logger.js';
+import {LlmGenerateFilesContext} from '../codegen/llm-runner.js';
+import {Environment} from '../configuration/environment.js';
+import {ProgressLogger} from '../progress/progress-logger.js';
 import {
   LlmContextFile,
   LlmResponse,
   LlmResponseFile,
   RootPromptDefinition,
 } from '../shared-interfaces.js';
-import { BuildResult } from '../workers/builder/builder-types.js';
+import {BuildResult} from '../workers/builder/builder-types.js';
 
-export type EvalID = string & { __evalID: true };
+export type EvalID = string & {__evalID: true};
 
 export interface Gateway<Env extends Environment> {
   /** Initializes an eval. */
@@ -22,7 +22,7 @@ export interface Gateway<Env extends Environment> {
     requestCtx: LlmGenerateFilesContext,
     model: string,
     contextFiles: LlmContextFile[],
-    abortSignal: AbortSignal
+    abortSignal: AbortSignal,
   ): Promise<LlmResponse>;
 
   repairBuild(
@@ -32,7 +32,7 @@ export interface Gateway<Env extends Environment> {
     errorMessage: string,
     appFiles: LlmResponseFile[],
     contextFiles: LlmContextFile[],
-    abortSignal: AbortSignal
+    abortSignal: AbortSignal,
   ): Promise<LlmResponse>;
 
   shouldRetryFailedBuilds(evalID: EvalID): boolean;
@@ -44,7 +44,7 @@ export interface Gateway<Env extends Environment> {
     rootPromptDef: RootPromptDefinition,
     workerConcurrencyQueue: PQueue,
     abortSignal: AbortSignal,
-    progress: ProgressLogger
+    progress: ProgressLogger,
   ): Promise<BuildResult>;
 
   serveBuild<T>(
@@ -53,7 +53,7 @@ export interface Gateway<Env extends Environment> {
     appDirectoryPath: string,
     rootPromptDef: RootPromptDefinition,
     progress: ProgressLogger,
-    logicWhileServing: (serveUrl: string) => Promise<T>
+    logicWhileServing: (serveUrl: string) => Promise<T>,
   ): Promise<T>;
 
   finalizeEval(id: EvalID): Promise<void>;

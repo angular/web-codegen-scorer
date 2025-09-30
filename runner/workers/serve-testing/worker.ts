@@ -1,9 +1,9 @@
-import { ProgressType } from '../../progress/progress-logger.js';
-import { AgentOutput } from '../../testing/browser-agent/models.js';
-import { callWithTimeout } from '../../utils/timeout.js';
-import { CspViolation } from '../serve-testing/auto-csp-types.js';
-import { runBrowserAgentUserJourneyTests } from '../serve-testing/browser-agent.js';
-import { runAppInPuppeteer } from '../serve-testing/puppeteer.js';
+import {ProgressType} from '../../progress/progress-logger.js';
+import {AgentOutput} from '../../testing/browser-agent/models.js';
+import {callWithTimeout} from '../../utils/timeout.js';
+import {CspViolation} from '../serve-testing/auto-csp-types.js';
+import {runBrowserAgentUserJourneyTests} from '../serve-testing/browser-agent.js';
+import {runAppInPuppeteer} from '../serve-testing/puppeteer.js';
 import {
   ServeTestingProgressLogMessage,
   ServeTestingResult,
@@ -21,14 +21,10 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
     userJourneyAgentTaskInput,
   } = message;
   const runtimeErrors: string[] = [];
-  const progressLog = (
-    state: ProgressType,
-    message: string,
-    details?: string
-  ) => {
+  const progressLog = (state: ProgressType, message: string, details?: string) => {
     process.send!({
       type: 'log',
-      payload: { state, message, details },
+      payload: {state, message, details},
     } satisfies ServeTestingProgressLogMessage);
   };
 
@@ -48,9 +44,9 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
           !!takeScreenshots,
           !!includeAxeTesting,
           progressLog,
-          !!enableAutoCsp
+          !!enableAutoCsp,
         ),
-      4 // 4min
+      4, // 4min
     );
 
     screenshotBase64Data = puppeteerResult.screenshotBase64Data;
@@ -64,7 +60,7 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
         appName,
         serveUrl,
         userJourneyAgentTaskInput,
-        progressLog
+        progressLog,
       );
     }
 

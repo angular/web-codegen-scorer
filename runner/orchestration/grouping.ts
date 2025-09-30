@@ -1,13 +1,9 @@
-import { createHash } from 'crypto';
-import type { LlmRunner } from '../codegen/llm-runner.js';
-import type { Environment } from '../configuration/environment.js';
-import { calculateBuildAndCheckStats } from '../ratings/stats.js';
-import type {
-  AssessmentResult,
-  RunGroup,
-  RunInfo,
-} from '../shared-interfaces.js';
-import { RunnerName } from '../codegen/runner-creation.js';
+import {createHash} from 'crypto';
+import type {LlmRunner} from '../codegen/llm-runner.js';
+import type {Environment} from '../configuration/environment.js';
+import {calculateBuildAndCheckStats} from '../ratings/stats.js';
+import type {AssessmentResult, RunGroup, RunInfo} from '../shared-interfaces.js';
+import {RunnerName} from '../codegen/runner-creation.js';
 
 /** Generates a unique grouping ID for a run. */
 export function getRunGroupId(
@@ -17,7 +13,7 @@ export function getRunGroupId(
     runner: RunnerName;
     model: string;
     labels?: string[];
-  }
+  },
 ): string {
   const dateOnly = new Date(
     timestamp.getFullYear(),
@@ -25,7 +21,7 @@ export function getRunGroupId(
     timestamp.getDate(),
     0,
     0,
-    0
+    0,
   );
 
   // We use this as a key to group identical reports together.
@@ -69,7 +65,7 @@ export function groupSimilarReports(inputRuns: RunInfo[]): RunGroup[] {
       let totalForRun = 0;
       let maxForRun = 0;
 
-      run.details.labels?.forEach((label) => labels.add(label));
+      run.details.labels?.forEach(label => labels.add(label));
 
       for (const result of run.results) {
         totalForRun += result.score.totalPoints;

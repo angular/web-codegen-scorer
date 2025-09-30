@@ -1,10 +1,5 @@
-import { autoRateCode } from '../autoraters/code-rater.js';
-import {
-  LLMBasedRating,
-  RatingKind,
-  RatingCategory,
-  RatingState,
-} from '../rating-types.js';
+import {autoRateCode} from '../autoraters/code-rater.js';
+import {LLMBasedRating, RatingKind, RatingCategory, RatingState} from '../rating-types.js';
 
 /** Rating that verifies the generated code quality using an LLM. */
 export const codeQualityRating: LLMBasedRating = {
@@ -14,15 +9,15 @@ export const codeQualityRating: LLMBasedRating = {
   category: RatingCategory.MEDIUM_IMPACT,
   id: 'common-autorater-code-quality',
   scoreReduction: '30%',
-  rate: async (ctx) => {
-    const { coefficient, usage, details } = await autoRateCode(
+  rate: async ctx => {
+    const {coefficient, usage, details} = await autoRateCode(
       ctx.llm,
       ctx.abortSignal,
       ctx.model,
       ctx.environment,
       ctx.outputFiles,
       ctx.fullPromptText,
-      ctx.ratingsResult
+      ctx.ratingsResult,
     );
 
     return {

@@ -1,25 +1,25 @@
-import { ChildProcess, exec } from 'child_process';
-import { killChildProcessGracefully } from '../../utils/kill-gracefully.js';
-import { cleanupBuildMessage } from '../builder/worker.js';
-import { ProgressLogger } from '../../progress/progress-logger.js';
-import { RootPromptDefinition } from '../../shared-interfaces.js';
+import {ChildProcess, exec} from 'child_process';
+import {killChildProcessGracefully} from '../../utils/kill-gracefully.js';
+import {cleanupBuildMessage} from '../builder/worker.js';
+import {ProgressLogger} from '../../progress/progress-logger.js';
+import {RootPromptDefinition} from '../../shared-interfaces.js';
 
 export async function serveApp<T>(
   serveCommand: string,
   rootPromptDef: RootPromptDefinition,
   appDirectoryPath: string,
   progress: ProgressLogger,
-  logicWhileServing: (serveUrl: string) => Promise<T>
+  logicWhileServing: (serveUrl: string) => Promise<T>,
 ): Promise<T> {
   let serveProcess: ChildProcess | null = null;
 
   try {
-    serveProcess = exec(serveCommand, { cwd: appDirectoryPath });
+    serveProcess = exec(serveCommand, {cwd: appDirectoryPath});
     progress.log(
       rootPromptDef,
       'eval',
       'Launching app inside a browser',
-      `(PID: ${serveProcess.pid})`
+      `(PID: ${serveProcess.pid})`,
     );
 
     const actualPort = await new Promise<number>((resolvePort, rejectPort) => {
@@ -27,8 +27,8 @@ export async function serveApp<T>(
       const timeoutId = setTimeout(() => {
         rejectPort(
           new Error(
-            `Serving process for \`${rootPromptDef.name}\` timed out waiting for port information after ${serveStartTimeout / 1000}s.`
-          )
+            `Serving process for \`${rootPromptDef.name}\` timed out waiting for port information after ${serveStartTimeout / 1000}s.`,
+          ),
         );
       }, serveStartTimeout);
 
@@ -47,21 +47,17 @@ export async function serveApp<T>(
           if (match && match[1]) {
             clearTimeout(timeoutId);
             const port = parseInt(match[1], 10);
-            progress.log(
-              rootPromptDef,
-              'eval',
-              `App is up and running on port ${port}`
-            );
+            progress.log(rootPromptDef, 'eval', `App is up and running on port ${port}`);
             portResolved = true;
             resolvePort(port);
           }
         }
       };
 
-      serveProcess!.stdout?.on('data', (data) => processOutput(data));
-      serveProcess!.stderr?.on('data', (data) => processOutput(data));
+      serveProcess!.stdout?.on('data', data => processOutput(data));
+      serveProcess!.stderr?.on('data', data => processOutput(data));
 
-      serveProcess!.on('error', (err) => {
+      serveProcess!.on('error', err => {
         clearTimeout(timeoutId);
         progress.log(rootPromptDef, 'error', 'Failed to launch app', err + '');
         rejectPort(err);
@@ -75,20 +71,15 @@ export async function serveApp<T>(
         if (code !== 0 && code !== null) {
           rejectPort(
             new Error(
-              `Launch process for \`${rootPromptDef.name}\` exited prematurely with code ${code}, signal ${signal}. Output: ${outputBuffer.slice(-500)}`
-            )
+              `Launch process for \`${rootPromptDef.name}\` exited prematurely with code ${code}, signal ${signal}. Output: ${outputBuffer.slice(-500)}`,
+            ),
           );
-        } else if (
-          code === null &&
-          signal &&
-          signal !== 'SIGTERM' &&
-          signal !== 'SIGINT'
-        ) {
+        } else if (code === null && signal && signal !== 'SIGTERM' && signal !== 'SIGINT') {
           // SIGTERM/SIGINT is expected for our kill
           rejectPort(
             new Error(
-              `Launch process for \`${rootPromptDef.name}\` was killed by unexpected signal ${signal} before port resolution. Output: ${outputBuffer.slice(-500)}`
-            )
+              `Launch process for \`${rootPromptDef.name}\` was killed by unexpected signal ${signal} before port resolution. Output: ${outputBuffer.slice(-500)}`,
+            ),
           );
         }
       });
@@ -103,7 +94,7 @@ export async function serveApp<T>(
         rootPromptDef,
         'eval',
         'Terminating browser process for app',
-        `(PID: ${serveProcess.pid})`
+        `(PID: ${serveProcess.pid})`,
       );
       await killChildProcessGracefully(serveProcess);
       serveProcess = null;

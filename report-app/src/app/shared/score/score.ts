@@ -1,5 +1,5 @@
-import { Component, computed, input } from '@angular/core';
-import { formatScore } from '../scoring';
+import {Component, computed, input} from '@angular/core';
+import {formatScore} from '../scoring';
 
 @Component({
   selector: 'score',
@@ -20,9 +20,7 @@ export class Score {
   readonly size = input<'small' | 'medium' | 'large'>('medium');
   readonly label = input<string>('');
 
-  protected formattedScore = computed(() =>
-    formatScore(this.total(), this.max())
-  );
+  protected formattedScore = computed(() => formatScore(this.total(), this.max()));
 
   protected scoreClass = computed(() => {
     const percentage = this.formattedScore();

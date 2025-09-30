@@ -1,9 +1,11 @@
 {
-  "semi": true,
-  "trailingComma": "es5",
+  "printWidth": 100,
   "singleQuote": true,
-  "printWidth": 80,
-  "tabWidth": 2,
+  "trailingComma": "all",
+  "quoteProps": "preserve",
+  "bracketSpacing": false,
+  "arrowParens": "avoid",
+  "embeddedLanguageFormatting": "off",
   "overrides": [
     {
       "files": "*.html",

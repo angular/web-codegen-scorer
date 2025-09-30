@@ -1,9 +1,4 @@
-import {
-  PerBuildRating,
-  RatingCategory,
-  RatingKind,
-  RatingState,
-} from '../rating-types.js';
+import {PerBuildRating, RatingCategory, RatingKind, RatingState} from '../rating-types.js';
 
 /**
  * A rating that assesses the code based on SafetyWeb violations found.
@@ -15,7 +10,7 @@ export const safetyWebRating: PerBuildRating = {
   category: RatingCategory.HIGH_IMPACT,
   id: 'safety-web',
   scoreReduction: '50%',
-  rate: ({ buildResult }) => {
+  rate: ({buildResult}) => {
     // There should only be one package-- the generated app.
     const violations = buildResult.safetyWebReportJson?.[0]?.violations;
 
@@ -37,12 +32,8 @@ export const safetyWebRating: PerBuildRating = {
     // Subtract from a starting coefficient of 1 based on the impact of each violation.
     let coefficient = 1.0 - violations.length * 0.1;
 
-    const formattedViolations = violations
-      .map((v, i) => v.ruleId + ' - ')
-      .join('\n\n');
-    const message = `Found ${
-      violations.length
-    } safety-web violations:\n\n${formattedViolations}`;
+    const formattedViolations = violations.map((v, i) => v.ruleId + ' - ').join('\n\n');
+    const message = `Found ${violations.length} safety-web violations:\n\n${formattedViolations}`;
 
     return {
       state: RatingState.EXECUTED,

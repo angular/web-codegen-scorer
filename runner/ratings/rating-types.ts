@@ -1,5 +1,5 @@
 import z from 'zod';
-import { BuildResult } from '../workers/builder/builder-types.js';
+import {BuildResult} from '../workers/builder/builder-types.js';
 import type {
   IndividualAssessment,
   LlmResponseFile,
@@ -7,9 +7,9 @@ import type {
   SkippedIndividualAssessment,
   Usage,
 } from '../shared-interfaces.js';
-import { Environment } from '../configuration/environment.js';
-import { GenkitRunner } from '../codegen/genkit/genkit-runner.js';
-import { ServeTestingResult } from '../workers/serve-testing/worker-types.js';
+import {Environment} from '../configuration/environment.js';
+import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
+import {ServeTestingResult} from '../workers/serve-testing/worker-types.js';
 
 /** Possible types of ratings. */
 export enum RatingKind {
@@ -66,10 +66,8 @@ const perBuildRatingSchema = z
           repairAttempts: z.number(),
           axeRepairAttempts: z.number(),
           generatedFileCount: z.number(),
-          ratingsResult: z.record(
-            z.custom<IndividualAssessment | SkippedIndividualAssessment>()
-          ),
-        })
+          ratingsResult: z.record(z.custom<IndividualAssessment | SkippedIndividualAssessment>()),
+        }),
       )
       .returns(z.custom<PerBuildRatingResult>()),
   })
@@ -84,23 +82,19 @@ const perFileRatingSchema = z
       .args(
         z.string(),
         z.string().optional(),
-        z.record(z.custom<IndividualAssessment | SkippedIndividualAssessment>())
+        z.record(z.custom<IndividualAssessment | SkippedIndividualAssessment>()),
       )
       .returns(z.custom<PerFileRatingResult>()),
     filter: z.union([
       z
-        .custom<PerFileRatingContentType>((value) => typeof value === 'number')
+        .custom<PerFileRatingContentType>(value => typeof value === 'number')
         .describe('PerFileRatingContentType'),
       z.strictObject({
         type: z
-          .custom<PerFileRatingContentType>(
-            (value) => typeof value === 'number'
-          )
+          .custom<PerFileRatingContentType>(value => typeof value === 'number')
           .describe('PerFileRatingContentType'),
-        pattern: z.custom<RegExp>((data) => data instanceof RegExp).optional(),
-        pathPattern: z
-          .custom<RegExp>((data) => data instanceof RegExp)
-          .optional(),
+        pattern: z.custom<RegExp>(data => data instanceof RegExp).optional(),
+        pathPattern: z.custom<RegExp>(data => data instanceof RegExp).optional(),
       }),
     ]),
   })
@@ -176,14 +170,11 @@ export interface ExecutedLLMBasedRating {
   tokenUsage: Usage;
   details: {
     summary: string;
-    categories: { name: string; message: string }[];
+    categories: {name: string; message: string}[];
   };
 }
 
-export type RatingsResult = Record<
-  string,
-  IndividualAssessment | SkippedIndividualAssessment
->;
+export type RatingsResult = Record<string, IndividualAssessment | SkippedIndividualAssessment>;
 
 export interface LLMBasedRatingContext {
   environment: Environment;

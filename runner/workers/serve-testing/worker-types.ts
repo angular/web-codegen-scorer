@@ -1,10 +1,7 @@
-import { ProgressType } from '../../progress/progress-logger.js';
-import {
-  AgentOutput,
-  BrowserAgentTaskInput,
-} from '../../testing/browser-agent/models.js';
-import { Result } from 'axe-core';
-import { CspViolation } from './auto-csp-types.js';
+import {ProgressType} from '../../progress/progress-logger.js';
+import {AgentOutput, BrowserAgentTaskInput} from '../../testing/browser-agent/models.js';
+import {Result} from 'axe-core';
+import {CspViolation} from './auto-csp-types.js';
 
 /**
  * Represents the message structure used for communication between
@@ -58,7 +55,7 @@ export interface ServeTestingProgressLogMessage {
 export type ServeTestingProgressLogFn = (
   state: ProgressType,
   message: string,
-  details?: string
+  details?: string,
 ) => void;
 
 export type ServeTestingWorkerResponseMessage =

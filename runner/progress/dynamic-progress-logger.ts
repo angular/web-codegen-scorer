@@ -1,12 +1,8 @@
-import { MultiBar, SingleBar, Presets } from 'cli-progress';
+import {MultiBar, SingleBar, Presets} from 'cli-progress';
 import chalk from 'chalk';
-import { RootPromptDefinition } from '../shared-interfaces.js';
-import {
-  ProgressLogger,
-  ProgressType,
-  progressTypeToIcon,
-} from './progress-logger.js';
-import { redX } from '../reporting/format.js';
+import {RootPromptDefinition} from '../shared-interfaces.js';
+import {ProgressLogger, ProgressType, progressTypeToIcon} from './progress-logger.js';
+import {redX} from '../reporting/format.js';
 
 const PREFIX_WIDTH = 20;
 
@@ -46,7 +42,7 @@ export class DynamicProgressLogger implements ProgressLogger {
         ...Presets.rect,
         // Use a character so the bar is visible while it's empty.
         barIncompleteChar: '_',
-      }
+      },
     );
 
     // Bar that tracks how many prompts are completed in total.
@@ -88,12 +84,7 @@ export class DynamicProgressLogger implements ProgressLogger {
     }
   }
 
-  log(
-    prompt: RootPromptDefinition,
-    type: ProgressType,
-    message: string,
-    details?: string
-  ): void {
+  log(prompt: RootPromptDefinition, type: ProgressType, message: string, details?: string): void {
     if (!this.wrapper || !this.totalBar) {
       return;
     }
@@ -113,14 +104,11 @@ export class DynamicProgressLogger implements ProgressLogger {
 
     // Capture errors for static printing once the dynamic progress is hidden.
     if (type === 'error') {
-      this.errors.push({ prompt, message, details });
+      this.errors.push({prompt, message, details});
     }
 
     // Pad/trim the name so they're all the same length.
-    const name = this.trimString(
-      prompt.name.padEnd(PREFIX_WIDTH, ' '),
-      PREFIX_WIDTH
-    );
+    const name = this.trimString(prompt.name.padEnd(PREFIX_WIDTH, ' '), PREFIX_WIDTH);
     const payload = {
       name: `${this.getColorFunction(type)(name)}`,
       message: `${progressTypeToIcon(type)} ${this.trimString(message, 100)}`,
@@ -151,8 +139,6 @@ export class DynamicProgressLogger implements ProgressLogger {
   }
 
   private trimString(value: string, maxLength: number): string {
-    return value.length > maxLength
-      ? value.slice(0, maxLength - 1) + '…'
-      : value;
+    return value.length > maxLength ? value.slice(0, maxLength - 1) + '…' : value;
   }
 }

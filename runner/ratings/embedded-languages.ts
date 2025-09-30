@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { LlmResponseFile } from '../shared-interfaces.js';
+import {LlmResponseFile} from '../shared-interfaces.js';
 
 /**
  * Extracts embedded stylesheets and HTML from a TypeScript file.
@@ -12,11 +12,7 @@ export function extractEmbeddedCodeFromTypeScript(file: LlmResponseFile) {
     return null;
   }
 
-  const sourceFile = ts.createSourceFile(
-    'temp.ts',
-    file.code,
-    ts.ScriptTarget.Latest
-  );
+  const sourceFile = ts.createSourceFile('temp.ts', file.code, ts.ScriptTarget.Latest);
 
   const stylesheets: string[] = [];
   const templates: string[] = [];
@@ -35,10 +31,7 @@ export function extractEmbeddedCodeFromTypeScript(file: LlmResponseFile) {
           continue;
         }
 
-        if (
-          prop.name.text === 'template' &&
-          ts.isStringLiteralLike(prop.initializer)
-        ) {
+        if (prop.name.text === 'template' && ts.isStringLiteralLike(prop.initializer)) {
           templates.push(prop.initializer.text);
         } else if (prop.name.text === 'styles') {
           if (ts.isStringLiteralLike(prop.initializer)) {
@@ -58,7 +51,7 @@ export function extractEmbeddedCodeFromTypeScript(file: LlmResponseFile) {
   });
 
   return {
-    stylesheets: stylesheets.map((c) => ({ code: c, filePath: file.filePath })),
-    templates: templates.map((c) => ({ code: c, filePath: file.filePath })),
+    stylesheets: stylesheets.map(c => ({code: c, filePath: file.filePath})),
+    templates: templates.map(c => ({code: c, filePath: file.filePath})),
   };
 }

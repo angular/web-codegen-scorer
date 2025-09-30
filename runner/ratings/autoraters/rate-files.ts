@@ -1,15 +1,15 @@
-import { greenCheckmark } from '../../reporting/format.js';
+import {greenCheckmark} from '../../reporting/format.js';
 import {
   AutoraterRunInfo,
   IndividualAssessment,
   LlmResponseFile,
   SkippedIndividualAssessment,
 } from '../../shared-interfaces.js';
-import { autoRateCode } from './code-rater.js';
-import { autoRateAppearance } from './visuals-rater.js';
-import { Environment } from '../../configuration/environment.js';
-import { GenkitRunner } from '../../codegen/genkit/genkit-runner.js';
-import { RatingsResult } from '../rating-types.js';
+import {autoRateCode} from './code-rater.js';
+import {autoRateAppearance} from './visuals-rater.js';
+import {Environment} from '../../configuration/environment.js';
+import {GenkitRunner} from '../../codegen/genkit/genkit-runner.js';
+import {RatingsResult} from '../rating-types.js';
 
 /**
  * Automatically rates the code inside of a file.
@@ -29,7 +29,7 @@ export async function autoRateFiles(
   files: LlmResponseFile[],
   appPrompt: string,
   screenshotPngUrl: string | null,
-  ratingsResult: RatingsResult
+  ratingsResult: RatingsResult,
 ): Promise<AutoraterRunInfo> {
   console.log(`Autorater is using '${model}' model. \n`);
 
@@ -42,7 +42,7 @@ export async function autoRateFiles(
     environment,
     files,
     appPrompt,
-    ratingsResult
+    ratingsResult,
   );
   console.log(`${greenCheckmark()} Code scoring is successful.`);
 
@@ -57,7 +57,7 @@ export async function autoRateFiles(
       environment,
       appPrompt,
       screenshotPngUrl,
-      'command-line'
+      'command-line',
     );
     console.log(`${greenCheckmark()} Visual scoring is successful.`);
   }

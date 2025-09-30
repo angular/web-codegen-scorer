@@ -1,7 +1,7 @@
 /** Generates the `GEMINI.md` file for an eval run. */
 export function getGeminiInstructionsFile(
   systemInstructions: string,
-  buildCommand: string
+  buildCommand: string,
 ): string {
   return [
     `# Important Rules`,
@@ -48,7 +48,7 @@ export function getGeminiIgnoreFile(): string {
 /** Gets the content of the `.gemini/settings.json` file. */
 export function getGeminiSettingsFile(
   packageManager: string,
-  possiblePackageManagers: string[]
+  possiblePackageManagers: string[],
 ): string {
   const config = {
     excludeTools: [
@@ -56,8 +56,8 @@ export function getGeminiSettingsFile(
       // managers since doing so via prompting doesn't always work.
       'run_shell_command(git)',
       ...possiblePackageManagers
-        .filter((m) => m !== packageManager)
-        .map((m) => `run_shell_command(${m})`),
+        .filter(m => m !== packageManager)
+        .map(m => `run_shell_command(${m})`),
 
       // Note that we don't block all commands,
       // because the build commands also go through it.

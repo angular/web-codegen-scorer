@@ -1,15 +1,6 @@
-import { join, dirname, isAbsolute } from 'path';
-import { existsSync } from 'fs';
-import {
-  mkdir,
-  copyFile,
-  readdir,
-  writeFile,
-  lstat,
-  symlink,
-  rm,
-  unlink,
-} from 'fs/promises';
+import {join, dirname, isAbsolute} from 'path';
+import {existsSync} from 'fs';
+import {mkdir, copyFile, readdir, writeFile, lstat, symlink, rm, unlink} from 'fs/promises';
 
 /**
  * Recursively copies a folder from a source path to a destination path,
@@ -19,13 +10,9 @@ import {
  * @param destination The path to the destination folder.
  * @param exclude An optional set of directory names to exclude from copying.
  */
-export async function copyFolderExcept(
-  source: string,
-  destination: string,
-  exclude?: Set<string>
-) {
-  await mkdir(destination, { recursive: true });
-  const entries = await readdir(source, { withFileTypes: true });
+export async function copyFolderExcept(source: string, destination: string, exclude?: Set<string>) {
+  await mkdir(destination, {recursive: true});
+  const entries = await readdir(source, {withFileTypes: true});
 
   for (const entry of entries) {
     const sourcePath = join(source, entry.name);
@@ -46,7 +33,7 @@ export async function copyFolderExcept(
  * inside symlinked directories.
  */
 export async function removeFolderWithSymlinks(dir: string) {
-  const entries = await readdir(dir, { withFileTypes: true });
+  const entries = await readdir(dir, {withFileTypes: true});
 
   for (const entry of entries) {
     const entryPath = join(dir, entry.name);
@@ -66,12 +53,12 @@ export async function removeFolderWithSymlinks(dir: string) {
 export async function safeWriteFile(
   filePath: string,
   content: string | Buffer,
-  encoding?: BufferEncoding
+  encoding?: BufferEncoding,
 ): Promise<void> {
   const directory = dirname(filePath);
 
   if (!existsSync(directory)) {
-    await mkdir(directory, { recursive: true });
+    await mkdir(directory, {recursive: true});
   }
 
   await writeFile(filePath, content, encoding);
@@ -88,7 +75,7 @@ export async function safeWriteFile(
  */
 export async function createSymlinkIfNotExists(
   sourcePath: string,
-  targetPath: string
+  targetPath: string,
 ): Promise<void> {
   try {
     await lstat(targetPath);

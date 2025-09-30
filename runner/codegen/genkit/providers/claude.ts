@@ -1,14 +1,10 @@
-import { Anthropic } from '@anthropic-ai/sdk';
-import { GenkitPlugin } from 'genkit/plugin';
-import {
-  GenkitModelProvider,
-  PromptDataForCounting,
-  RateLimitConfig,
-} from '../model-provider.js';
-import { anthropic } from 'genkitx-anthropic';
-import { claude35Haiku, claude4Sonnet } from 'genkitx-anthropic';
-import { lazy } from '../../../utils/lazy-creation.js';
-import { RateLimiter } from 'limiter';
+import {Anthropic} from '@anthropic-ai/sdk';
+import {GenkitPlugin} from 'genkit/plugin';
+import {GenkitModelProvider, PromptDataForCounting, RateLimitConfig} from '../model-provider.js';
+import {anthropic} from 'genkitx-anthropic';
+import {claude35Haiku, claude4Sonnet} from 'genkitx-anthropic';
+import {lazy} from '../../../utils/lazy-creation.js';
+import {RateLimiter} from 'limiter';
 
 export class ClaudeModelProvider extends GenkitModelProvider {
   readonly apiKeyVariableName = 'ANTHROPIC_API_KEY';
@@ -29,7 +25,7 @@ export class ClaudeModelProvider extends GenkitModelProvider {
         tokensPerInterval: 40_000 * 0.75, // *0.75 to be more resilient to token count deviations
         interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side.
       }),
-      countTokens: (prompt) => this.countClaudeTokens(prompt),
+      countTokens: prompt => this.countClaudeTokens(prompt),
     },
   };
 
@@ -43,16 +39,14 @@ export class ClaudeModelProvider extends GenkitModelProvider {
   }
 
   private anthropicApi = lazy(() => {
-    return new Anthropic({ apiKey: this.getApiKey() || undefined });
+    return new Anthropic({apiKey: this.getApiKey() || undefined});
   });
 
   protected pluginFactory(apiKey: string): GenkitPlugin {
-    return anthropic({ apiKey });
+    return anthropic({apiKey});
   }
 
-  private async countClaudeTokens(
-    prompt: PromptDataForCounting
-  ): Promise<number | null> {
+  private async countClaudeTokens(prompt: PromptDataForCounting): Promise<number | null> {
     const sonnetPrompt: string | Anthropic.Messages.MessageParam[] = [];
     for (const part of prompt.messages) {
       for (const c of part.content) {
@@ -76,7 +70,7 @@ export class ClaudeModelProvider extends GenkitModelProvider {
     }
     const messages: Anthropic.Messages.MessageParam[] = [
       ...sonnetPrompt,
-      { content: prompt.prompt, role: 'user' },
+      {content: prompt.prompt, role: 'user'},
     ];
 
     return (
