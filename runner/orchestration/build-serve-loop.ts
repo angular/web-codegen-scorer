@@ -118,24 +118,27 @@ export async function attemptBuild(
     lastAttempt = attempt;
   }
 
-  // Now that we got a working app, try to serve it and collect
-  // findings from the running app.
-  lastAttempt.serveTestingResult = await serveAndTestApp(
-    evalID,
-    gateway,
-    directory,
-    env,
-    rootPromptDef,
-    workerConcurrencyQueue,
-    abortSignal,
-    progress,
-    skipScreenshots,
-    skipAxeTesting,
-    enableAutoCsp,
-    userJourneyAgentTaskInput
-  );
+  if (lastAttempt.buildResult.status === BuildResultStatus.SUCCESS) {
+    // Now that we got a working app, try to serve it and collect
+    // findings from the running app.
+    lastAttempt.serveTestingResult = await serveAndTestApp(
+      evalID,
+      gateway,
+      directory,
+      env,
+      rootPromptDef,
+      workerConcurrencyQueue,
+      abortSignal,
+      progress,
+      skipScreenshots,
+      skipAxeTesting,
+      enableAutoCsp,
+      userJourneyAgentTaskInput
+    );
+  }
 
   // Attempt to repair axe testing.
+  // This only runs when the last build completed & serving did run.
   let axeRepairAttempts = 0;
   while (
     lastAttempt.serveTestingResult &&
@@ -174,6 +177,15 @@ export async function attemptBuild(
       progress
     );
 
+    attemptDetails.push(attempt);
+    lastAttempt = attempt;
+
+    // If we somehow introduced build errors via the Axe repair loop,
+    // then we should abort and let that last attempt have "build errors".
+    if (attempt.buildResult.status !== BuildResultStatus.SUCCESS) {
+      break;
+    }
+
     // Re-run serving & tests after Axe repair.
     // This allows us to check if we fixed the violations.
     attempt.serveTestingResult = await serveAndTestApp(
@@ -190,9 +202,6 @@ export async function attemptBuild(
       enableAutoCsp,
       userJourneyAgentTaskInput
     );
-
-    attemptDetails.push(attempt);
-    lastAttempt = attempt;
 
     if (attempt.serveTestingResult.axeViolations?.length === 0) {
       progress.log(
