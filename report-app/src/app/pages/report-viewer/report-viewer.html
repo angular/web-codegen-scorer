@@ -461,13 +461,21 @@
 
               <div class="app-details-section">
                 <h4>Debugging Tools</h4>
+
                 <button
                   class="neutral-button"
                   title="Download a ZIP for debugging. You can upload the ZIP to AI Studio for further analysis of a specific app."
-                  (click)="downloadDebuggingZip(result)"
-                >
+                  (click)="downloadDebuggingZip(result)">
                   Download ZIP for debugging
                 </button>
+
+                @let debugCommand = getDebugCommand(report, result);
+
+                @if (debugCommand) {
+                  <p>To see the app locally, run the following command:</p>
+                  <pre class="callout neutral code">{{debugCommand}}</pre>
+                }
+
                 @if (result.toolLogs && result.toolLogs.length > 0) {
                   <expansion-panel>
                     <expansion-panel-header>Tool Logs</expansion-panel-header>

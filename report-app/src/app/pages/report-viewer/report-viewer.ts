@@ -44,6 +44,8 @@ import { ExpansionPanel } from '../../shared/expansion-panel/expansion-panel';
 import { ExpansionPanelHeader } from '../../shared/expansion-panel/expansion-panel-header';
 import { ProviderLabel } from '../../shared/provider-label';
 
+const localReportRegex = /-l\d+$/;
+
 @Component({
   imports: [
     StackedBarChart,
@@ -438,5 +440,17 @@ export class ReportViewer {
     } else {
       return 'failed';
     }
+  }
+
+  protected getDebugCommand(
+    report: RunInfo,
+    result: AssessmentResult
+  ): string | null {
+    // Only show the command for local reports.
+    if (!localReportRegex.test(report.group)) {
+      return null;
+    }
+
+    return `wcs run --prompt=${result.promptDef.name} --env=<path to ${report.details.summary.environmentId} config>`;
   }
 }
