@@ -51,13 +51,11 @@
     "wcs": "./runner/bin/cli.js"
   },
   "dependencies": {
-    "@anthropic-ai/claude-code": "^1.0.128",
     "@anthropic-ai/sdk": "^0.63.0",
     "@axe-core/puppeteer": "^4.10.2",
     "@genkit-ai/compat-oai": "^1.19.1",
     "@genkit-ai/googleai": "1.19.3",
     "@genkit-ai/mcp": "1.19.3",
-    "@google/gemini-cli": "^0.5.0",
     "@google/genai": "1.20.0",
     "@inquirer/prompts": "^7.8.4",
     "@safety-web/runner": "0.4.0-alpha.14",
@@ -91,7 +89,13 @@
     "zod": "^3.23.8",
     "zod-validation-error": "^4.0.1"
   },
+  "optionalDependencies": {
+    "@anthropic-ai/claude-code": "^1.0.128",
+    "@google/gemini-cli": "^0.5.0"
+  },
   "devDependencies": {
+    "@anthropic-ai/claude-code": "^1.0.128",
+    "@google/gemini-cli": "^0.5.0",
     "prettier": "^3.5.3",
     "tsx": "^4.20.3"
   }
