@@ -19,6 +19,8 @@ export abstract class BaseCliAgentRunner {
   protected abstract readonly ignoredFilePatterns: string[];
   protected abstract getCommandLineFlags(options: LlmGenerateFilesRequestOptions): string[];
   protected abstract writeAgentFiles(options: LlmGenerateFilesRequestOptions): Promise<void>;
+  protected inactivityTimeoutMins = 2;
+  protected totalRequestTimeoutMins = 10;
 
   private pendingTimeouts = new Set<ReturnType<typeof setTimeout>>();
   private pendingProcesses = new Set<ChildProcess>();
@@ -46,7 +48,7 @@ export abstract class BaseCliAgentRunner {
 
     await this.writeAgentFiles(options);
 
-    const reasoning = await this.runAgentProcess(options, 2, 10);
+    const reasoning = await this.runAgentProcess(options);
     const finalSnapshot = await DirectorySnapshot.forDirectory(context.directory, ignoredPatterns);
 
     const diff = finalSnapshot.getChangedOrAddedFiles(initialSnapshot);
@@ -168,15 +170,13 @@ export abstract class BaseCliAgentRunner {
     return binaryPath;
   }
 
-  private runAgentProcess(
-    options: LlmGenerateFilesRequestOptions,
-    inactivityTimeoutMins: number,
-    totalRequestTimeoutMins: number,
-  ): Promise<string> {
+  private runAgentProcess(options: LlmGenerateFilesRequestOptions): Promise<string> {
     return new Promise<string>(resolve => {
       let stdoutBuffer = '';
       let stdErrBuffer = '';
       let isDone = false;
+      const inactivityTimeoutMins = this.inactivityTimeoutMins;
+      const totalRequestTimeoutMins = this.totalRequestTimeoutMins;
       const msPerMin = 1000 * 60;
       const finalize = (finalMessage: string) => {
         if (isDone) {
