@@ -232,6 +232,9 @@ export abstract class BaseCliAgentRunner {
         env: {...process.env},
       });
 
+      // Important! some agents won't start executing until stdin has ended.
+      childProcess.stdin.end();
+
       childProcess.on('close', code =>
         finalize(
           `${this.displayName} process has exited` + (code == null ? '.' : ` with ${code} code.`),
