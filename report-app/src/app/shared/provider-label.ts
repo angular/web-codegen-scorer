@@ -17,6 +17,11 @@ const exactMatches: Record<string, string> = {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      font-size: 1rem;
+    }
+
+    :host(.small) {
+      font-size: 0.75rem;
     }
 
     .logo {
@@ -39,11 +44,14 @@ const exactMatches: Record<string, string> = {
   `,
   host: {
     '[class]': 'id()',
+    '[class.small]': 'size() === "small"',
   },
 })
 export class ProviderLabel {
   readonly id = input<string>();
   readonly label = input.required<string>();
+  readonly size = input<'small' | 'medium'>('medium');
+
   protected logo = computed(() => {
     const id = this.id();
 

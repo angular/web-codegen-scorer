@@ -67,14 +67,17 @@
               <div class="run-meta">
                 <provider-label
                   [id]="group.model"
-                  [label]="group.model"/>
+                  [label]="group.model"
+                  size="small"/>
                 <provider-label
                   [id]="group.framework.fullStackFramework.id"
-                  [label]="group.framework.fullStackFramework.displayName"/>
+                  [label]="group.framework.fullStackFramework.displayName"
+                  size="small"/>
                 @if (group.runner) {
                   <provider-label
                     [id]="group.runner.id"
-                    [label]="group.runner.displayName"/>
+                    [label]="group.runner.displayName"
+                    size="small"/>
                 }
               </div>
               <stacked-bar-chart
