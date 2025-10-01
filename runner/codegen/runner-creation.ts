@@ -1,5 +1,5 @@
 import {UserFacingError} from '../utils/errors.js';
-import type {GeminiCliRunner} from './gemini-cli/gemini-cli-runner.js';
+import type {GeminiCliRunner} from './gemini-cli-runner.js';
 import type {GenkitRunner} from './genkit/genkit-runner.js';
 
 interface AvailableRunners {
@@ -22,7 +22,7 @@ export async function getRunnerByName<T extends RunnerName>(name: T): Promise<Av
         m => new m.GenkitRunner() as AvailableRunners[T],
       );
     case 'gemini-cli':
-      return import('./gemini-cli/gemini-cli-runner.js').then(
+      return import('./gemini-cli-runner.js').then(
         m => new m.GeminiCliRunner() as AvailableRunners[T],
       );
     default:

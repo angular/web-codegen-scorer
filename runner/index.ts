@@ -24,7 +24,7 @@ export {generateCodeAndAssess} from './orchestration/generate.js';
 export {groupSimilarReports} from './orchestration/grouping.js';
 export {type LlmRunner} from './codegen/llm-runner.js';
 export {GenkitRunner} from './codegen/genkit/genkit-runner.js';
-export {GeminiCliRunner} from './codegen/gemini-cli/gemini-cli-runner.js';
+export {GeminiCliRunner} from './codegen/gemini-cli-runner.js';
 export {getRunnerByName, type RunnerName} from './codegen/runner-creation.js';
 export {getEnvironmentByPath} from './configuration/environment-resolution.js';
 export {type Environment} from './configuration/environment.js';

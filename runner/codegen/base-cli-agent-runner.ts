@@ -86,6 +86,54 @@ export abstract class BaseCliAgentRunner {
     this.pendingProcesses.clear();
   }
 
+  /** Gets patterns of files that likely all agents need to ignore. */
+  protected getCommonIgnorePatterns() {
+    return {
+      directories: [
+        '/dist',
+        '/tmp',
+        '/out-tsc',
+        '/bazel-out',
+        '/node_modules',
+        '/.angular/cache',
+        '.sass-cache/',
+        '.DS_Store',
+      ],
+      files: [
+        'npm-debug.log',
+        'yarn-error.log',
+        '.editorconfig',
+        '.postcssrc.json',
+        '.gitignore',
+        'yarn.lock',
+        'pnpm-lock.yaml',
+        'package-lock.json',
+        'pnpm-workspace.yaml',
+        'Thumbs.db',
+      ],
+    };
+  }
+
+  /** Gets the common system instructions for all agents. */
+  protected getCommonInstructions(options: LlmGenerateFilesRequestOptions) {
+    return [
+      `# Important Rules`,
+      `The following instructions dictate how you should behave. It is CRITICAL that you follow them AS CLOSELY AS POSSIBLE:`,
+      `- Do NOT attempt to improve the existing code, only implement the user request.`,
+      `- STOP once you've implemented the user request, do NOT try to clean up the project.`,
+      `- You ARE NOT ALLOWED to install dependencies. Assume that all necessary dependencies are already installed.`,
+      `- Do NOT clean up unused files.`,
+      `- Do NOT run the dev server, use \`${options.context.buildCommand}\` to verify the build correctness instead.`,
+      `- Do NOT use \`git\` or any other versioning software.`,
+      `- Do NOT attempt to lint the project.`,
+      '',
+      `Following the rules is VERY important and should be done with the utmost care!`,
+      '',
+      '',
+      options.context.systemInstructions,
+    ].join('\n');
+  }
+
   private resolveBinaryPath(binaryName: string): string {
     let dir = import.meta.dirname;
     let closestRoot: string | null = null;
