@@ -1,6 +1,6 @@
 import {MultiBar, SingleBar, Presets} from 'cli-progress';
 import chalk from 'chalk';
-import {RootPromptDefinition} from '../shared-interfaces.js';
+import {AssessmentResult, RootPromptDefinition} from '../shared-interfaces.js';
 import {ProgressLogger, ProgressType, progressTypeToIcon} from './progress-logger.js';
 import {redX} from '../reporting/format.js';
 
@@ -13,6 +13,8 @@ export class DynamicProgressLogger implements ProgressLogger {
   private pendingBars = new Map<RootPromptDefinition, SingleBar>();
   private spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   private currentSpinnerFrame = 0;
+  private completedEvals = 0;
+  private totalScore = 0;
   private spinnerInterval: ReturnType<typeof setInterval> | undefined;
   private errors: {
     prompt: RootPromptDefinition;
@@ -46,10 +48,17 @@ export class DynamicProgressLogger implements ProgressLogger {
     );
 
     // Bar that tracks how many prompts are completed in total.
-    this.totalBar = this.wrapper.create(total, 0, undefined, {
-      format: '{bar} {spinner} {value}/{total} prompts completed',
-      barsize: PREFIX_WIDTH,
-    });
+    this.totalBar = this.wrapper.create(
+      total,
+      0,
+      {
+        additionalInfo: '',
+      },
+      {
+        format: '{bar} {spinner} {value}/{total} prompts completed{additionalInfo}',
+        barsize: PREFIX_WIDTH,
+      },
+    );
 
     // Interval to update the spinner.
     this.spinnerInterval = setInterval(() => {
@@ -74,6 +83,7 @@ export class DynamicProgressLogger implements ProgressLogger {
     this.wrapper?.stop();
     this.pendingBars.clear();
     this.wrapper = this.totalBar = this.spinnerInterval = undefined;
+    this.completedEvals = this.totalScore = 0;
 
     for (const error of this.errors) {
       let message = `${redX()} [${error.prompt.name}] ${error.message}`;
@@ -91,17 +101,6 @@ export class DynamicProgressLogger implements ProgressLogger {
 
     let bar = this.pendingBars.get(prompt);
 
-    // Drop the bar from the screen if it's complete.
-    if (type === 'done') {
-      this.pendingBars.delete(prompt);
-
-      if (bar) {
-        this.totalBar.increment();
-        this.wrapper.remove(bar);
-      }
-      return;
-    }
-
     // Capture errors for static printing once the dynamic progress is hidden.
     if (type === 'error') {
       this.errors.push({prompt, message, details});
@@ -117,14 +116,36 @@ export class DynamicProgressLogger implements ProgressLogger {
     if (bar) {
       bar.update(0, payload);
     } else {
-      const bar = this.wrapper.create(1, 0, payload);
+      bar = this.wrapper.create(1, 0, payload);
       this.pendingBars.set(prompt, bar);
+    }
+  }
+
+  evalFinished(prompt: RootPromptDefinition, results: AssessmentResult[]): void {
+    const bar = this.pendingBars.get(prompt);
+    this.pendingBars.delete(prompt);
+
+    for (const result of results) {
+      this.completedEvals++;
+      this.totalScore += (result.score.totalPoints / result.score.maxOverallPoints) * 100;
+    }
+
+    if (this.completedEvals > 0) {
+      this.totalBar?.increment(1, {
+        additionalInfo: `, ${Math.round(this.totalScore / this.completedEvals)}% score on average`,
+      });
+    } else {
+      this.totalBar?.increment();
+    }
+
+    // Drop the bar from the screen if it's complete.
+    if (bar) {
+      this.wrapper?.remove(bar);
     }
   }
 
   private getColorFunction(type: ProgressType): (value: string) => string {
     switch (type) {
-      case 'done':
       case 'success':
       case 'serve-testing':
       case 'build':

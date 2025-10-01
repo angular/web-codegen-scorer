@@ -1,15 +1,8 @@
 import {greenCheckmark, redX} from '../reporting/format.js';
-import {RootPromptDefinition} from '../shared-interfaces.js';
+import {AssessmentResult, RootPromptDefinition} from '../shared-interfaces.js';
 
 /** Possible progress event types. */
-export type ProgressType =
-  | 'codegen'
-  | 'build'
-  | 'serve-testing'
-  | 'success'
-  | 'error'
-  | 'eval'
-  | 'done';
+export type ProgressType = 'codegen' | 'build' | 'serve-testing' | 'success' | 'error' | 'eval';
 
 /** Maps a ProgressType to an icon that can represent it. */
 export function progressTypeToIcon(type: ProgressType): string {
@@ -27,8 +20,6 @@ export function progressTypeToIcon(type: ProgressType): string {
       return redX();
     case 'eval':
       return '🔎';
-    case 'done':
-      return '🏁';
   }
 }
 
@@ -42,6 +33,13 @@ export interface ProgressLogger {
 
   /** Stops the logging process. */
   finalize(): void;
+
+  /**
+   * Logs when an individual eval has finished.
+   * @param prompt Prompt associated with the event.
+   * @param results Assessment results for the prompt.
+   */
+  evalFinished(prompt: RootPromptDefinition, results: AssessmentResult[]): void;
 
   /**
    * Logs a progress event to the logger.

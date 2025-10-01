@@ -155,9 +155,10 @@ export async function generateCodeAndAssess(options: {
         appConcurrencyQueue.add(
           async () => {
             const evalID = await env.gateway.initializeEval();
+            let results: AssessmentResult[] | undefined;
 
             try {
-              return await callWithTimeout(
+              results = await callWithTimeout(
                 `Evaluation of ${rootPromptDef.name}`,
                 async abortSignal =>
                   startEvaluationTask(
@@ -183,6 +184,7 @@ export async function generateCodeAndAssess(options: {
                 // 10min max per app evaluation.  We just want to make sure it never gets stuck.
                 10,
               );
+              return results;
             } catch (e: unknown) {
               failedPrompts.push({
                 promptName: rootPromptDef.name,
@@ -198,8 +200,7 @@ export async function generateCodeAndAssess(options: {
               progress.log(rootPromptDef, 'error', 'Failed to evaluate code', details);
               return [] satisfies AssessmentResult[];
             } finally {
-              progress.log(rootPromptDef, 'done', 'Done');
-
+              progress.evalFinished(rootPromptDef, results || []);
               await env.gateway.finalizeEval(evalID);
             }
           },

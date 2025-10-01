@@ -178,6 +178,7 @@ async function getPossiblePrompts(environmentDir: string): Promise<string[]> {
 class ErrorOnlyProgressLogger implements ProgressLogger {
   initialize(): void {}
   finalize(): void {}
+  evalFinished(): void {}
 
   log(_: unknown, type: ProgressType, message: string, details?: string) {
     if (type === 'error') {

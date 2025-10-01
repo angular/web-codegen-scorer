@@ -17,13 +17,11 @@ export class TextProgressLogger implements ProgressLogger {
 
   log(prompt: RootPromptDefinition, type: ProgressType, message: string, details?: string): void {
     const icon = progressTypeToIcon(type);
-
-    if (type === 'done') {
-      // It's handy to know how many apps are done when one completes.
-      const suffix = `(${++this.done}/${this.total})`;
-      details = details ? `${details} ${suffix}` : suffix;
-    }
-
     console.log(`[${prompt.name}] ${icon} ${message} ${details || ''}`.trim());
+  }
+
+  evalFinished(prompt: RootPromptDefinition): void {
+    // It's handy to know how many apps are done when one completes.
+    console.log(`[${prompt.name}] 🏁 Done (${++this.done}/${this.total})`.trim());
   }
 }

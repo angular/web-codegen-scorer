@@ -5,4 +5,5 @@ export class NoopProgressLogger implements ProgressLogger {
   initialize(): void {}
   finalize(): void {}
   log(): void {}
+  evalFinished(): void {}
 }
