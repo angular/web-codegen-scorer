@@ -1,9 +1,4 @@
-import {
-  LlmConstrainedOutputGenerateResponse,
-  LlmGenerateFilesRequestOptions,
-  LlmGenerateTextResponse,
-  LlmRunner,
-} from '../llm-runner.js';
+import {LlmGenerateFilesRequestOptions, LlmRunner} from '../llm-runner.js';
 import {join} from 'path';
 import {mkdirSync} from 'fs';
 import {writeFile} from 'fs/promises';
@@ -12,7 +7,6 @@ import {
   getGeminiInstructionsFile,
   getGeminiSettingsFile,
 } from './gemini-files.js';
-import {UserFacingError} from '../../utils/errors.js';
 import {BaseCliAgentRunner} from '../base-cli-agent-runner.js';
 
 const SUPPORTED_MODELS = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'];
@@ -24,17 +18,6 @@ export class GeminiCliRunner extends BaseCliAgentRunner implements LlmRunner {
   readonly hasBuiltInRepairLoop = true;
   protected ignoredFilePatterns = ['**/GEMINI.md', '**/.geminiignore'];
   protected binaryName = 'gemini';
-
-  generateText(): Promise<LlmGenerateTextResponse> {
-    // Technically we can make this work, but we don't need it at the time of writing.
-    throw new UserFacingError('Generating text with Gemini CLI is not supported.');
-  }
-
-  generateConstrained(): Promise<LlmConstrainedOutputGenerateResponse<any>> {
-    // We can't support this, because there's no straightforward
-    // way to tell the Gemini CLI to follow a schema.
-    throw new UserFacingError('Constrained output with Gemini CLI is not supported.');
-  }
 
   getSupportedModels(): string[] {
     return SUPPORTED_MODELS;
