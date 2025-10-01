@@ -186,6 +186,6 @@ export type McpServerOptions = z.infer<typeof mcpServerOptionsSchema>;
  * deal with conversions from complex prompt data to e.g. OpenAI message data.
  * */
 export interface PromptDataMessage {
-  role: 'user';
+  role: 'user' | 'model';
   content: Array<{text: string} | {media: {url: string; base64PngImage: string}}>;
 }

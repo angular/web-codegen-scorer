@@ -17,7 +17,7 @@ import {
 } from '../configuration/constants.js';
 import {Environment} from '../configuration/environment.js';
 import {rateGeneratedCode} from '../ratings/rate-code.js';
-import {summarizeReportWithAI} from '../reporting/ai-summarize.js';
+import {chatWithReportAI} from '../reporting/report-ai-chat.js';
 import {redX} from '../reporting/format.js';
 import {
   AssessmentResult,
@@ -51,6 +51,7 @@ import {executeCommand} from '../utils/exec.js';
 import {EvalID, Gateway} from './gateway.js';
 import {LocalEnvironment} from '../configuration/environment-local.js';
 import {getRunnerByName, RunnerName} from '../codegen/runner-creation.js';
+import {summarizeReportWithAI} from '../reporting/report-ai-summary.js';
 
 /**
  * Orchestrates the entire assessment process for each prompt defined in the `prompts` array.
@@ -603,7 +604,7 @@ async function prepareSummary(
       inputTokens += result.usage.inputTokens;
       outputTokens += result.usage.outputTokens;
       totalTokens += result.usage.totalTokens;
-      aiSummary = result.summary;
+      aiSummary = result.responseHtml;
     } catch (e) {
       console.error(`${redX()} Failed to generate AI summary for report: ${e}`);
       if ((e as Partial<Error>).stack) {

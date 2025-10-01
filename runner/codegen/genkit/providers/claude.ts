@@ -51,7 +51,7 @@ export class ClaudeModelProvider extends GenkitModelProvider {
     for (const part of prompt.messages) {
       for (const c of part.content) {
         sonnetPrompt.push({
-          role: part.role,
+          role: part.role === 'user' ? 'user' : 'assistant',
           content:
             'media' in c
               ? [

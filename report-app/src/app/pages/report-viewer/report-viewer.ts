@@ -1,5 +1,6 @@
 import {Clipboard} from '@angular/cdk/clipboard';
 import {DatePipe, DecimalPipe} from '@angular/common';
+import {HttpClient} from '@angular/common/http';
 import {
   afterNextRender,
   Component,
@@ -17,6 +18,7 @@ import {
   BuildResultStatus,
 } from '../../../../../runner/workers/builder/builder-types';
 import {
+  AiChatResponse,
   AssessmentResult,
   IndividualAssessment,
   IndividualAssessmentState,
@@ -42,6 +44,8 @@ import {bucketToScoreVariable, formatScore, ScoreCssVariable} from '../../shared
 import {ExpansionPanel} from '../../shared/expansion-panel/expansion-panel';
 import {ExpansionPanelHeader} from '../../shared/expansion-panel/expansion-panel-header';
 import {ProviderLabel} from '../../shared/provider-label';
+import {firstValueFrom} from 'rxjs';
+import {AiAssistant} from '../../shared/ai-assistant/ai-assistant';
 
 const localReportRegex = /-l\d+$/;
 
@@ -58,6 +62,7 @@ const localReportRegex = /-l\d+$/;
     ExpansionPanelHeader,
     ProviderLabel,
     NgxJsonViewerModule,
+    AiAssistant,
   ],
   templateUrl: './report-viewer.html',
   styleUrls: ['./report-viewer.scss'],
@@ -68,6 +73,7 @@ const localReportRegex = /-l\d+$/;
 export class ReportViewer {
   private clipboard = inject(Clipboard);
   private reportsFetcher = inject(ReportsFetcher);
+  private http = inject(HttpClient);
 
   constructor() {
     // Scroll the page to the top since it seems to always land slightly scrolled down.
@@ -79,6 +85,7 @@ export class ReportViewer {
   protected formatted = signal<Map<LlmResponseFile, string>>(new Map());
   protected formatScore = formatScore;
   protected error = computed(() => this.selectedReport.error());
+  protected isAiAssistantVisible = signal(false);
 
   private selectedReport = resource({
     params: () => ({groupId: this.reportGroupId()}),

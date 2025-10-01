@@ -16,7 +16,19 @@
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "externalDependencies": ["@firebase/app", "@firebase/firestore"],
+            "externalDependencies": [
+              "@firebase/app",
+              "@firebase/firestore",
+              "tiktoken",
+              "genkit",
+              "@genkit-ai/compat-oai",
+              "@genkit-ai/googleai",
+              "@genkit-ai/mcp",
+              "@google/genai",
+              "@google/generative-ai",
+              "genkitx-anthropic",
+              "node-fetch"
+            ],
             "allowedCommonJsDependencies": [
               "prettier/plugins/angular.js",
               "prettier/plugins/typescript.js",

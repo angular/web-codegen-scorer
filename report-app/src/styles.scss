@@ -89,3 +89,9 @@ hr {
 ::view-transition-old(count) {
   animation-name: -ua-view-transition-fade-out;
 }
+
+// Global style because the `pre` is rendered HTML via `innerHTML`.
+// Styles of the component would be bound the emulated view encapsulation.
+.ai-assistant-container pre {
+  overflow: hidden;
+}

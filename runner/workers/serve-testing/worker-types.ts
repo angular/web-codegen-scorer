@@ -31,7 +31,6 @@ export interface ServeTestingWorkerMessage {
 export interface ServeTestingResult {
   errorMessage?: string;
   screenshotPngUrl?: string;
-  missingDependency?: string;
   runtimeErrors?: string;
   userJourneyAgentOutput: AgentOutput | null;
   cspViolations?: CspViolation[];

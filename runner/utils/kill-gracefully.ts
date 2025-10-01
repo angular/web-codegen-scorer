@@ -7,7 +7,7 @@ function treeKillPromise(pid: number, signal: string): Promise<void> {
       if (err !== undefined) {
         reject(err);
       } else {
-        resolve(err);
+        resolve();
       }
     });
   });

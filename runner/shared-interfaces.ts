@@ -296,6 +296,31 @@ export interface FrameworkInfo {
 }
 
 /**
+ * AI-generated chat response.
+ */
+export interface AiChatResponse {
+  /** The response in HTML format. */
+  responseHtml: string;
+  /** Token usage for generating the response. */
+  usage: Usage;
+}
+
+/**
+ * Request body for the AI chat endpoint.
+ */
+export interface AiChatRequest {
+  prompt: string;
+  pastMessages: AiChatMessage[];
+  model: string;
+}
+
+/** Interface for capturing chat messages in an AI-assistant conversation. */
+export interface AiChatMessage {
+  role: 'user' | 'model';
+  text: string;
+}
+
+/**
  * A summary of build outcomes and code quality scores for an entire assessment run.
  */
 export interface RunSummary {

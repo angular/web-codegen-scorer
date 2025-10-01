@@ -58,7 +58,7 @@ process.on('message', async (message: BuildWorkerMessage) => {
         runSafetyWeb(directory, /* processPrivatePackages */ true, /* useDefaultTSConfig */ true),
       4,
     );
-    safetyWebReportJson = new Array(...safetyWebSummaries);
+    safetyWebReportJson = Array.from(safetyWebSummaries);
   } catch (error: any) {
     console.error(`${redX()} Could not create safety web report for \`${appName}\``, error);
   }

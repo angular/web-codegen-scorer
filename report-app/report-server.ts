@@ -7,9 +7,14 @@ import {
 import express from 'express';
 import {dirname, isAbsolute, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {FetchedLocalReports, fetchReportsFromDisk} from '../runner/reporting/report-local-disk';
-import {RunInfo} from '../runner/shared-interfaces';
+import {chatWithReportAI} from '../runner/reporting/report-ai-chat';
 import {convertV2ReportToV3Report} from '../runner/reporting/migrations/v2_to_v3';
+import {FetchedLocalReports, fetchReportsFromDisk} from '../runner/reporting/report-local-disk';
+import {AiChatRequest, RunInfo} from '../runner/shared-interfaces';
+
+// This will result in a lot of loading and would slow down the serving,
+// so it's loaded lazily below.
+import {type GenkitRunner} from '../runner/codegen/genkit/genkit-runner';
 
 const app = express();
 const reportsLoader = await getReportLoader();
@@ -18,6 +23,8 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 const angularApp = new AngularNodeAppEngine();
 let localDataPromise: Promise<FetchedLocalReports> | null = null;
+
+app.use(express.json());
 
 // Endpoint for fetching all available report groups.
 app.get('/api/reports', async (_, res) => {
@@ -34,9 +41,7 @@ app.get('/api/reports', async (_, res) => {
   res.json(results);
 });
 
-// Endpoint for fetching a specific report group.
-app.get('/api/reports/:id', async (req, res) => {
-  const id = req.params.id;
+async function fetchAndMigrateReports(id: string): Promise<RunInfo[] | null> {
   const localData = await resolveLocalData(options.reportsRoot);
   let result: RunInfo[] | null = null;
 
@@ -46,10 +51,56 @@ app.get('/api/reports/:id', async (req, res) => {
     result = await reportsLoader.getGroupedReports(id);
   }
 
-  // Convert potential older v2 reports.
-  result = result.map(r => convertV2ReportToV3Report(r));
+  if (result === null) {
+    return null;
+  }
 
-  res.json(result);
+  // Convert potential older v2 reports.
+  return result.map(r => convertV2ReportToV3Report(r));
+}
+
+// Endpoint for fetching a specific report group.
+app.get('/api/reports/:id', async (req, res) => {
+  const id = req.params.id;
+  const result = await fetchAndMigrateReports(id);
+
+  res.json(result ?? []);
+});
+
+let llm: Promise<GenkitRunner> | null = null;
+
+/** Lazily initializes and returns the genkit runner. */
+async function getOrCreateGenkitLlmRunner() {
+  const llm = new (await import('../runner/codegen/genkit/genkit-runner')).GenkitRunner();
+  // Gracefully shut down the runner on exit.
+  process.on('SIGINT', () => llm!.dispose());
+  process.on('SIGTERM', () => llm!.dispose());
+  return llm;
+}
+
+// Endpoint for fetching a specific report group.
+app.post('/api/reports/:id/chat', async (req, res) => {
+  const id = req.params.id;
+  const reports = await fetchAndMigrateReports(id);
+
+  if (reports === null) {
+    res.status(404).send('Not found');
+    return;
+  }
+
+  const {prompt, pastMessages, model} = req.body as AiChatRequest;
+  const assessments = reports.flatMap(run => run.results);
+  const abortController = new AbortController();
+  const summary = await chatWithReportAI(
+    await (llm ?? getOrCreateGenkitLlmRunner()),
+    prompt,
+    abortController.signal,
+    assessments,
+    pastMessages,
+    model,
+  );
+
+  res.json(summary);
 });
 
 app.use(
@@ -106,6 +157,7 @@ async function getReportLoader() {
     return {
       getGroupedReports: () => Promise.resolve([]),
       getGroupsList: () => Promise.resolve([]),
+      configureEndpoints: async () => {},
     } satisfies ReportLoader;
   }
 

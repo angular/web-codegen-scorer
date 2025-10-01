@@ -15,11 +15,11 @@ import {Spinner} from './spinner/spinner';
       gap: 25px;
       align-items: center;
       width: 100%;
-      margin: 50px auto;
+      margin: 20px auto;
     }
 
     spinner {
-      width: 80px;
+      width: 50px;
       padding: 8px;
     }
   `,
