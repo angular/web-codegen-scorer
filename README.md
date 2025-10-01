@@ -83,7 +83,7 @@ You can customize the `web-codegen-scorer eval` script with the following flags:
     - Example: `web-codegen-scorer eval --model=gemini-2.5-flash --autorater-model=gemini-2.5-flash --env=<config path>`
 
 - `--runner=<name>`: Specifies the runner to use to execute the eval. Supported runners are
-  `genkit` (default) or `gemini-cli`.
+  `genkit` (default), `gemini-cli` or `claude-code`.
 
 - `--local`: Runs the script in local mode for the initial code generation request. Instead of
   calling the LLM, it will attempt to read the initial code from a corresponding file in the

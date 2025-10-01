@@ -51,6 +51,7 @@
     "wcs": "./runner/bin/cli.js"
   },
   "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.128",
     "@anthropic-ai/sdk": "^0.63.0",
     "@axe-core/puppeteer": "^4.10.2",
     "@genkit-ai/compat-oai": "^1.19.1",
