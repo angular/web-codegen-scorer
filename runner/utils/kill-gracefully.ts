@@ -28,7 +28,12 @@ export function killChildProcessGracefully(
       throw new Error(`No process ID for processed that should be killed.`);
     }
 
-    // Watch for exiting, so that we can cancel the timeout(s) then.
+    // Declare the variables here, because in some cases it was throwing a
+    // `Cannot access '<name>' before initialization` error, despite hoisting.
+    let sigkillTimeoutId: ReturnType<typeof setTimeout> | undefined;
+    let rejectTimeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    // Watch for exiting, so that we can cancel the timeouts.
     child.on('exit', () => {
       clearTimeout(sigkillTimeoutId);
       clearTimeout(rejectTimeoutId);
@@ -43,9 +48,10 @@ export function killChildProcessGracefully(
     }
 
     // Start a timeout for the SIGKILL fallback
-    const sigkillTimeoutId = setTimeout(() => treeKill(pid, 'SIGKILL'), timeoutInMs);
+    sigkillTimeoutId = setTimeout(() => treeKill(pid, 'SIGKILL'), timeoutInMs);
+
     // Start another timeout to reject the promise if the child process never fires `exit` for some reasons.
-    const rejectTimeoutId = setTimeout(
+    rejectTimeoutId = setTimeout(
       () => reject(new Error('Child process did not exit gracefully within the timeout.')),
       timeoutInMs * 2,
     );
