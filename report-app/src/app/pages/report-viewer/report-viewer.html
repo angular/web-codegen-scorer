@@ -173,17 +173,25 @@
     </expansion-panel>
 
     @if (report.details.summary.aiSummary !== undefined) {
-      <button #aiAssistButton class="fab" (click)="isAiAssistantVisible.set(true)">
-        <span class="material-symbols-outlined">smart_toy</span>
-      </button>
+      <expansion-panel size="large" class="root-section">
+        <expansion-panel-header>
+          <img src="gemini.webp" alt="Gemini Logo" height="30" width="30" />
+          AI Summary
+        </expansion-panel-header>
+        <div [innerHTML]="report.details.summary.aiSummary"></div>
+      </expansion-panel>
+    }
 
-      @defer (on interaction(aiAssistButton)) {
-        <app-ai-assistant
-          [class.hidden]="!isAiAssistantVisible()"
-          [reportGroupId]="reportGroupId()"
-          (close)="isAiAssistantVisible.set(false)"
-        />
-      }
+    <button #aiAssistButton class="fab" (click)="isAiAssistantVisible.set(true)">
+      <span class="material-symbols-outlined">smart_toy</span>
+    </button>
+
+    @defer (on interaction(aiAssistButton)) {
+      <app-ai-assistant
+        [class.hidden]="!isAiAssistantVisible()"
+        [reportGroupId]="reportGroupId()"
+        (close)="isAiAssistantVisible.set(false)"
+      />
     }
 
     @if (missingDeps().length > 0) {
@@ -274,9 +282,7 @@
                 }
 
                 @if (hasBuildFailureDuringA11yRepair(result)) {
-                  <span class="status-badge error"
-                    >Build failed after a11y repair</span
-                  >
+                  <span class="status-badge error">Build failed after a11y repair</span>
                 }
               </div>
             </div>
@@ -343,13 +349,7 @@
                     [class.warn]="totalPercent < 90 && totalPercent >= 80"
                     [class.error]="totalPercent < 80"
                   >
-                    {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{
-                      totalPercent
-
-
-
-
-
+                    {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{totalPercent
                     }}%)
                   </span>
                 </div>

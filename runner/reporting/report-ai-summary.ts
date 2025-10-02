@@ -11,11 +11,10 @@ export async function summarizeReportWithAI(
     llm,
     `Strictly follow the instructions here.
 
-- You are an expert in LLM-based code generation evaluation and quality assessments.
 - You will receive a report of an evaluation tool that describes LLM-generated code quality. Summarize/categorize the report.
 - Quote exact build failures, or assessment checks when possible.
 - Try to keep the summary short. e.g. cut off app names to reduce output length.
-- Return aesthetically pleasing Markdown for the report. You can use inline styles for colors.
+- Do not add an overview of scores unless necessary to illustrate common failures or low-hanging fruit.
 
 **Your primary goals (two)**:
   - Make it easy to understand what common failures are,
