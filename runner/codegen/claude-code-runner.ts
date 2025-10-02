@@ -16,6 +16,8 @@ export class ClaudeCodeRunner extends BaseCliAgentRunner implements LlmRunner {
   readonly hasBuiltInRepairLoop = true;
   protected ignoredFilePatterns = ['**/CLAUDE.md', '**/.claude/**'];
   protected binaryName = 'claude';
+
+  // Claude only outputs once at the end so we bump the inactivity timeout.
   protected override inactivityTimeoutMins = 10;
   protected override totalRequestTimeoutMins = 10;
 

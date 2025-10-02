@@ -2,11 +2,13 @@ import {UserFacingError} from '../utils/errors.js';
 import type {GeminiCliRunner} from './gemini-cli-runner.js';
 import type {ClaudeCodeRunner} from './claude-code-runner.js';
 import type {GenkitRunner} from './genkit/genkit-runner.js';
+import type {CodexRunner} from './codex-runner.js';
 
 interface AvailableRunners {
   genkit: GenkitRunner;
   'gemini-cli': GeminiCliRunner;
   'claude-code': ClaudeCodeRunner;
+  'codex': CodexRunner;
 }
 
 /** Names of supported runners. */
@@ -31,6 +33,8 @@ export async function getRunnerByName<T extends RunnerName>(name: T): Promise<Av
       return import('./claude-code-runner.js').then(
         m => new m.ClaudeCodeRunner() as AvailableRunners[T],
       );
+    case 'codex':
+      return import('./codex-runner.js').then(m => new m.CodexRunner() as AvailableRunners[T]);
     default:
       throw new UserFacingError(`Unsupported runner ${name}`);
   }

@@ -8,6 +8,7 @@ const exactMatches: Record<string, string> = {
   solid: 'frameworks/solid.svg',
   'gemini-cli': 'gemini.webp',
   genkit: 'genkit.png',
+  codex: 'open-ai.png',
 };
 
 @Component({
