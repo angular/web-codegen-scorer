@@ -58,8 +58,9 @@ export interface LlmRunner {
    * Optional since not all runners may support MCP.
    * @param hostName Name for the MCP host.
    * @param servers Configured servers that should be started.
+   * @returns Details about the created server.
    */
-  startMcpServerHost?(hostName: string, servers: McpServerOptions[]): void;
+  startMcpServerHost?(hostName: string, servers: McpServerOptions[]): Promise<McpServerDetails>;
 
   /** Stops tracking MCP server logs and returns the current ones. */
   flushMcpServerLogs?(): string[];
@@ -170,6 +171,12 @@ export const mcpServerOptionsSchema = z.object({
 
 /** Options used to start an MCP server. */
 export type McpServerOptions = z.infer<typeof mcpServerOptionsSchema>;
+
+/** Details about an MCP server. */
+export interface McpServerDetails {
+  tools: string[];
+  resources: string[];
+}
 
 /**
  * Type for a prompt message may be passed to LLM runner in the eval tool.
