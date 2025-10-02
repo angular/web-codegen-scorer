@@ -15,7 +15,7 @@
     <div class="header-actions">
       <button class="expand-button" (click)="toggleExpanded()">
         <span class="material-symbols-outlined">
-          @if (isExpanded) {
+          @if (isExpanded()) {
             close_fullscreen
           } @else {
             open_in_full
@@ -38,7 +38,7 @@
           <div [innerHTML]="message.text"></div>
         </div>
       }
-      @if (isLoading) {
+      @if (isLoading()) {
         <div class="message model-message">
           <message-spinner message="Thinking..." />
         </div>
@@ -47,12 +47,13 @@
     <div class="input-container">
       <textarea
         #userInputElement
-        [(ngModel)]="userInput"
+        [ngModel]="userInput()"
+        (ngModelChange)="userInput.set($event)"
         placeholder="Ask a question about the report..."
-        (keydown.enter)="send()"
-        [readonly]="isLoading"
+        (keydown.enter)="$event.preventDefault(); send()"
+        [readonly]="isLoading()"
       ></textarea>
-      <button (click)="send()" [disabled]="isLoading">
+      <button (click)="send()" [disabled]="isLoading()">
         <span class="material-symbols-outlined">send</span>
       </button>
     </div>

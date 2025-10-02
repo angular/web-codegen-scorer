@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Component, input, output} from '@angular/core';
+import {Component, inject, input, output, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {firstValueFrom} from 'rxjs';
 import {
@@ -20,7 +20,7 @@ interface Model {
   styleUrl: './ai-assistant.scss',
   imports: [FormsModule, MessageSpinner],
   host: {
-    '[class.expanded]': 'isExpanded',
+    '[class.expanded]': 'isExpanded()',
   },
 })
 export class AiAssistant {
@@ -28,9 +28,11 @@ export class AiAssistant {
   readonly close = output();
 
   protected messages: AiChatMessage[] = [];
-  protected userInput = '';
-  protected isLoading = false;
-  protected isExpanded = false;
+  protected userInput = signal('');
+  protected isLoading = signal(false);
+  protected isExpanded = signal(false);
+
+  private readonly http = inject(HttpClient);
 
   protected readonly models: Model[] = [
     {id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash'},
@@ -39,23 +41,21 @@ export class AiAssistant {
   ];
   protected selectedModel = this.models[0].id;
 
-  constructor(private readonly http: HttpClient) {}
-
   protected toggleExpanded(): void {
-    this.isExpanded = !this.isExpanded;
+    this.isExpanded.set(!this.isExpanded());
   }
 
   async send(): Promise<void> {
-    if (!this.userInput.trim() || this.isLoading) {
+    if (!this.userInput().trim() || this.isLoading()) {
       return;
     }
 
     const pastMessages = this.messages.slice();
 
-    this.messages.push({role: 'user', text: this.userInput});
-    const prompt = this.userInput;
-    this.userInput = '';
-    this.isLoading = true;
+    this.messages.push({role: 'user', text: this.userInput()});
+    const prompt = this.userInput();
+    this.userInput.set('');
+    this.isLoading.set(true);
 
     const payload: AiChatRequest = {
       prompt,
@@ -75,7 +75,7 @@ export class AiAssistant {
         text: 'Sorry, I failed to get a response. Please try again.',
       });
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 }
