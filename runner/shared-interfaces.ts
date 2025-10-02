@@ -220,6 +220,9 @@ export interface AttemptDetails {
   /** LLM reasoning messages for generating these files. */
   // Note: May not be set in older reports.
   reasoning?: string;
+
+  /** Whether the build failed during an accessibility repair attempt. */
+  buildFailedDuringA11yRepair?: boolean;
 }
 
 /** Statistics related to the build process of the generated applications. */

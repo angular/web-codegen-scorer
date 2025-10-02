@@ -419,4 +419,8 @@ export class ReportViewer {
 
     return `wcs run --prompt=${result.promptDef.name} --env=<path to ${report.details.summary.environmentId} config>`;
   }
+
+  protected hasBuildFailureDuringA11yRepair(result: AssessmentResult): boolean {
+    return result.attemptDetails.some(attempt => attempt.buildFailedDuringA11yRepair);
+  }
 }

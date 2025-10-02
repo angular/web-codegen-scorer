@@ -273,6 +273,12 @@
                 @if (initialAttempt?.buildResult?.status === 'error') {
                   <span class="status-badge error">Initial build failed</span>
                 }
+
+                @if (hasBuildFailureDuringA11yRepair(result)) {
+                  <span class="status-badge error"
+                    >Build failed after a11y repair</span
+                  >
+                }
               </div>
             </div>
           </expansion-panel-header>

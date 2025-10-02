@@ -170,15 +170,15 @@ export async function attemptBuild(
       progress,
     );
 
+    let hasBuildFailure = attempt.buildResult.status !== BuildResultStatus.SUCCESS;
+    attempt.buildFailedDuringA11yRepair = hasBuildFailure;
     attemptDetails.push(attempt);
     lastAttempt = attempt;
 
     // If we somehow introduced build errors via the Axe repair loop, we abort
     // further a11y repairs and capture the failed build. This is useful insight
     // as LLMs seem to regress when asked to repair a11y violations.
-    if (attempt.buildResult.status !== BuildResultStatus.SUCCESS) {
-      break;
-    }
+    if (hasBuildFailure) break;
 
     // Re-run serving & tests after Axe repair.
     // This allows us to check if we fixed the violations.
