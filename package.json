@@ -90,11 +90,11 @@
     "zod-validation-error": "^4.0.1"
   },
   "optionalDependencies": {
-    "@anthropic-ai/claude-code": "^1.0.128",
+    "@anthropic-ai/claude-code": "^2.0.0",
     "@google/gemini-cli": "^0.5.0"
   },
   "devDependencies": {
-    "@anthropic-ai/claude-code": "^1.0.128",
+    "@anthropic-ai/claude-code": "^2.0.0",
     "@google/gemini-cli": "^0.5.0",
     "prettier": "^3.5.3",
     "tsx": "^4.20.3"
