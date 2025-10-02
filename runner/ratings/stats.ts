@@ -8,7 +8,7 @@ import {
 } from '../shared-interfaces.js';
 
 /** Possible buckets that scores can be categorized into. */
-const BUCKET_CONFIG = [
+export const BUCKET_CONFIG = [
   {name: 'Excellent', min: 98, max: 100, id: 'excellent'},
   {name: 'Great', min: 85, max: 97, id: 'great'},
   {name: 'Good', min: 71, max: 84, id: 'good'},

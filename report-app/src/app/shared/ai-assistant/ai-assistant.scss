@@ -61,18 +61,10 @@
     color: var(--text-secondary);
 
     select {
-      background-color: var(--background-color);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      font-size: 13px;
-      padding: 2px 6px;
-      cursor: pointer;
-
-      &:focus {
-        outline: none;
-        border-color: var(--accent-blue);
-      }
+      padding-left: 6px;
+      width: 100%;
+      font-size: 0.8rem;
+      height: 1.5rem;
     }
   }
 

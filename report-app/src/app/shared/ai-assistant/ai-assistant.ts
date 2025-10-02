@@ -32,7 +32,10 @@ export class AiAssistant {
 
   protected readonly aiConfigState = httpResource<AIConfigState>(() => '/api/ai-config-state');
   protected readonly models = computed(() => this.aiConfigState.value()?.configuredModels ?? []);
-  protected selectedModel = linkedSignal(() => this.models()[0]);
+  protected selectedModel = linkedSignal(
+    // By default, select Gemini 2.5 Flash if available (it's fast enough for chat + can reason well).
+    () => this.models().find(m => m === 'gemini-2.5-flash') ?? this.models()[0],
+  );
 
   protected toggleExpanded(): void {
     this.isExpanded.set(!this.isExpanded());

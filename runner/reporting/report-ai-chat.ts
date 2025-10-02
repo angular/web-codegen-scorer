@@ -7,6 +7,8 @@ import {
   IndividualAssessmentState,
 } from '../shared-interfaces.js';
 import {BuildResultStatus} from '../workers/builder/builder-types.js';
+import {BUCKET_CONFIG} from '../ratings/stats.js';
+import {POINTS_FOR_CATEGORIES} from '../ratings/rating-types.js';
 
 export const reportLlmEvalsToolContext = `## What is a report?
 A report consists of many apps that were LLM generated. You will have information
@@ -15,6 +17,17 @@ about checks that failed for this LLM generated app.
 Note that there may be multiple attempts for an app. E.g. an initial build may fail and
 another attempt might have repaired the build failure. The last attempt reflects the final
 state of the app. E.g. whether it does build, or if there are runtime errors.
+
+## Scoring mechanism
+Apps are rated based on their scores in the following buckets:
+${BUCKET_CONFIG.map(b => `* ${b.name}: ${b.min}-${b.max}`).join('\n')}
+
+The overall score of an app is determined based on score reductions.
+There are three pillars: ${Object.keys(POINTS_FOR_CATEGORIES).join(', ')}
+Pillars are a split up of a 100% perfect score, allowing for individual ratings
+to be less impactful than others. The pillars are distributed as follows:
+${Object.entries(POINTS_FOR_CATEGORIES).map(e => `* ${e[0]}: ${e[1]} points.`)}
+Within pillars, the available score can be reduced by individual ratings.
 `;
 
 const defaultAiChatPrompt = `Strictly follow the instructions here.
@@ -86,7 +99,7 @@ export function serializeReportForPrompt(assessments: AssessmentResult[]): strin
         `
 Name: ${app.promptDef.name}
 Score: ${app.score.totalPoints}/${app.score.maxOverallPoints}
-Failed checks: ${JSON.stringify(
+Failed checks/ratings: ${JSON.stringify(
           app.score.categories
             .flatMap(category => category.assessments)
             .filter(
@@ -95,7 +108,8 @@ Failed checks: ${JSON.stringify(
             )
             .map(c => ({
               description: c.description,
-              points: `${(c.successPercentage * 100).toFixed(2)}/100`,
+              category: c.category,
+              scoreReduction: c.scoreReduction,
               message: c.message,
             })),
           null,

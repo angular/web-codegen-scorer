@@ -4,6 +4,8 @@
       <div class="title-row">
         <h2>AI Assistant</h2>
       </div>
+    </div>
+    <div class="header-actions">
       <div class="model-selector-container">
         <select [(ngModel)]="selectedModel">
           @for (model of models(); track model) {
@@ -11,8 +13,6 @@
           }
         </select>
       </div>
-    </div>
-    <div class="header-actions">
       <button class="expand-button" (click)="toggleExpanded()">
         <span class="material-symbols-outlined">
           @if (isExpanded()) {

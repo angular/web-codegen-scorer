@@ -17,7 +17,6 @@ import {
 } from '../configuration/constants.js';
 import {Environment} from '../configuration/environment.js';
 import {rateGeneratedCode} from '../ratings/rate-code.js';
-import {chatWithReportAI} from '../reporting/report-ai-chat.js';
 import {redX} from '../reporting/format.js';
 import {
   AssessmentResult,
