@@ -74,7 +74,7 @@
     "limiter": "^3.0.0",
     "marked": "^16.1.1",
     "node-fetch": "^3.3.2",
-    "p-queue": "^8.1.0",
+    "p-queue": "^9.0.0",
     "puppeteer": "^24.10.1",
     "sass": "^1.89.2",
     "strict-csp": "^1.1.1",
