@@ -323,6 +323,11 @@ export interface AiChatMessage {
   text: string;
 }
 
+/** Interface describing the response of the AI config state report-server endpoint. */
+export interface AIConfigState {
+  configuredModels: string[];
+}
+
 /**
  * A summary of build outcomes and code quality scores for an entire assessment run.
  */

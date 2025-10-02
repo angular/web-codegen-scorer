@@ -10,7 +10,7 @@ import {fileURLToPath} from 'node:url';
 import {chatWithReportAI} from '../runner/reporting/report-ai-chat';
 import {convertV2ReportToV3Report} from '../runner/reporting/migrations/v2_to_v3';
 import {FetchedLocalReports, fetchReportsFromDisk} from '../runner/reporting/report-local-disk';
-import {AiChatRequest, RunInfo} from '../runner/shared-interfaces';
+import {AiChatRequest, AIConfigState, RunInfo} from '../runner/shared-interfaces';
 
 // This will result in a lot of loading and would slow down the serving,
 // so it's loaded lazily below.
@@ -88,19 +88,42 @@ app.post('/api/reports/:id/chat', async (req, res) => {
     return;
   }
 
-  const {prompt, pastMessages, model} = req.body as AiChatRequest;
-  const assessments = reports.flatMap(run => run.results);
-  const abortController = new AbortController();
-  const summary = await chatWithReportAI(
-    await (llm ?? getOrCreateGenkitLlmRunner()),
-    prompt,
-    abortController.signal,
-    assessments,
-    pastMessages,
-    model,
-  );
+  try {
+    const {prompt, pastMessages, model} = req.body as AiChatRequest;
+    const assessments = reports.flatMap(run => run.results);
+    const abortController = new AbortController();
+    const summary = await chatWithReportAI(
+      await (llm ?? getOrCreateGenkitLlmRunner()),
+      prompt,
+      abortController.signal,
+      assessments,
+      pastMessages,
+      model,
+    );
+    res.json(summary);
+  } catch (e) {
+    console.error(e);
+    if (e instanceof Error) {
+      console.error(e.stack);
+    }
+    res.status(500);
+    res.end(`Unexpected error. See terminal logs.`);
+  }
+});
 
-  res.json(summary);
+app.get('/api/ai-config-state', async (req, res) => {
+  try {
+    const llm = await getOrCreateGenkitLlmRunner();
+    return res.json({
+      configuredModels: llm.getSupportedModelsWithAPIKey(),
+    } satisfies AIConfigState);
+  } catch (e) {
+    console.error('Could not instantiate LLM instance. Error:', e);
+    if (e instanceof Error) {
+      console.error(e.stack);
+    }
+    return res.json({configuredModels: []});
+  }
 });
 
 app.use(

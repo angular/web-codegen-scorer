@@ -6,8 +6,8 @@
       </div>
       <div class="model-selector-container">
         <select [(ngModel)]="selectedModel">
-          @for (model of models; track model) {
-            <option [value]="model.id">{{ model.name }}</option>
+          @for (model of models(); track model) {
+            <option [value]="model">{{ model }}</option>
           }
         </select>
       </div>
@@ -29,19 +29,34 @@
   </header>
   <div class="ai-assistant-body">
     <div class="messages-container" #messagesContainer>
-      @for (message of messages; track $index) {
-        <div
-          class="message"
-          [class.user-message]="message.role === 'user'"
-          [class.model-message]="message.role === 'model'"
-        >
-          <div [innerHTML]="message.text"></div>
-        </div>
-      }
-      @if (isLoading()) {
-        <div class="message model-message">
-          <message-spinner message="Thinking..." />
-        </div>
+      @if (aiConfigState.isLoading()) {
+        <message-spinner message="Checking available models for chat..." />
+      } @else if (aiConfigState.error() !== undefined) {
+        Error fetching available models.
+      } @else if (models().length === 0) {
+        @if (models().length === 0) {
+          No models available. Make sure you set API keys as per
+          <a
+            href="https://github.com/angular/web-codegen-scorer?tab=readme-ov-file#setup"
+            target="_blank"
+            >Setup instructions.</a
+          >
+        }
+      } @else {
+        @for (message of messages; track $index) {
+          <div
+            class="message"
+            [class.user-message]="message.role === 'user'"
+            [class.model-message]="message.role === 'model'"
+          >
+            <div [innerHTML]="message.text"></div>
+          </div>
+        }
+        @if (isLoading()) {
+          <div class="message model-message">
+            <message-spinner message="Thinking..." />
+          </div>
+        }
       }
     </div>
     <div class="input-container">

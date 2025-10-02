@@ -96,6 +96,10 @@ export class GenkitRunner implements LlmRunner {
     return MODEL_PROVIDERS.flatMap(p => p.getSupportedModels());
   }
 
+  getSupportedModelsWithAPIKey(): string[] {
+    return MODEL_PROVIDERS.filter(p => p.getApiKey() !== null).flatMap(p => p.getSupportedModels());
+  }
+
   private async _genkitRequest(
     provider: GenkitModelProvider,
     model: ModelReference<any>,

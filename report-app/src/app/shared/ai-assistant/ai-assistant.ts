@@ -1,18 +1,14 @@
-import {HttpClient} from '@angular/common/http';
-import {Component, inject, input, output, signal} from '@angular/core';
+import {HttpClient, httpResource} from '@angular/common/http';
+import {Component, computed, inject, input, linkedSignal, output, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {firstValueFrom} from 'rxjs';
 import {
   AiChatMessage,
   AiChatRequest,
   AiChatResponse,
+  AIConfigState,
 } from '../../../../../runner/shared-interfaces';
 import {MessageSpinner} from '../message-spinner';
-
-interface Model {
-  id: string;
-  name: string;
-}
 
 @Component({
   selector: 'app-ai-assistant',
@@ -34,12 +30,9 @@ export class AiAssistant {
 
   private readonly http = inject(HttpClient);
 
-  protected readonly models: Model[] = [
-    {id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash'},
-    {id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro'},
-    {id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite'},
-  ];
-  protected selectedModel = this.models[0].id;
+  protected readonly aiConfigState = httpResource<AIConfigState>(() => '/api/ai-config-state');
+  protected readonly models = computed(() => this.aiConfigState.value()?.configuredModels ?? []);
+  protected selectedModel = linkedSignal(() => this.models()[0]);
 
   protected toggleExpanded(): void {
     this.isExpanded.set(!this.isExpanded());
@@ -60,7 +53,7 @@ export class AiAssistant {
     const payload: AiChatRequest = {
       prompt,
       pastMessages,
-      model: this.selectedModel,
+      model: this.selectedModel(),
     };
 
     try {
