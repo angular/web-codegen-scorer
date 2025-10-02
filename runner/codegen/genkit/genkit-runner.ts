@@ -11,6 +11,7 @@ import {
   LlmGenerateTextResponse,
   LlmGenerateTextRequestOptions,
   LlmGenerateFilesRequestOptions,
+  McpServerDetails,
 } from '../llm-runner.js';
 import {setTimeout} from 'node:timers/promises';
 import {callWithTimeout} from '../../utils/timeout.js';
@@ -193,7 +194,7 @@ export class GenkitRunner implements LlmRunner {
     }
   }
 
-  startMcpServerHost(hostName: string, servers: McpServerOptions[]): void {
+  async startMcpServerHost(hostName: string, servers: McpServerOptions[]): Promise<McpServerDetails> {
     if (this.mcpHost !== null) {
       throw new Error('MCP host is already started');
     }
@@ -210,6 +211,12 @@ export class GenkitRunner implements LlmRunner {
 
     globalLogger.startCapturingLogs();
     this.mcpHost = createMcpHost({name: hostName, mcpServers});
+    const tools = await this.mcpHost.getActiveTools(this.genkitInstance);
+    const resources = await this.mcpHost.getActiveResources(this.genkitInstance);
+    return {
+      tools: tools.map((t) => t.__action.name),
+      resources: resources.map((r) => r.__action.name),
+    };
   }
 
   flushMcpServerLogs(): string[] {
