@@ -173,15 +173,17 @@
     </expansion-panel>
 
     @if (report.details.summary.aiSummary !== undefined) {
-      <button class="fab" (click)="isAiAssistantVisible.set(true)">
+      <button #aiAssistButton class="fab" (click)="isAiAssistantVisible.set(true)">
         <span class="material-symbols-outlined">smart_toy</span>
       </button>
 
-      <app-ai-assistant
-        [class.hidden]="!isAiAssistantVisible()"
-        [reportGroupId]="reportGroupId()"
-        (close)="isAiAssistantVisible.set(false)"
-      />
+      @defer (on interaction(aiAssistButton)) {
+        <app-ai-assistant
+          [class.hidden]="!isAiAssistantVisible()"
+          [reportGroupId]="reportGroupId()"
+          (close)="isAiAssistantVisible.set(false)"
+        />
+      }
     }
 
     @if (missingDeps().length > 0) {
@@ -343,6 +345,8 @@
                   >
                     {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{
                       totalPercent
+
+
 
 
 
