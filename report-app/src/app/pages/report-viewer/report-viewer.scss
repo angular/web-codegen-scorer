@@ -48,6 +48,10 @@ expansion-panel {
   margin-top: 1rem;
 }
 
+lighthouse-category + lighthouse-category {
+  margin-top: 2rem;
+}
+
 .summary-meta {
   display: flex;
   align-items: center;
