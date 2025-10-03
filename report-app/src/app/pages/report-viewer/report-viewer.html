@@ -439,6 +439,29 @@
                   </expansion-panel>
                 }
 
+                @let lighthouse = result.finalAttempt.serveTestingResult?.lighthouseResult;
+
+                @if (lighthouse) {
+                  <expansion-panel>
+                    <expansion-panel-header>Lighthouse</expansion-panel-header>
+
+                    @for (category of lighthouse.categories; track category.id) {
+                      <lighthouse-category
+                        [audits]="category.audits"
+                        [displayName]="category.displayName"
+                        [score]="category.score"
+                        [description]="category.description"/>
+                    }
+
+                    @if (lighthouse.uncategorized.length > 0) {
+                      <lighthouse-category
+                        [audits]="lighthouse.uncategorized"
+                        displayName="Uncategorized"
+                        [score]="null"/>
+                    }
+                  </expansion-panel>
+                }
+
                 @if (result.userJourneys && result.userJourneys.result.length > 0) {
                   <expansion-panel>
                     <expansion-panel-header>User Journeys</expansion-panel-header>
