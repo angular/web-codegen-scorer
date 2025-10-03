@@ -62,8 +62,7 @@
     <div class="input-container">
       <textarea
         #userInputElement
-        [ngModel]="userInput()"
-        (ngModelChange)="userInput.set($event)"
+        [(ngModel)]="userInput"
         placeholder="Ask a question about the report..."
         (keydown.enter)="$event.preventDefault(); send()"
         [readonly]="isLoading()"
