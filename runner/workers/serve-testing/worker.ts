@@ -5,6 +5,7 @@ import {CspViolation} from '../serve-testing/auto-csp-types.js';
 import {runBrowserAgentUserJourneyTests} from '../serve-testing/browser-agent.js';
 import {runAppInPuppeteer} from '../serve-testing/puppeteer.js';
 import {
+  LighthouseResult,
   ServeTestingProgressLogMessage,
   ServeTestingResult,
   ServeTestingWorkerMessage,
@@ -19,6 +20,7 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
     includeAxeTesting,
     takeScreenshots,
     userJourneyAgentTaskInput,
+    includeLighthouseData,
   } = message;
   const runtimeErrors: string[] = [];
   const progressLog = (state: ProgressType, message: string, details?: string) => {
@@ -29,10 +31,11 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
   };
 
   let result: ServeTestingResult;
-  let screenshotBase64Data: string | undefined = undefined;
+  let screenshotBase64Data: string | undefined;
   let axeViolations: any[] | undefined = [];
   let userJourneyAgentOutput: AgentOutput | null = null;
   let cspViolations: CspViolation[] | undefined = [];
+  let lighthouseResult: LighthouseResult | undefined;
 
   try {
     const puppeteerResult = await callWithTimeout(
@@ -45,6 +48,7 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
           !!includeAxeTesting,
           progressLog,
           !!enableAutoCsp,
+          includeLighthouseData,
         ),
       4, // 4min
     );
@@ -52,6 +56,7 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
     screenshotBase64Data = puppeteerResult.screenshotBase64Data;
     axeViolations = puppeteerResult.axeViolations;
     cspViolations = puppeteerResult.cspViolations;
+    lighthouseResult = puppeteerResult.lighthouseResult;
 
     runtimeErrors.push(...puppeteerResult.runtimeErrors);
 
@@ -72,6 +77,7 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
       axeViolations,
       userJourneyAgentOutput: userJourneyAgentOutput,
       cspViolations,
+      lighthouseResult,
     };
   } catch (error: any) {
     const cleanErrorMessage = cleanupBuildMessage(error.message);
@@ -80,6 +86,7 @@ process.on('message', async (message: ServeTestingWorkerMessage) => {
       runtimeErrors: runtimeErrors.join('\n'),
       userJourneyAgentOutput: userJourneyAgentOutput,
       cspViolations,
+      lighthouseResult,
     };
   }
 
