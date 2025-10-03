@@ -3,6 +3,7 @@
 @use './app/shared/styles/callouts';
 @use './app/shared/styles/cards';
 @use './app/shared/styles/statuses';
+@use './app/shared/styles/tooltip';
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -80,6 +81,7 @@ hr {
 @include callouts.callout-styles;
 @include cards.card-styles;
 @include statuses.status-styles;
+@include tooltip.tooltip-styles;
 
 ::view-transition-old(count),
 ::view-transition-new(count) {

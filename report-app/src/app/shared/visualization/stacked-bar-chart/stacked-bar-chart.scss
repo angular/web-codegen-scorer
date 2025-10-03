@@ -51,31 +51,6 @@
   &:hover {
     filter: brightness(1.1);
   }
-
-  &[data-tooltip]::before {
-    content: attr(data-tooltip); // Use a data attribute for the text
-    position: absolute;
-    bottom: 110%; // Position it above the segment
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--tooltip-background-color);
-    color: var(--tooltip-text-color);
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity 0.2s ease-in-out,
-      visibility 0.2s ease-in-out;
-    z-index: 10;
-  }
-
-  &[data-tooltip]:hover::before {
-    opacity: 1;
-    visibility: visible;
-  }
 }
 
 .legend {
