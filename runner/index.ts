@@ -17,6 +17,11 @@ export {
   BuildResultStatus,
   type BuildResult,
 } from './workers/builder/builder-types.js';
+export {
+  type LighthouseResult,
+  type LighthouseCategory,
+  type LighthouseAudit,
+} from './workers/serve-testing/worker-types.js';
 export {type UserJourneysResult} from './orchestration/user-journeys.js';
 export {type AutoRateResult} from './ratings/autoraters/auto-rate-shared.js';
 export {DEFAULT_MODEL_NAME, REPORT_VERSION} from './configuration/constants.js';

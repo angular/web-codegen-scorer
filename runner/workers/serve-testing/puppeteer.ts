@@ -1,10 +1,11 @@
 import {AxePuppeteer} from '@axe-core/puppeteer';
-import {Result} from 'axe-core';
+import {Result as AxeResult} from 'axe-core';
 import puppeteer from 'puppeteer';
 import {callWithTimeout} from '../../utils/timeout.js';
 import {AutoCsp} from './auto-csp.js';
 import {CspViolation} from './auto-csp-types.js';
-import {ServeTestingProgressLogFn} from './worker-types.js';
+import {LighthouseResult, ServeTestingProgressLogFn} from './worker-types.js';
+import {getLighthouseData} from './lighthouse.js';
 
 /**
  * Uses Puppeteer to take a screenshot of the main page, perform Axe testing,
@@ -18,13 +19,15 @@ export async function runAppInPuppeteer(
   includeAxeTesting: boolean,
   progressLog: ServeTestingProgressLogFn,
   enableAutoCsp: boolean,
+  includeLighthouseData: boolean,
 ) {
   const runtimeErrors: string[] = [];
 
   // Undefined by default so it gets flagged correctly as `skipped` if there's no data.
   let cspViolations: CspViolation[] | undefined;
   let screenshotBase64Data: string | undefined;
-  let axeViolations: Result[] | undefined;
+  let axeViolations: AxeResult[] | undefined;
+  let lighthouseResult: LighthouseResult | undefined;
 
   try {
     const browser = await puppeteer.launch({
@@ -139,6 +142,22 @@ export async function runAppInPuppeteer(
       );
       progressLog('success', 'Screenshot captured and encoded');
     }
+
+    if (includeLighthouseData) {
+      try {
+        progressLog('eval', `Gathering Lighthouse data from ${hostUrl}`);
+        lighthouseResult = await getLighthouseData(hostUrl, page);
+
+        if (lighthouseResult) {
+          progressLog('success', 'Lighthouse data has been collected');
+        } else {
+          progressLog('error', 'Lighthouse did not produce usable data');
+        }
+      } catch (lighthouseError: any) {
+        progressLog('error', 'Could not gather Lighthouse data', lighthouseError.message);
+      }
+    }
+
     await browser.close();
   } catch (screenshotError: any) {
     let details: string = screenshotError.message;
@@ -150,5 +169,5 @@ export async function runAppInPuppeteer(
     progressLog('error', 'Could not take screenshot', details);
   }
 
-  return {screenshotBase64Data, runtimeErrors, axeViolations, cspViolations};
+  return {screenshotBase64Data, runtimeErrors, axeViolations, cspViolations, lighthouseResult};
 }
