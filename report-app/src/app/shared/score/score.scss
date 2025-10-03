@@ -4,6 +4,7 @@
   align-items: center;
   justify-content: center;
   color: var(--text-on-status);
+  flex-shrink: 0;
 }
 
 :host(.excellent-score) {
@@ -49,6 +50,17 @@
   width: 36px;
   height: 36px;
   font-size: 0.8rem;
+  border-radius: 6px;
+
+  .label {
+    font-size: 0.4rem;
+  }
+}
+
+:host(.tiny) {
+  width: 26px;
+  height: 26px;
+  font-size: 0.7rem;
   border-radius: 6px;
 
   .label {
