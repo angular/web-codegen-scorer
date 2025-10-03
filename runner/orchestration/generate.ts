@@ -85,6 +85,7 @@ export async function generateCodeAndAssess(options: {
   logging?: 'text-only' | 'dynamic';
   autoraterModel?: string;
   a11yRepairAttempts?: number;
+  skipLighthouse?: boolean;
 }): Promise<RunInfo> {
   const env = await getEnvironmentByPath(options.environmentConfigPath, options.runner);
   const ratingLlm = await getRunnerByName('genkit');
@@ -180,6 +181,7 @@ export async function generateCodeAndAssess(options: {
                     progress,
                     options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME,
                     options.a11yRepairAttempts ?? 0,
+                    !!options.skipLighthouse,
                   ),
                 // 10min max per app evaluation.  We just want to make sure it never gets stuck.
                 10,
@@ -310,6 +312,7 @@ async function startEvaluationTask(
   progress: ProgressLogger,
   autoraterModel: string,
   a11yRepairAttempts: number,
+  skipLighthouse: boolean,
 ): Promise<AssessmentResult[]> {
   // Set up the project structure once for the root project.
   const {directory, cleanup} = await setupProjectStructure(
@@ -433,6 +436,7 @@ async function startEvaluationTask(
       skipScreenshots,
       skipAxeTesting,
       enableAutoCsp,
+      skipLighthouse,
       userJourneyAgentTaskInput,
       a11yRepairAttempts,
     );

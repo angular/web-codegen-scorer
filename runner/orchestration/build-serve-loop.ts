@@ -46,6 +46,7 @@ export async function attemptBuild(
   skipScreenshots: boolean,
   skipAxeTesting: boolean,
   enableAutoCsp: boolean,
+  skipLighthouse: boolean,
   userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined,
   maxAxeRepairAttempts: number,
 ) {
@@ -125,6 +126,7 @@ export async function attemptBuild(
       skipScreenshots,
       skipAxeTesting,
       enableAutoCsp,
+      skipLighthouse,
       userJourneyAgentTaskInput,
     );
   }
@@ -194,6 +196,7 @@ export async function attemptBuild(
       skipScreenshots,
       skipAxeTesting,
       enableAutoCsp,
+      skipLighthouse,
       userJourneyAgentTaskInput,
     );
 

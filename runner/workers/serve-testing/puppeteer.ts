@@ -1,10 +1,11 @@
 import {AxePuppeteer} from '@axe-core/puppeteer';
-import {Result} from 'axe-core';
+import {Result as AxeResult} from 'axe-core';
 import puppeteer from 'puppeteer';
+import lighthouse, {RunnerResult as LighthouseRunnerResult} from 'lighthouse';
 import {callWithTimeout} from '../../utils/timeout.js';
 import {AutoCsp} from './auto-csp.js';
 import {CspViolation} from './auto-csp-types.js';
-import {ServeTestingProgressLogFn} from './worker-types.js';
+import {LighthouseAudit, LighthouseResult, ServeTestingProgressLogFn} from './worker-types.js';
 
 /**
  * Uses Puppeteer to take a screenshot of the main page, perform Axe testing,
@@ -18,13 +19,15 @@ export async function runAppInPuppeteer(
   includeAxeTesting: boolean,
   progressLog: ServeTestingProgressLogFn,
   enableAutoCsp: boolean,
+  includeLighthouseData: boolean,
 ) {
   const runtimeErrors: string[] = [];
 
   // Undefined by default so it gets flagged correctly as `skipped` if there's no data.
   let cspViolations: CspViolation[] | undefined;
   let screenshotBase64Data: string | undefined;
-  let axeViolations: Result[] | undefined;
+  let axeViolations: AxeResult[] | undefined;
+  let lighthouseResult: LighthouseResult | undefined;
 
   try {
     const browser = await puppeteer.launch({
@@ -139,6 +142,35 @@ export async function runAppInPuppeteer(
       );
       progressLog('success', 'Screenshot captured and encoded');
     }
+
+    if (includeLighthouseData) {
+      try {
+        progressLog('eval', `Gathering Lighthouse data from ${hostUrl}`);
+        const lighthouseData = await lighthouse(
+          hostUrl,
+          undefined,
+          {
+            extends: 'lighthouse:default',
+            settings: {
+              // Exclude accessibility since it's already covered by Axe above.
+              onlyCategories: ['performance', 'best-practices'],
+            },
+          },
+          page,
+        );
+
+        lighthouseResult = lighthouseData ? processLighthouseData(lighthouseData) : undefined;
+
+        if (lighthouseResult) {
+          progressLog('success', 'Lighthouse data has been collected');
+        } else {
+          progressLog('error', 'Lighthouse did not produce usable data');
+        }
+      } catch (lighthouseError: any) {
+        progressLog('error', 'Could not gather Lighthouse data', lighthouseError.message);
+      }
+    }
+
     await browser.close();
   } catch (screenshotError: any) {
     let details: string = screenshotError.message;
@@ -150,5 +182,52 @@ export async function runAppInPuppeteer(
     progressLog('error', 'Could not take screenshot', details);
   }
 
-  return {screenshotBase64Data, runtimeErrors, axeViolations, cspViolations};
+  return {screenshotBase64Data, runtimeErrors, axeViolations, cspViolations, lighthouseResult};
+}
+
+function processLighthouseData(data: LighthouseRunnerResult): LighthouseResult | undefined {
+  const availableAudits = new Map<string, LighthouseAudit>();
+  const result: LighthouseResult = {categories: [], uncategorized: []};
+
+  for (const audit of Object.values(data.lhr.audits)) {
+    const type = audit.details?.type;
+    const displayMode = audit.scoreDisplayMode;
+    const isAllowedType =
+      !type ||
+      type === 'list' ||
+      type === 'opportunity' ||
+      (type === 'checklist' && Object.keys(audit.details?.items || {}).length > 0) ||
+      (type === 'table' && audit.details?.items.length);
+    const isAllowedDisplayMode = displayMode === 'binary' || displayMode === 'numeric';
+
+    if (audit.score != null && isAllowedType && isAllowedDisplayMode) {
+      availableAudits.set(audit.id, audit);
+    }
+  }
+
+  for (const category of Object.values(data.lhr.categories)) {
+    const auditsForCategory: LighthouseAudit[] = [];
+
+    for (const ref of category.auditRefs) {
+      const audit = availableAudits.get(ref.id);
+
+      if (audit) {
+        auditsForCategory.push(audit);
+        availableAudits.delete(ref.id);
+      }
+    }
+
+    result.categories.push({
+      id: category.id,
+      displayName: category.title,
+      description: category.description || '',
+      score: category.score || 0,
+      audits: auditsForCategory,
+    });
+  }
+
+  // Track all remaining audits as uncategorized.
+  result.uncategorized.push(...availableAudits.values());
+
+  return result.categories.length === 0 && result.uncategorized.length === 0 ? undefined : result;
 }

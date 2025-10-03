@@ -38,6 +38,7 @@ interface Options {
   autoraterModel?: string;
   a11yRepairAttempts?: number;
   logging?: 'text-only' | 'dynamic';
+  skipLighthouse?: boolean;
 }
 
 function builder(argv: Argv): Argv<Options> {
@@ -153,6 +154,11 @@ function builder(argv: Argv): Argv<Options> {
         default: 0,
         description: 'Number of repair attempts for discovered a11y violations',
       })
+      .option('skip-lighthouse', {
+        type: 'boolean',
+        default: false,
+        description: 'Whether to skip collecting Lighthouse data',
+      })
       .strict()
       .version(false)
       .help()
@@ -197,6 +203,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
       autoraterModel: cliArgs.autoraterModel,
       skipAiSummary: cliArgs.skipAiSummary,
       a11yRepairAttempts: cliArgs.a11yRepairAttempts,
+      skipLighthouse: cliArgs.skipLighthouse,
     });
 
     logReportToConsole(runInfo);
