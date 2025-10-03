@@ -17,7 +17,7 @@ import {formatScore} from '../scoring';
 export class Score {
   readonly total = input.required<number>();
   readonly max = input.required<number>();
-  readonly size = input<'small' | 'medium' | 'large'>('medium');
+  readonly size = input<'tiny' | 'small' | 'medium' | 'large'>('medium');
   readonly label = input<string>('');
 
   protected formattedScore = computed(() => formatScore(this.total(), this.max()));
