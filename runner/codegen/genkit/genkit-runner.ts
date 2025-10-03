@@ -1,4 +1,11 @@
-import {DynamicResourceAction, GenerateResponse, genkit, ModelReference, ToolAction} from 'genkit';
+import {
+  Action,
+  DynamicResourceAction,
+  GenerateResponse,
+  genkit,
+  ModelReference,
+  ToolAction,
+} from 'genkit';
 import {GenkitMcpHost, McpServerConfig, createMcpHost} from '@genkit-ai/mcp';
 import {GenkitPlugin, GenkitPluginV2} from 'genkit/plugin';
 import {z} from 'zod';
@@ -22,9 +29,17 @@ import {UserFacingError} from '../../utils/errors.js';
 import {GenkitModelProvider, PromptDataForCounting} from './model-provider.js';
 import {ToolLogEntry} from '../../shared-interfaces.js';
 import {combineAbortSignals} from '../../utils/abort-signal.js';
+import {toToolDefinition} from 'genkit/tool';
 
 const globalLogger = new GenkitLogger();
 logger.init(globalLogger);
+
+/**
+ * Gets the name of a Genkit action.
+ */
+function getActionName(action: Action<any, any>): string {
+  return toToolDefinition(action).name;
+}
 
 /** Runner that uses the Genkit API under the hood. */
 export class GenkitRunner implements LlmRunner {
@@ -223,8 +238,8 @@ export class GenkitRunner implements LlmRunner {
     const tools = await this.mcpHost.getActiveTools(this.genkitInstance);
     const resources = await this.mcpHost.getActiveResources(this.genkitInstance);
     return {
-      tools: tools.map(t => t.__action.name),
-      resources: resources.map(r => r.__action.name),
+      tools: tools.map(getActionName),
+      resources: resources.map(getActionName),
     };
   }
 
