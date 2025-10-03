@@ -8,10 +8,10 @@ import {
 } from '../shared-interfaces.js';
 import {LlmGenerateFilesContext, LlmRunner, PromptDataMessage} from '../codegen/llm-runner.js';
 import {Environment} from '../configuration/environment.js';
-import {getPossiblePackageManagers} from '../configuration/environment-config.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {EvalID, Gateway} from './gateway.js';
 import {LocalEnvironment} from '../configuration/environment-local.js';
+import {getPossiblePackageManagers} from '../configuration/package-managers.js';
 
 /**
  * Generates code using the configured AI model based on the provided prompt.
@@ -94,18 +94,17 @@ export async function repairCodeWithAI(
   promptDef: RootPromptDefinition,
   directory: string,
   appFiles: LlmResponseFile[],
-  errorMessage: string,
-  errorContext: string,
+  errors: Array<{errorContext: string; errorMessage: string}>,
   contextFiles: LlmContextFile[],
   abortSignal: AbortSignal,
   progress: ProgressLogger,
+  repairType: 'build' | 'test',
 ): Promise<LlmResponse> {
   const repairSystemInstructions = env.systemPromptRepair();
   const repairPrompt = [
-    errorContext,
-    '```',
-    errorMessage,
-    '```',
+    ...errors.map(({errorContext, errorMessage}) =>
+      [errorContext, '```', errorMessage, '```'].join('\n'),
+    ),
     '',
     'In the following source code:',
     ...appFiles.map(file => `${file.filePath}:\n\`\`\`\n${file.code}\`\`\`\n\n`),
@@ -121,13 +120,13 @@ export async function repairCodeWithAI(
     possiblePackageManagers: getPossiblePackageManagers().slice(),
   };
 
-  progress.log(promptDef, 'codegen', 'Repairing code with AI');
+  progress.log(promptDef, 'codegen', `Repairing ${repairType} failures with AI`);
 
-  const response = await gateway.repairBuild(
+  const response = await gateway.repairCode(
     evalID,
     context,
     model,
-    errorMessage,
+    errors.map(ec => ec.errorMessage).join('\n'),
     appFiles,
     contextFiles,
     abortSignal,

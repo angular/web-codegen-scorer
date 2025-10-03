@@ -10,6 +10,7 @@ import {
   LlmContextFile,
   LlmResponse,
   LlmResponseFile,
+  TestExecutionResult,
 } from '../../shared-interfaces.js';
 import {generateCodeWithAI} from '../codegen.js';
 import {EvalID, Gateway} from '../gateway.js';
@@ -19,6 +20,9 @@ import {ProgressLogger} from '../../progress/progress-logger.js';
 import {serveApp} from '../../workers/serve-testing/serve-app.js';
 import {LocalEnvironment} from '../../configuration/environment-local.js';
 import PQueue from 'p-queue';
+import {executeCommand} from '../../utils/exec.js';
+import {callWithTimeout} from '../../utils/timeout.js';
+import {cleanupBuildMessage} from '../../workers/builder/worker.js';
 
 let uniqueIDs = 0;
 
@@ -39,7 +43,7 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
     return await generateCodeWithAI(this.llm, model, requestCtx, contextFiles, abortSignal);
   }
 
-  async repairBuild(
+  async repairCode(
     _id: EvalID,
     requestCtx: LlmGenerateFilesContext,
     model: string,
@@ -88,6 +92,45 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
     );
   }
 
+  async tryTest(
+    _id: EvalID,
+    env: LocalEnvironment,
+    appDirectoryPath: string,
+    rootPromptDef: RootPromptDefinition,
+    workerConcurrencyQueue: PQueue,
+    abortSignal: AbortSignal,
+    progress: ProgressLogger,
+  ): Promise<TestExecutionResult | null> {
+    if (!env.testCommand) {
+      return Promise.resolve(null);
+    }
+
+    let output: string;
+    let passed: boolean;
+
+    try {
+      // Run the test command inside the temporary project directory
+      const stdout = await callWithTimeout(
+        `Testing ${rootPromptDef.name}`,
+        timeoutAbort =>
+          executeCommand(env.testCommand!, appDirectoryPath, undefined, {
+            abortSignal: AbortSignal.any([abortSignal, timeoutAbort]),
+          }),
+        4, // 4min. This is a safety boundary. Lots of parallelism can slow-down.
+      );
+      output = stdout;
+      passed = true;
+    } catch (error: any) {
+      output = error.message;
+      passed = false;
+    }
+
+    return {
+      passed,
+      output: cleanupBuildMessage(output),
+    } satisfies TestExecutionResult;
+  }
+
   async serveBuild<T>(
     _id: EvalID,
     env: LocalEnvironment,
@@ -106,6 +149,10 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
   }
 
   shouldRetryFailedBuilds(): boolean {
+    return this.llm.hasBuiltInRepairLoop === false;
+  }
+
+  shouldRetryFailedTestExecution(): boolean {
     return this.llm.hasBuiltInRepairLoop === false;
   }
 

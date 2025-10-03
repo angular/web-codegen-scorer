@@ -6,9 +6,10 @@ import {AttemptDetails, LlmContextFile, RootPromptDefinition} from '../shared-in
 import {DEFAULT_MAX_REPAIR_ATTEMPTS} from '../configuration/constants.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {runBuild} from './build-worker.js';
-import {repairAndBuild} from './build-repair.js';
+import {repairAndBuild} from './repair.js';
 import {EvalID, Gateway} from './gateway.js';
 import {serveAndTestApp} from './serve-testing-worker.js';
+import {runTest} from './test-worker.js';
 import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
 
 /**
@@ -30,7 +31,7 @@ import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
  * @param abortSignal Signal to fire when the build should be aborted.
  * @param workerConcurrencyQueue Concurrency queue for controlling parallelism of worker invocations (as they are more expensive than LLM calls).
  */
-export async function attemptBuild(
+export async function attemptBuildAndTest(
   evalID: EvalID,
   gateway: Gateway<Environment>,
   model: string,
@@ -47,7 +48,7 @@ export async function attemptBuild(
   skipAxeTesting: boolean,
   enableAutoCsp: boolean,
   userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined,
-  maxAxeRepairAttempts: number,
+  maxTestRepairAttempts: number,
 ) {
   const initialBuildResult = await runBuild(
     evalID,
@@ -97,13 +98,18 @@ export async function attemptBuild(
       rootPromptDef,
       directory,
       lastAttempt.outputFiles,
-      lastAttempt.buildResult.message,
-      'There are the following build errors:',
+      [
+        {
+          errorContext: 'There are the following build errors:',
+          errorMessage: lastAttempt.buildResult.message,
+        },
+      ],
       contextFiles,
       abortSignal,
       workerConcurrencyQueue,
       repairAttempts,
       progress,
+      'build',
     );
 
     attemptDetails.push(attempt);
@@ -127,31 +133,70 @@ export async function attemptBuild(
       enableAutoCsp,
       userJourneyAgentTaskInput,
     );
+    const testResult = await runTest(
+      evalID,
+      gateway,
+      directory,
+      env,
+      rootPromptDef,
+      abortSignal,
+      workerConcurrencyQueue,
+      progress,
+    );
+
+    if (testResult !== null) {
+      lastAttempt.testResult = testResult;
+    }
   }
 
-  // Attempt to repair axe testing. This only runs when the last build
-  // passed and serving did run. Note: By default, we don't run axe repair
+  // Attempt to repair testing. This only runs when the last build
+  // passed and serving did run. Note: By default, we don't run repair
   // attempts as it's not commonly done by LLMs in the ecosystem.
   let axeRepairAttempts = 0;
-  while (
-    lastAttempt.serveTestingResult &&
-    (lastAttempt.serveTestingResult.axeViolations?.length ?? 0) > 0 &&
-    axeRepairAttempts < maxAxeRepairAttempts
-  ) {
-    axeRepairAttempts++;
-    progress.log(
-      rootPromptDef,
-      'build',
-      `Trying to repair axe accessibility violations (attempt #${axeRepairAttempts + 1})...`,
-    );
+  let testRepairAttempts = 0;
+  for (let testRepairAttempt = 0; testRepairAttempt < maxTestRepairAttempts; testRepairAttempt++) {
+    const hasAxeFailure =
+      lastAttempt.serveTestingResult && lastAttempt.serveTestingResult.axeViolations?.length;
+    const hasTestFailure = lastAttempt.testResult && !lastAttempt.testResult.passed;
+    if (!hasAxeFailure && !hasTestFailure) {
+      break;
+    }
 
-    const axeViolationsError = JSON.stringify(
-      lastAttempt.serveTestingResult.axeViolations,
-      null,
-      2,
-    );
+    const attemptId = testRepairAttempt + repairAttempts + 1;
 
-    progress.log(rootPromptDef, 'error', 'Found Axe accessibility violations');
+    const errors: Array<{errorContext: string; errorMessage: string}> = [];
+    if (hasAxeFailure) {
+      axeRepairAttempts++;
+      progress.log(
+        rootPromptDef,
+        'build',
+        `Trying to repair axe accessibility violations (attempt #${attemptId})...`,
+      );
+      const axeViolationsError = JSON.stringify(
+        lastAttempt.serveTestingResult!.axeViolations,
+        null,
+        2,
+      );
+      progress.log(rootPromptDef, 'error', 'Found Axe accessibility violations');
+      errors.push({
+        errorContext:
+          'There are the following accessibility errors from axe accessibility violations:',
+        errorMessage: axeViolationsError,
+      });
+    }
+    if (hasTestFailure) {
+      testRepairAttempts++;
+      progress.log(
+        rootPromptDef,
+        'test',
+        `Trying to repair test failures (attempt #${attemptId})...`,
+      );
+
+      errors.push({
+        errorContext: 'Application tests failed. Attempt to fix them. Test output was:',
+        errorMessage: lastAttempt.testResult!.output,
+      });
+    }
 
     const attempt = await repairAndBuild(
       evalID,
@@ -161,28 +206,28 @@ export async function attemptBuild(
       rootPromptDef,
       directory,
       lastAttempt.outputFiles,
-      axeViolationsError,
-      'There are the following accessibility errors from axe accessibility violations:',
+      errors,
       contextFiles,
       abortSignal,
       workerConcurrencyQueue,
-      axeRepairAttempts + repairAttempts,
+      attemptId,
       progress,
+      'test',
     );
 
     let hasBuildFailure = attempt.buildResult.status !== BuildResultStatus.SUCCESS;
-    attempt.buildFailedDuringA11yRepair = hasBuildFailure;
+    attempt.buildFailedDuringTestRepair = hasBuildFailure;
     attemptDetails.push(attempt);
     lastAttempt = attempt;
+    // If we somehow introduced build errors via the repair loop, we abort
+    // further repairs and capture the failed build. This is useful insight
+    // as LLMs seem to regress when asked to repair violations.
+    if (hasBuildFailure) {
+      break;
+    }
 
-    // If we somehow introduced build errors via the Axe repair loop, we abort
-    // further a11y repairs and capture the failed build. This is useful insight
-    // as LLMs seem to regress when asked to repair a11y violations.
-    if (hasBuildFailure) break;
-
-    // Re-run serving & tests after Axe repair.
-    // This allows us to check if we fixed the violations.
-    attempt.serveTestingResult = await serveAndTestApp(
+    // Re-run serving & tests after repair.
+    lastAttempt.serveTestingResult = await serveAndTestApp(
       evalID,
       gateway,
       directory,
@@ -196,9 +241,26 @@ export async function attemptBuild(
       enableAutoCsp,
       userJourneyAgentTaskInput,
     );
+    const testResult = await runTest(
+      evalID,
+      gateway,
+      directory,
+      env,
+      rootPromptDef,
+      abortSignal,
+      workerConcurrencyQueue,
+      progress,
+    );
 
-    if (attempt.serveTestingResult.axeViolations?.length === 0) {
+    if (testResult !== null) {
+      lastAttempt.testResult = testResult;
+    }
+
+    if (hasAxeFailure && lastAttempt.serveTestingResult.axeViolations?.length === 0) {
       progress.log(rootPromptDef, 'success', `Successfully fixed all Axe accessibility violations`);
+    }
+    if (hasTestFailure && lastAttempt.testResult?.passed) {
+      progress.log(rootPromptDef, 'success', `Successfully fixed all test failures`);
     }
   }
 
@@ -207,6 +269,8 @@ export async function attemptBuild(
     serveTestingResult: lastAttempt.serveTestingResult,
     outputFiles: lastAttempt.outputFiles,
     repairAttempts,
-    axeRepairAttempts,
+    axeRepairAttempts: axeRepairAttempts,
+    testResult: lastAttempt.testResult,
+    testRepairAttempts: testRepairAttempts,
   };
 }

@@ -36,7 +36,7 @@ interface Options {
   enableUserJourneyTesting?: boolean;
   enableAutoCsp?: boolean;
   autoraterModel?: string;
-  a11yRepairAttempts?: number;
+  testRepairAttempts?: number;
   logging?: 'text-only' | 'dynamic';
 }
 
@@ -148,10 +148,11 @@ function builder(argv: Argv): Argv<Options> {
         default: DEFAULT_AUTORATER_MODEL_NAME,
         description: 'Model to use when automatically rating generated code',
       })
-      .option('a11y-repair-attempts', {
+      .option('test-repair-attempts', {
         type: 'number',
         default: 0,
-        description: 'Number of repair attempts for discovered a11y violations',
+        description:
+          'Number of repair attempts for discovered test failures (including a11y violations and ones from testCommand)',
       })
       .strict()
       .version(false)
@@ -196,7 +197,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
       logging: cliArgs.logging,
       autoraterModel: cliArgs.autoraterModel,
       skipAiSummary: cliArgs.skipAiSummary,
-      a11yRepairAttempts: cliArgs.a11yRepairAttempts,
+      testRepairAttempts: cliArgs.testRepairAttempts,
     });
 
     logReportToConsole(runInfo);

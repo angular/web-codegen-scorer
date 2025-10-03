@@ -3,7 +3,7 @@ import z from 'zod';
 import {LlmRunner, McpServerOptions, mcpServerOptionsSchema} from '../codegen/llm-runner.js';
 import {LocalGateway} from '../orchestration/gateways/local_gateway.js';
 import {BaseEnvironment} from './base-environment.js';
-import {EnvironmentConfig, getPossiblePackageManagers} from './environment-config.js';
+import {getPossiblePackageManagers} from './package-managers.js';
 import {baseEnvironmentConfigSchema} from './base-environment-config.js';
 
 export const localEnvironmentConfigSchema = baseEnvironmentConfigSchema.extend({
@@ -29,6 +29,10 @@ export const localEnvironmentConfigSchema = baseEnvironmentConfigSchema.extend({
    */
   serveCommand: z.string().optional(),
   /**
+   * Command to run when testing the code.
+   */
+  testCommand: z.string().optional(),
+  /**
    * Whether to skip installing dependencies when running evals in the environment.
    * Useful if you're managing dependencies yourself.
    */
@@ -47,6 +51,8 @@ export class LocalEnvironment extends BaseEnvironment {
   readonly buildCommand: string;
   /** Command to run when starting a development server inside the app. */
   readonly serveCommand: string;
+  /** Command to run when starting tests inside the app. */
+  readonly testCommand: string | null;
   /**
    * Absolute path at which files specific to this environment are located. Will be merged in
    * with the files from the `projectTemplatePath` to get the final project structure.
@@ -82,6 +88,7 @@ export class LocalEnvironment extends BaseEnvironment {
     this.installCommand = `${packageManager} install --silent`;
     this.buildCommand = config.buildCommand || `${packageManager} run build`;
     this.serveCommand = config.serveCommand || this.getDefaultServeCommand(packageManager);
+    this.testCommand = config.testCommand ?? null;
     this.projectTemplatePath = projectTemplatePath;
     this.sourceDirectory = sourceDirectory;
     this.mcpServerOptions = config.mcpServers || [];

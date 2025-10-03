@@ -73,6 +73,20 @@
             <stacked-bar-chart [data]="buildsAsGraphData(overview.stats.builds)" [compact]="true" />
           </div>
         </div>
+        @if (overview.stats.tests) {
+          <div class="chart-container test-results-details">
+            <h3 class="chart-title">
+              <span class="material-symbols-outlined"> quiz </span>
+              <span>Tests</span>
+            </h3>
+            <div class="summary-card-item">
+              <stacked-bar-chart
+                [data]="testsAsGraphData(overview.stats.tests)"
+                [compact]="true"
+              />
+            </div>
+          </div>
+        }
         @if (overview.stats.runtime) {
           <div class="chart-container">
             <h3 class="chart-title">
@@ -281,8 +295,18 @@
                   <span class="status-badge error">Initial build failed</span>
                 }
 
-                @if (hasBuildFailureDuringA11yRepair(result)) {
+                @if (hasBuildFailureDuringTestRepair(result)) {
                   <span class="status-badge error">Build failed after a11y repair</span>
+                }
+                <!-- Test status badges -->
+                @if (finalAttempt.testResult) {
+                  @if (finalAttempt.testResult.passed) {
+                    @if ((result.testRepairAttempts || 0) > 0) {
+                      <span class="status-badge warning">Tests passed after repair</span>
+                    }
+                  } @else {
+                    <span class="status-badge error">Tests failed</span>
+                  }
                 }
               </div>
             </div>
@@ -355,12 +379,36 @@
                 </div>
               </div>
 
+              @if (result.testResult) {
+                <div class="app-details-section">
+                  <h4>Test Results</h4>
+                  <div class="test-summary">
+                    @if (result.testResult.passed) {
+                      <span class="status-text success">✔ Tests passed</span>
+                      @if ((result.testRepairAttempts || 0) > 0) {
+                        <span class="status-text">&nbsp;after {{ result.testRepairAttempts }} repair attempt(s)</span>
+                      }
+                    } @else {
+                      <span class="status-text error">✘ Tests failed</span>
+                    }
+                  </div>
+                  
+                  @if (result.testResult.output && !result.testResult.passed) {
+                    <details class="test-output-button">
+                      <summary class="neutral-button">See Test Output</summary>
+                      <pre class="callout neutral code">{{ result.testResult.output }}</pre>
+                    </details>
+                  }
+                </div>
+              }
+
               <div class="app-details-section">
                 <h4>Additional info</h4>
                 @for (attempt of result.attemptDetails; track attempt) {
                   @let isBuilt = attempt.buildResult.status === 'success';
                   @let axeViolations = attempt.serveTestingResult?.axeViolations;
                   @let hasAxeViolations = axeViolations && axeViolations.length > 0;
+                  @let testsFailed = attempt.testResult?.passed === false;
 
                   <expansion-panel #expansionPanel>
                     <expansion-panel-header>
@@ -383,6 +431,15 @@
                           [class.error]="hasAxeViolations"
                           [class.success]="!hasAxeViolations"
                           >A11y</span
+                        >
+                      }
+
+                      @if (attempt.testResult) {
+                        <span
+                          class="status-badge"
+                          [class.error]="!attempt.testResult.passed"
+                          [class.success]="attempt.testResult.passed"
+                          >Tests</span
                         >
                       }
                     </expansion-panel-header>
@@ -419,6 +476,11 @@
                             }
                           </ul>
                         </pre>
+                      }
+
+                      @if (testsFailed) {
+                        <h4>Failed Tests</h4>
+                        <pre class="callout neutral code">{{ attempt.testResult?.output }}</pre>
                       }
 
                       <h4>Generated Code</h4>

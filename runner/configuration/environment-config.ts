@@ -15,11 +15,6 @@ const environmentConfigSchema = z.union([
  */
 export type EnvironmentConfig = z.infer<typeof environmentConfigSchema>;
 
-/** Package managers that are currently supported. */
-export function getPossiblePackageManagers() {
-  return ['npm', 'pnpm', 'yarn'] as const;
-}
-
 /** Asserts that the specified data is a valid environment config. */
 export function assertIsEnvironmentConfig(value: unknown): asserts value is EnvironmentConfig {
   const validationResult = environmentConfigSchema.safeParse(value);

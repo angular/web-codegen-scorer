@@ -2,7 +2,14 @@ import {greenCheckmark, redX} from '../reporting/format.js';
 import {AssessmentResult, RootPromptDefinition} from '../shared-interfaces.js';
 
 /** Possible progress event types. */
-export type ProgressType = 'codegen' | 'build' | 'serve-testing' | 'success' | 'error' | 'eval';
+export type ProgressType =
+  | 'codegen'
+  | 'build'
+  | 'test'
+  | 'serve-testing'
+  | 'success'
+  | 'error'
+  | 'eval';
 
 /** Maps a ProgressType to an icon that can represent it. */
 export function progressTypeToIcon(type: ProgressType): string {
@@ -12,6 +19,8 @@ export function progressTypeToIcon(type: ProgressType): string {
       return '🤖';
     case 'build':
       return '🔨';
+    case 'test':
+      return '🧪';
     case 'serve-testing':
       return '🌊';
     case 'success':

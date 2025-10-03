@@ -7,6 +7,7 @@ import {
   LlmResponse,
   LlmResponseFile,
   RootPromptDefinition,
+  TestExecutionResult,
 } from '../shared-interfaces.js';
 import {BuildResult} from '../workers/builder/builder-types.js';
 
@@ -25,7 +26,7 @@ export interface Gateway<Env extends Environment> {
     abortSignal: AbortSignal,
   ): Promise<LlmResponse>;
 
-  repairBuild(
+  repairCode(
     id: EvalID,
     requestCtx: LlmGenerateFilesContext,
     model: string,
@@ -46,6 +47,18 @@ export interface Gateway<Env extends Environment> {
     abortSignal: AbortSignal,
     progress: ProgressLogger,
   ): Promise<BuildResult>;
+
+  tryTest(
+    id: EvalID,
+    env: Env,
+    appDirectoryPath: string,
+    rootPromptDef: RootPromptDefinition,
+    workerConcurrencyQueue: PQueue,
+    abortSignal: AbortSignal,
+    progress: ProgressLogger,
+  ): Promise<TestExecutionResult | null>;
+
+  shouldRetryFailedTestExecution(evalID: EvalID): boolean;
 
   serveBuild<T>(
     id: EvalID,

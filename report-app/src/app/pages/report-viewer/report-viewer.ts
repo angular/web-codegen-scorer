@@ -25,6 +25,7 @@ import {
   LlmResponseFile,
   RunInfo,
   RunSummaryBuilds,
+  RunSummaryTests,
   RuntimeStats,
   ScoreBucket,
   SkippedIndividualAssessment,
@@ -271,6 +272,31 @@ export class ReportViewer {
     ];
   }
 
+  protected testsAsGraphData(tests: RunSummaryTests): StackedBarChartData {
+    return [
+      {
+        label: 'Passed',
+        color: ScoreCssVariable.excellent,
+        value: tests.successfulInitialTests,
+      },
+      {
+        label: 'Passed after repair',
+        color: ScoreCssVariable.great,
+        value: tests.successfulTestsAfterRepair,
+      },
+      {
+        label: 'Failed',
+        color: ScoreCssVariable.poor,
+        value: tests.failedTests,
+      },
+      {
+        label: 'No tests run',
+        color: ScoreCssVariable.neutral,
+        value: tests.noTestsRun,
+      },
+    ];
+  }
+
   protected checksAsGraphData(buckets: ScoreBucket[]): StackedBarChartData {
     return buckets.map(b => ({
       label: b.nameWithLabels,
@@ -427,7 +453,7 @@ export class ReportViewer {
     return `wcs run --prompt=${result.promptDef.name} --env=<path to ${report.details.summary.environmentId} config>`;
   }
 
-  protected hasBuildFailureDuringA11yRepair(result: AssessmentResult): boolean {
-    return result.attemptDetails.some(attempt => attempt.buildFailedDuringA11yRepair);
+  protected hasBuildFailureDuringTestRepair(result: AssessmentResult): boolean {
+    return result.attemptDetails.some(attempt => attempt.buildFailedDuringTestRepair);
   }
 }
