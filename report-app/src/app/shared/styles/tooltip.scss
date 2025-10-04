@@ -1,0 +1,39 @@
+@mixin tooltip-styles {
+  .has-tooltip {
+    position: relative;
+
+    &::before {
+      font-family: var(--font-family);
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--tooltip-background-color);
+      color: var(--tooltip-text-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+      opacity: 0;
+      visibility: hidden;
+      overflow: hidden;
+      white-space: nowrap;
+      transition:
+        opacity 0.2s ease-in-out,
+        visibility 0.2s ease-in-out;
+      z-index: 10;
+      display: block;
+    }
+
+    &.multiline-tooltip::before {
+      white-space: normal;
+      max-width: 400px;
+    }
+
+    &:hover::before {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}

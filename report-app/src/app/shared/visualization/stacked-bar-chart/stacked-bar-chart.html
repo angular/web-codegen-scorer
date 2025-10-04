@@ -8,8 +8,8 @@
           [style.width.%]="asPercent(item.value)"
           [style.background-color]="item.color"
           (click)="toggleDisplayMode()"
-          [attr.data-tooltip]="showLegend() ? null : item.label"
-        >
+          [class.has-tooltip]="!showLegend()"
+          [attr.data-tooltip]="item.label">
           {{ getItemDisplayValue(item) }}
         </div>
       }

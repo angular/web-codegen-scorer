@@ -13,12 +13,8 @@ import {
   viewChild,
 } from '@angular/core';
 import {NgxJsonViewerModule} from 'ngx-json-viewer';
+import {BuildErrorType} from '../../../../../runner/workers/builder/builder-types';
 import {
-  BuildErrorType,
-  BuildResultStatus,
-} from '../../../../../runner/workers/builder/builder-types';
-import {
-  AiChatResponse,
   AssessmentResult,
   IndividualAssessment,
   IndividualAssessmentState,
@@ -44,8 +40,8 @@ import {bucketToScoreVariable, formatScore, ScoreCssVariable} from '../../shared
 import {ExpansionPanel} from '../../shared/expansion-panel/expansion-panel';
 import {ExpansionPanelHeader} from '../../shared/expansion-panel/expansion-panel-header';
 import {ProviderLabel} from '../../shared/provider-label';
-import {firstValueFrom} from 'rxjs';
 import {AiAssistant} from '../../shared/ai-assistant/ai-assistant';
+import {LighthouseCategory} from './lighthouse-category';
 
 const localReportRegex = /-l\d+$/;
 
@@ -63,6 +59,7 @@ const localReportRegex = /-l\d+$/;
     ProviderLabel,
     NgxJsonViewerModule,
     AiAssistant,
+    LighthouseCategory,
   ],
   templateUrl: './report-viewer.html',
   styleUrls: ['./report-viewer.scss'],

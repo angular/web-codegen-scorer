@@ -26,6 +26,7 @@ export async function serveAndTestApp(
   skipScreenshots: boolean,
   skipAxeTesting: boolean,
   enableAutoCsp: boolean,
+  skipLighthouse: boolean,
   userJourneyAgentTaskInput?: BrowserAgentTaskInput,
 ): Promise<ServeTestingResult> {
   progress.log(rootPromptDef, 'serve-testing', `Testing the app`);
@@ -43,6 +44,7 @@ export async function serveAndTestApp(
         enableAutoCsp,
         includeAxeTesting: skipAxeTesting === false,
         takeScreenshots: skipScreenshots === false,
+        includeLighthouseData: skipLighthouse === false,
         userJourneyAgentTaskInput,
       };
 
