@@ -182,18 +182,6 @@
       </expansion-panel>
     }
 
-    <button #aiAssistButton class="fab" (click)="isAiAssistantVisible.set(true)">
-      <span class="material-symbols-outlined">smart_toy</span>
-    </button>
-
-    @defer (on interaction(aiAssistButton)) {
-      <app-ai-assistant
-        [class.hidden]="!isAiAssistantVisible()"
-        [reportGroupId]="reportGroupId()"
-        (close)="isAiAssistantVisible.set(false)"
-      />
-    }
-
     @if (missingDeps().length > 0) {
       <expansion-panel size="large" class="root-section">
         <expansion-panel-header>
@@ -236,6 +224,18 @@
         <h4>Logs</h4>
         <pre class="callout neutral code">{{ details.mcp.logs }}</pre>
       </expansion-panel>
+    }
+
+    <button #aiAssistButton class="fab" (click)="isAiAssistantVisible.set(true)">
+      <span class="material-symbols-outlined">smart_toy</span>
+    </button>
+
+    @defer (on interaction(aiAssistButton)) {
+      <app-ai-assistant
+        [class.hidden]="!isAiAssistantVisible()"
+        [reportGroupId]="reportGroupId()"
+        (close)="isAiAssistantVisible.set(false)"
+      />
     }
 
     <h2>Generated applications</h2>
