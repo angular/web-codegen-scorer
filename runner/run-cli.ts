@@ -14,7 +14,7 @@ import {serveApp} from './workers/serve-testing/serve-app.js';
 import {ProgressLogger, ProgressType} from './progress/progress-logger.js';
 import {formatTitleCard, redX} from './reporting/format.js';
 import {NoopProgressLogger} from './progress/noop-progress-logger.js';
-import {LocalEnvironment} from './configuration/environment-local.js';
+import {LocalExecutor} from './orchestration/executors/local-executor.js';
 
 export const RunModule = {
   builder,
@@ -61,7 +61,7 @@ async function runApp(options: Options) {
   const {environment, rootPromptDef, files} = await resolveConfig(options);
   const progress = new ErrorOnlyProgressLogger();
 
-  if (!(environment instanceof LocalEnvironment)) {
+  if (!(environment.executor instanceof LocalExecutor)) {
     console.error(`${redX()} Unable to run eval app locally for a remote environment.`);
     return;
   }
@@ -92,7 +92,7 @@ async function runApp(options: Options) {
     await writeResponseFiles(directory, files, environment, rootPromptDef.name);
 
     await serveApp(
-      environment.serveCommand,
+      environment.executor.getServeCommand(),
       rootPromptDef,
       directory,
       new NoopProgressLogger(),

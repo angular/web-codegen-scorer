@@ -1,6 +1,6 @@
 // @ts-check
 
-import { getBuiltInRatings } from 'web-codegen-scorer';
+import {getBuiltInRatings} from 'web-codegen-scorer';
 
 /** @type {import("web-codegen-scorer").EnvironmentConfig} */
 export default {
@@ -11,5 +11,4 @@ export default {
   generationSystemPrompt: './system-instructions.md',
   executablePrompts: ['../../prompts/**/*.md'],
   packageManager: 'npm',
-  buildCommand: '',
 };

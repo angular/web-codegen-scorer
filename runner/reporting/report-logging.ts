@@ -16,9 +16,8 @@ import {
   formatTitleCard,
 } from './format.js';
 import {Environment} from '../configuration/environment.js';
-import {LlmRunner} from '../codegen/llm-runner.js';
 import {groupSimilarReports} from '../orchestration/grouping.js';
-import {LocalEnvironment} from '../configuration/environment-local.js';
+import {LocalExecutor} from '../orchestration/executors/local-executor.js';
 
 /**
  * Generates a structured report on fs, based on the assessment run information.
@@ -135,7 +134,7 @@ export async function writeReportToDisk(runInfo: RunInfo, id: string): Promise<v
 }
 
 /** Logs information about a report at the beginning of a run. */
-export function logReportHeader(
+export async function logReportHeader(
   env: Environment,
   promptsToProcess: number,
   concurrency: number,
@@ -145,7 +144,9 @@ export function logReportHeader(
     startMcp?: boolean;
     autoraterModel?: string;
   },
-): void {
+): Promise<void> {
+  const executorInfo = await env.executor.getExecutorInfo();
+  const mcpServerCount = executorInfo?.mcpServersLaunched ?? null;
   const titleCardText = [
     'Running a codegen evaluation with configuration:',
     '',
@@ -154,9 +155,9 @@ export function logReportHeader(
     options.autoraterModel && options.autoraterModel !== DEFAULT_AUTORATER_MODEL_NAME
       ? ` - Autorater model: ${options.autoraterModel}`
       : null,
-    ` - Runner: ${env instanceof LocalEnvironment ? env.llm.displayName : 'Remote'}`,
-    env instanceof LocalEnvironment
-      ? ` - MCP servers: ${options.startMcp && env.mcpServerOptions.length ? env.mcpServerOptions.length : 'none'}`
+    ` - Runner: ${executorInfo.displayName}`,
+    mcpServerCount !== null
+      ? ` - MCP servers: ${options.startMcp && mcpServerCount > 0 ? mcpServerCount : 'none'}`
       : null,
     options.labels.length ? ` - Labels: ${options.labels.join(', ')}` : null,
     ` - Concurrency: ${concurrency}`,

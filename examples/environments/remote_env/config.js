@@ -1,18 +1,18 @@
 // @ts-check
 
 /**
- * @import {RemoteEnvironmentConfig} from 'web-codegen-scorer';
+ * @import {EnvironmentConfig} from 'web-codegen-scorer';
  */
 
-import { getBuiltInRatings } from 'web-codegen-scorer';
-import { FakeRemoteGateway } from './fake-gateway';
+import {getBuiltInRatings} from 'web-codegen-scorer';
+import {FakeRemoteExecutor} from './fake-executor';
 
-/** @type {RemoteEnvironmentConfig} */
+/** @type {EnvironmentConfig} */
 export default {
   displayName: 'Remote Env (example)',
   clientSideFramework: 'angular',
   ratings: getBuiltInRatings(),
   generationSystemPrompt: './system-instructions.md',
   executablePrompts: ['../../prompts/**/*.md'],
-  gateway: new FakeRemoteGateway(),
+  executor: new FakeRemoteExecutor(),
 };

@@ -547,3 +547,20 @@ export interface RunGroup {
   /** Runner used to generate code for the runs in the group. */
   runner?: CodegenRunnerInfo;
 }
+
+/** Request information for a file generation. */
+export interface LlmGenerateFilesRequest {
+  /** System instructions that should be included. */
+  systemInstructions: string;
+  /** Prompt being executed. */
+  executablePrompt: string;
+  /**
+   * Combined system instructions and prompt for the environments
+   * where the two can't be provided separately.
+   *
+   * TODO(crisbeto): Can we explain the reason for this better?
+   */
+  combinedPrompt: string;
+  /** Directory in which the generation will occur. */
+  directory: string;
+}

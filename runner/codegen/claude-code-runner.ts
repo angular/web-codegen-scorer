@@ -1,4 +1,8 @@
-import {LlmGenerateFilesContext, LlmGenerateFilesRequestOptions, LlmRunner} from './llm-runner.js';
+import {
+  LocalLlmGenerateFilesContext,
+  LocalLlmGenerateFilesRequestOptions,
+  LlmRunner,
+} from './llm-runner.js';
 import {join} from 'path';
 import {mkdirSync} from 'fs';
 import {writeFile} from 'fs/promises';
@@ -25,7 +29,7 @@ export class ClaudeCodeRunner extends BaseCliAgentRunner implements LlmRunner {
     return Object.keys(MODEL_MAPPING);
   }
 
-  protected getCommandLineFlags(options: LlmGenerateFilesRequestOptions): string[] {
+  protected getCommandLineFlags(options: LocalLlmGenerateFilesRequestOptions): string[] {
     return [
       '--print',
       '--model',
@@ -39,7 +43,7 @@ export class ClaudeCodeRunner extends BaseCliAgentRunner implements LlmRunner {
     ];
   }
 
-  protected async writeAgentFiles(options: LlmGenerateFilesRequestOptions): Promise<void> {
+  protected async writeAgentFiles(options: LocalLlmGenerateFilesRequestOptions): Promise<void> {
     const {context} = options;
     const instructionFilePath = join(context.directory, 'CLAUDE.md');
     const settingsDir = join(context.directory, '.claude');
@@ -52,7 +56,7 @@ export class ClaudeCodeRunner extends BaseCliAgentRunner implements LlmRunner {
     ]);
   }
 
-  private getSettingsJsonFile(context: LlmGenerateFilesContext): string {
+  private getSettingsJsonFile(context: LocalLlmGenerateFilesContext): string {
     const ignoredPatterns = super.getCommonIgnorePatterns();
     const deniedPermissions: string[] = [
       // Block some commands like `git` and `npm install` since they aren't relevant for the evals.

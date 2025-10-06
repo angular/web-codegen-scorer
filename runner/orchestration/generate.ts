@@ -5,11 +5,7 @@ import {randomUUID} from 'crypto';
 import PQueue from 'p-queue';
 import {basename, join} from 'path';
 import {existsSync, readdirSync} from 'fs';
-import {
-  assertValidModelName,
-  LlmGenerateFilesContext,
-  LlmGenerateFilesResponse,
-} from '../codegen/llm-runner.js';
+import {assertValidModelName, LocalLlmGenerateFilesResponse} from '../codegen/llm-runner.js';
 import {
   DEFAULT_AUTORATER_MODEL_NAME,
   LLM_OUTPUT_DIR,
@@ -24,6 +20,7 @@ import {
   AttemptDetails,
   CompletionStats,
   LlmContextFile,
+  LlmGenerateFilesRequest,
   MultiStepPromptDefinition,
   PromptDefinition,
   RootPromptDefinition,
@@ -40,7 +37,6 @@ import {generateUserJourneysForApp} from './user-journeys.js';
 import {resolveContextFiles, setupProjectStructure, writeResponseFiles} from './file-system.js';
 import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 import {getEnvironmentByPath} from '../configuration/environment-resolution.js';
-import {getPossiblePackageManagers} from '../configuration/environment-config.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {TextProgressLogger} from '../progress/text-progress-logger.js';
 import {logReportHeader} from '../reporting/report-logging.js';
@@ -48,10 +44,10 @@ import {DynamicProgressLogger} from '../progress/dynamic-progress-logger.js';
 import {UserFacingError} from '../utils/errors.js';
 import {getRunGroupId} from './grouping.js';
 import {executeCommand} from '../utils/exec.js';
-import {EvalID, Gateway} from './gateway.js';
-import {LocalEnvironment} from '../configuration/environment-local.js';
 import {getRunnerByName} from '../codegen/runner-creation.js';
 import {summarizeReportWithAI} from '../reporting/report-ai-summary.js';
+import {LocalExecutor} from './executors/local-executor.js';
+import {EvalID} from './executors/executor.js';
 
 /**
  * Orchestrates the entire assessment process for each prompt defined in the `prompts` array.
@@ -69,10 +65,7 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
   const env = await getEnvironmentByPath(options.environmentConfigPath, options.runner);
   const ratingLlm = await getRunnerByName('genkit');
 
-  // TODO(devversion): Consider validating model names also for remote environments.
-  if (env instanceof LocalEnvironment) {
-    assertValidModelName(options.model, env.llm.getSupportedModels());
-  }
+  await assertValidModelName(options.model, env.executor);
 
   try {
     const promptsToProcess = getCandidateExecutablePrompts(
@@ -105,13 +98,8 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
     // We need Chrome to collect runtime information.
     await installChrome();
 
-    if (
-      env instanceof LocalEnvironment &&
-      options.startMcp &&
-      env.mcpServerOptions.length &&
-      env.llm.startMcpServerHost
-    ) {
-      env.llm.startMcpServerHost(`mcp-${env.clientSideFramework.id}`, env.mcpServerOptions);
+    if (options.startMcp && env.executor instanceof LocalExecutor) {
+      env.executor.startMcpServerHost(`mcp-${env.clientSideFramework.id}`);
     }
 
     progress.initialize(promptsToProcess.length);
@@ -133,7 +121,7 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
     for (const rootPromptDef of promptsToProcess) {
       allTasks.push(
         appConcurrencyQueue.add(async () => {
-          const evalID = await env.gateway.initializeEval();
+          const evalID = await env.executor.initializeEval();
           let results: AssessmentResult[] | undefined;
 
           try {
@@ -144,7 +132,6 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
                   options,
                   evalID,
                   env,
-                  env.gateway,
                   ratingLlm,
                   rootPromptDef,
                   abortSignal,
@@ -171,7 +158,7 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
             return [] satisfies AssessmentResult[];
           } finally {
             progress.evalFinished(rootPromptDef, results || []);
-            await env.gateway.finalizeEval(evalID);
+            await env.executor.finalizeEval(evalID);
           }
         }),
       );
@@ -186,19 +173,8 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
     progress.finalize();
 
     const mcp =
-      env instanceof LocalEnvironment &&
-      options.startMcp &&
-      env.mcpServerOptions.length > 0 &&
-      env.llm.startMcpServerHost &&
-      env.llm.flushMcpServerLogs
-        ? {
-            servers: env.mcpServerOptions.map(m => ({
-              name: m.name,
-              command: m.command,
-              args: m.args,
-            })),
-            logs: env.llm.flushMcpServerLogs().join('\n'),
-          }
+      env.executor instanceof LocalExecutor && options.startMcp
+        ? await env.executor.collectMcpServerLogs()
         : undefined;
 
     const timestamp = new Date();
@@ -232,9 +208,7 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
       details,
     } satisfies RunInfo;
   } finally {
-    if (env instanceof LocalEnvironment) {
-      await env.llm.dispose();
-    }
+    await env.executor.destroy();
   }
 }
 
@@ -247,7 +221,6 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
  *
  * @param evalID ID of the evaluation task.
  * @param env Environment for this evaluation.
- * @param gateway Gateway.
  * @param model Name of the LLM to use.
  * @param rootPromptDef Definition of the root prompt being processed.
  * @param localMode A boolean indicating whether to load code from local files instead of generating it.
@@ -263,7 +236,6 @@ async function startEvaluationTask(
   config: AssessmentConfig,
   evalID: EvalID,
   env: Environment,
-  gateway: Gateway<Environment>,
   ratingLlm: GenkitRunner,
   rootPromptDef: PromptDefinition | MultiStepPromptDefinition,
   abortSignal: AbortSignal,
@@ -302,9 +274,6 @@ async function startEvaluationTask(
         systemInstructions,
         combinedPrompt: fullPromptText,
         executablePrompt: promptDef.prompt,
-        packageManager: env instanceof LocalEnvironment ? env.packageManager : undefined,
-        buildCommand: env instanceof LocalEnvironment ? env.buildCommand : undefined,
-        possiblePackageManagers: getPossiblePackageManagers().slice(),
       },
       contextFiles,
       abortSignal,
@@ -378,7 +347,6 @@ async function startEvaluationTask(
     const attempt = await attemptBuild(
       config,
       evalID,
-      gateway,
       env,
       rootPromptDef,
       directory,
@@ -436,7 +404,6 @@ async function startEvaluationTask(
 /**
  * Generates the initial files for a prompt using an LLM.
  * @param evalID ID of the eval for which files are generated.
- * @param gateway Gateway.
  * @param model Name of the model used for generation.
  * @param env Environment that is currently being run.
  * @param promptName Name of the prompt being generated.
@@ -450,11 +417,11 @@ async function generateInitialFiles(
   evalID: EvalID,
   env: Environment,
   promptDef: RootPromptDefinition,
-  codegenContext: LlmGenerateFilesContext,
+  codegenRequest: LlmGenerateFilesRequest,
   contextFiles: LlmContextFile[],
   abortSignal: AbortSignal,
   progress: ProgressLogger,
-): Promise<LlmGenerateFilesResponse> {
+): Promise<LocalLlmGenerateFilesResponse> {
   if (options.localMode) {
     const localFilesDirectory = join(LLM_OUTPUT_DIR, env.id, promptDef.name);
     const filePaths = globSync('**/*', {cwd: localFilesDirectory});
@@ -482,9 +449,9 @@ async function generateInitialFiles(
 
   progress.log(promptDef, 'codegen', 'Generating code with AI');
 
-  const response = await env.gateway.generateInitialFiles(
+  const response = await env.executor.generateInitialFiles(
     evalID,
-    codegenContext,
+    codegenRequest,
     options.model,
     contextFiles,
     abortSignal,
@@ -564,6 +531,8 @@ async function prepareSummary(
     }
   }
 
+  const executorInfo = await env.executor.getExecutorInfo?.();
+
   return {
     model,
     environmentId: env.id,
@@ -586,8 +555,8 @@ async function prepareSummary(
       totalTokens,
     },
     runner: {
-      id: env instanceof LocalEnvironment ? env.llm.id : 'remote',
-      displayName: env instanceof LocalEnvironment ? env.llm.displayName : 'Remote',
+      id: executorInfo.id,
+      displayName: executorInfo.displayName,
     },
   } satisfies RunSummary;
 }
