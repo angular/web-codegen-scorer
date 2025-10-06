@@ -11,10 +11,19 @@ import {MessageSpinner} from '../../shared/message-spinner';
 import {Score} from '../../shared/score/score';
 import {ProviderLabel} from '../../shared/provider-label';
 import {bucketToScoreVariable} from '../../shared/scoring';
+import {MultiSelect} from '../../shared/multi-select/multi-select';
 
 @Component({
   selector: 'app-report-list',
-  imports: [RouterLink, DatePipe, StackedBarChart, MessageSpinner, Score, ProviderLabel],
+  imports: [
+    RouterLink,
+    DatePipe,
+    StackedBarChart,
+    MessageSpinner,
+    Score,
+    ProviderLabel,
+    MultiSelect,
+  ],
   templateUrl: './report-list.html',
   styleUrls: ['./report-list.scss'],
 })
@@ -30,6 +39,7 @@ export class ReportListComponent {
   protected selectedFramework = signal<string | null>(null);
   protected selectedModel = signal<string | null>(null);
   protected selectedRunner = signal<string | null>(null);
+  protected selectedLabels = signal<string[]>([]);
 
   protected allFrameworks = computed(() => {
     const frameworks = new Map<string, string>();
@@ -67,17 +77,40 @@ export class ReportListComponent {
     }));
   });
 
+  protected allLabels = computed(() => {
+    const labels = new Set<string>();
+
+    for (const group of this.allGroups()) {
+      for (const label of group.labels) {
+        const trimmed = label.trim();
+
+        if (trimmed) {
+          labels.add(trimmed);
+        }
+      }
+    }
+
+    return Array.from(labels)
+      .sort()
+      .map(label => ({
+        label,
+        value: label,
+      }));
+  });
+
   protected reportGroups = computed(() => {
     const framework = this.selectedFramework();
     const model = this.selectedModel();
     const runner = this.selectedRunner();
+    const labels = this.selectedLabels();
     const groups = this.allGroups();
 
     return groups.filter(group => {
       const frameworkMatch = !framework || group.framework.fullStackFramework.id === framework;
       const modelMatch = !model || group.model === model;
       const runnerMatch = !runner || group.runner?.id === runner;
-      return frameworkMatch && modelMatch && runnerMatch;
+      const labelsMatch = labels.length === 0 || group.labels.some(l => labels.includes(l.trim()));
+      return frameworkMatch && modelMatch && runnerMatch && labelsMatch;
     });
   });
 
