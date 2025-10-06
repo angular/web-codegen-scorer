@@ -16,6 +16,7 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "externalDependencies": [
+              "firebase-admin",
               "@firebase/app",
               "@firebase/firestore",
               "tiktoken",

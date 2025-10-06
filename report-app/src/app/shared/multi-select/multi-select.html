@@ -1,0 +1,19 @@
+<button
+  [class.open]="isOpen()"
+  (click)="isOpen.set(!isOpen())"
+  (keydown.escape)="isOpen.set(false)">
+  {{label()}}
+
+  <div class="dropdown">
+    @for (option of options(); track option.value) {
+      <label>
+        <input
+          type="checkbox"
+          [checked]="selected().includes(option.value)"
+          (change)="optionClicked(option)"
+        />
+        {{ option.label }}
+      </label>
+    }
+  </div>
+</button>
