@@ -78,8 +78,8 @@ importers:
         specifier: ^3.3.2
         version: 3.3.2
       p-queue:
-        specifier: ^8.1.0
-        version: 8.1.1
+        specifier: ^9.0.0
+        version: 9.0.0
       puppeteer:
         specifier: ^24.10.1
         version: 24.22.3(typescript@5.9.3)
@@ -5288,13 +5288,13 @@ packages:
     resolution: {integrity: sha512-VkndIv2fIB99swvQoA65bm+fsmt6UNdGeIB0oxBs+WhAhdh08QA04JXpI7rbB9r08/nkbysKoya9rtDERYOYMA==}
     engines: {node: '>=18'}
 
-  p-queue@8.1.1:
-    resolution: {integrity: sha512-aNZ+VfjobsWryoiPnEApGGmf5WmNsCo9xu8dfaYamG5qaLP7ClhLN6NgsFe6SwJ2UbLEBK5dv9x8Mn5+RVhMWQ==}
-    engines: {node: '>=18'}
+  p-queue@9.0.0:
+    resolution: {integrity: sha512-KO1RyxstL9g1mK76530TExamZC/S2Glm080Nx8PE5sTd7nlduDQsAfEl4uXX+qZjLiwvDauvzXavufy3+rJ9zQ==}
+    engines: {node: '>=20'}
 
-  p-timeout@6.1.4:
-    resolution: {integrity: sha512-MyIV3ZA/PmyBN/ud8vV9XzwTrNtR4jFrObymZYnZqMmW0zA8Z17vnT0rBgFE/TlohB+YCHqXMgZzb3Csp49vqg==}
-    engines: {node: '>=14.16'}
+  p-timeout@7.0.0:
+    resolution: {integrity: sha512-DhZ7ydOE3JXtXzDf2wz/KEamkKAD7Il5So09I2tOz4i+9pLcdghDKKmODkkoHKJ0TyczmhcHNxyTeTrsENT81A==}
+    engines: {node: '>=20'}
 
   pac-proxy-agent@7.2.0:
     resolution: {integrity: sha512-TEB8ESquiLMc0lV8vcd5Ql/JAKAoyzHFXaStwjkzpOpC5Yv+pIzLfHvjTSdf3vpa2bMiUQrg9i6276yn8666aA==}
@@ -12821,12 +12821,12 @@ snapshots:
 
   p-map@7.0.3: {}
 
-  p-queue@8.1.1:
+  p-queue@9.0.0:
     dependencies:
       eventemitter3: 5.0.1
-      p-timeout: 6.1.4
+      p-timeout: 7.0.0
 
-  p-timeout@6.1.4: {}
+  p-timeout@7.0.0: {}
 
   pac-proxy-agent@7.2.0:
     dependencies:

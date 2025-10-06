@@ -152,60 +152,57 @@ export async function generateCodeAndAssess(options: {
 
     for (const rootPromptDef of promptsToProcess) {
       allTasks.push(
-        appConcurrencyQueue.add(
-          async () => {
-            const evalID = await env.gateway.initializeEval();
-            let results: AssessmentResult[] | undefined;
+        appConcurrencyQueue.add(async () => {
+          const evalID = await env.gateway.initializeEval();
+          let results: AssessmentResult[] | undefined;
 
-            try {
-              results = await callWithTimeout(
-                `Evaluation of ${rootPromptDef.name}`,
-                async abortSignal =>
-                  startEvaluationTask(
-                    evalID,
-                    env,
-                    env.gateway,
-                    ratingLlm,
-                    options.model,
-                    rootPromptDef,
-                    options.localMode,
-                    options.skipScreenshots,
-                    options.outputDirectory,
-                    options.ragEndpoint,
-                    abortSignal,
-                    options.skipAxeTesting,
-                    !!options.enableUserJourneyTesting,
-                    !!options.enableAutoCsp,
-                    workerConcurrencyQueue,
-                    progress,
-                    options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME,
-                    options.a11yRepairAttempts ?? 0,
-                  ),
-                // 10min max per app evaluation.  We just want to make sure it never gets stuck.
-                10,
-              );
-              return results;
-            } catch (e: unknown) {
-              failedPrompts.push({
-                promptName: rootPromptDef.name,
-                error: `${e}`,
-                stack: e instanceof Error ? e.stack : undefined,
-              });
+          try {
+            results = await callWithTimeout(
+              `Evaluation of ${rootPromptDef.name}`,
+              async abortSignal =>
+                startEvaluationTask(
+                  evalID,
+                  env,
+                  env.gateway,
+                  ratingLlm,
+                  options.model,
+                  rootPromptDef,
+                  options.localMode,
+                  options.skipScreenshots,
+                  options.outputDirectory,
+                  options.ragEndpoint,
+                  abortSignal,
+                  options.skipAxeTesting,
+                  !!options.enableUserJourneyTesting,
+                  !!options.enableAutoCsp,
+                  workerConcurrencyQueue,
+                  progress,
+                  options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME,
+                  options.a11yRepairAttempts ?? 0,
+                ),
+              // 10min max per app evaluation.  We just want to make sure it never gets stuck.
+              10,
+            );
+            return results;
+          } catch (e: unknown) {
+            failedPrompts.push({
+              promptName: rootPromptDef.name,
+              error: `${e}`,
+              stack: e instanceof Error ? e.stack : undefined,
+            });
 
-              let details = `Error: ${e}`;
-              if (e instanceof Error && e.stack) {
-                details += `\nStack: ${e.stack}`;
-              }
-
-              progress.log(rootPromptDef, 'error', 'Failed to evaluate code', details);
-              return [] satisfies AssessmentResult[];
-            } finally {
-              progress.evalFinished(rootPromptDef, results || []);
-              await env.gateway.finalizeEval(evalID);
+            let details = `Error: ${e}`;
+            if (e instanceof Error && e.stack) {
+              details += `\nStack: ${e.stack}`;
             }
-          },
-          {throwOnTimeout: true},
-        ),
+
+            progress.log(rootPromptDef, 'error', 'Failed to evaluate code', details);
+            return [] satisfies AssessmentResult[];
+          } finally {
+            progress.evalFinished(rootPromptDef, results || []);
+            await env.gateway.finalizeEval(evalID);
+          }
+        }),
       );
     }
 

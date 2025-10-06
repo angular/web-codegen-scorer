@@ -84,7 +84,6 @@ export class LocalGateway implements Gateway<LocalEnvironment> {
             reject(err);
           });
         }),
-      {throwOnTimeout: true},
     );
   }
 
