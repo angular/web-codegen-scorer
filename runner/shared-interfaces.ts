@@ -4,6 +4,32 @@ import type {UserJourneysResult} from './orchestration/user-journeys.js';
 import type {AutoRateResult} from './ratings/autoraters/auto-rate-shared.js';
 import type {Rating, RatingCategory} from './ratings/rating-types.js';
 import type {ServeTestingResult} from './workers/serve-testing/worker-types.js';
+import type {RunnerName} from './codegen/runner-creation.js';
+
+/** Configuration options necessary for kicking off an assessment run. */
+export interface AssessmentConfig {
+  model: string;
+  runner: RunnerName;
+  environmentConfigPath: string;
+  localMode: boolean;
+  limit: number;
+  concurrency: number | 'auto';
+  reportName: string;
+  skipScreenshots: boolean;
+  startMcp?: boolean;
+  ragEndpoint?: string;
+  outputDirectory?: string;
+  promptFilter?: string;
+  labels: string[];
+  skipAiSummary?: boolean;
+  skipAxeTesting: boolean;
+  enableUserJourneyTesting?: boolean;
+  enableAutoCsp?: boolean;
+  logging?: 'text-only' | 'dynamic';
+  autoraterModel?: string;
+  a11yRepairAttempts?: number;
+  skipLighthouse?: boolean;
+}
 
 /**
  * Represents a single prompt definition and extra metadata for it.
