@@ -19,6 +19,7 @@ import {Environment} from '../configuration/environment.js';
 import {rateGeneratedCode} from '../ratings/rate-code.js';
 import {redX} from '../reporting/format.js';
 import {
+  AssessmentConfig,
   AssessmentResult,
   AttemptDetails,
   CompletionStats,
@@ -49,7 +50,7 @@ import {getRunGroupId} from './grouping.js';
 import {executeCommand} from '../utils/exec.js';
 import {EvalID, Gateway} from './gateway.js';
 import {LocalEnvironment} from '../configuration/environment-local.js';
-import {getRunnerByName, RunnerName} from '../codegen/runner-creation.js';
+import {getRunnerByName} from '../codegen/runner-creation.js';
 import {summarizeReportWithAI} from '../reporting/report-ai-summary.js';
 
 /**
@@ -64,29 +65,7 @@ import {summarizeReportWithAI} from '../reporting/report-ai-summary.js';
  * @returns A Promise that resolves to an array of AssessmentResult objects,
  *          each containing the prompt, generated code, and final validation status.
  */
-export async function generateCodeAndAssess(options: {
-  model: string;
-  runner: RunnerName;
-  environmentConfigPath: string;
-  localMode: boolean;
-  limit: number;
-  concurrency: number | 'auto';
-  reportName: string;
-  skipScreenshots: boolean;
-  startMcp?: boolean;
-  ragEndpoint?: string;
-  outputDirectory?: string;
-  promptFilter?: string;
-  labels: string[];
-  skipAiSummary?: boolean;
-  skipAxeTesting: boolean;
-  enableUserJourneyTesting?: boolean;
-  enableAutoCsp?: boolean;
-  logging?: 'text-only' | 'dynamic';
-  autoraterModel?: string;
-  a11yRepairAttempts?: number;
-  skipLighthouse?: boolean;
-}): Promise<RunInfo> {
+export async function generateCodeAndAssess(options: AssessmentConfig): Promise<RunInfo> {
   const env = await getEnvironmentByPath(options.environmentConfigPath, options.runner);
   const ratingLlm = await getRunnerByName('genkit');
 
@@ -162,25 +141,15 @@ export async function generateCodeAndAssess(options: {
               `Evaluation of ${rootPromptDef.name}`,
               async abortSignal =>
                 startEvaluationTask(
+                  options,
                   evalID,
                   env,
                   env.gateway,
                   ratingLlm,
-                  options.model,
                   rootPromptDef,
-                  options.localMode,
-                  options.skipScreenshots,
-                  options.outputDirectory,
-                  options.ragEndpoint,
                   abortSignal,
-                  options.skipAxeTesting,
-                  !!options.enableUserJourneyTesting,
-                  !!options.enableAutoCsp,
                   workerConcurrencyQueue,
                   progress,
-                  options.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME,
-                  options.a11yRepairAttempts ?? 0,
-                  !!options.skipLighthouse,
                 ),
               // 10min max per app evaluation.  We just want to make sure it never gets stuck.
               10,
@@ -291,32 +260,22 @@ export async function generateCodeAndAssess(options: {
  * @returns A Promise that resolves to an AssessmentResult object containing all details of the task's execution.
  */
 async function startEvaluationTask(
+  config: AssessmentConfig,
   evalID: EvalID,
   env: Environment,
   gateway: Gateway<Environment>,
   ratingLlm: GenkitRunner,
-  model: string,
   rootPromptDef: PromptDefinition | MultiStepPromptDefinition,
-  localMode: boolean,
-  skipScreenshots: boolean,
-  outputDirectory: string | undefined,
-  ragEndpoint: string | undefined,
   abortSignal: AbortSignal,
-  skipAxeTesting: boolean,
-  enableUserJourneyTesting: boolean,
-  enableAutoCsp: boolean,
   workerConcurrencyQueue: PQueue,
   progress: ProgressLogger,
-  autoraterModel: string,
-  a11yRepairAttempts: number,
-  skipLighthouse: boolean,
 ): Promise<AssessmentResult[]> {
   // Set up the project structure once for the root project.
   const {directory, cleanup} = await setupProjectStructure(
     env,
     rootPromptDef,
     progress,
-    outputDirectory,
+    config.outputDirectory,
   );
 
   const results: AssessmentResult[] = [];
@@ -324,7 +283,7 @@ async function startEvaluationTask(
 
   for (const promptDef of defsToExecute) {
     const [fullPromptText, systemInstructions] = await Promise.all([
-      env.getPrompt(promptDef.systemPromptType, promptDef.prompt, ragEndpoint),
+      env.getPrompt(promptDef.systemPromptType, promptDef.prompt, config.ragEndpoint),
       env.getPrompt(promptDef.systemPromptType, ''),
     ]);
 
@@ -334,9 +293,8 @@ async function startEvaluationTask(
 
     // Generate the initial set of files through the LLM.
     const initialResponse = await generateInitialFiles(
+      config,
       evalID,
-      gateway,
-      model,
       env,
       promptDef,
       {
@@ -349,7 +307,6 @@ async function startEvaluationTask(
         possiblePackageManagers: getPossiblePackageManagers().slice(),
       },
       contextFiles,
-      localMode,
       abortSignal,
       progress,
     );
@@ -406,21 +363,22 @@ async function startEvaluationTask(
 
     // TODO: Only execute the serve command on the "final working attempt".
     // TODO: Incorporate usage.
-    const userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined = enableUserJourneyTesting
-      ? {
-          userJourneys: userJourneys.result,
-          appPrompt: defsToExecute[0].prompt,
-        }
-      : undefined;
+    const userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined =
+      config.enableUserJourneyTesting
+        ? {
+            userJourneys: userJourneys.result,
+            appPrompt: defsToExecute[0].prompt,
+          }
+        : undefined;
 
     const attemptDetails: AttemptDetails[] = []; // Store details for assessment.json
 
     // Try to build the files in the root prompt directory.
     // This will also attempt to fix issues with the generated code.
     const attempt = await attemptBuild(
+      config,
       evalID,
       gateway,
-      model,
       env,
       rootPromptDef,
       directory,
@@ -430,12 +388,7 @@ async function startEvaluationTask(
       abortSignal,
       workerConcurrencyQueue,
       progress,
-      skipScreenshots,
-      skipAxeTesting,
-      enableAutoCsp,
-      skipLighthouse,
       userJourneyAgentTaskInput,
-      a11yRepairAttempts,
     );
 
     if (!attempt) {
@@ -455,7 +408,7 @@ async function startEvaluationTask(
       attempt.axeRepairAttempts,
       abortSignal,
       progress,
-      autoraterModel,
+      config.autoraterModel || DEFAULT_AUTORATER_MODEL_NAME,
     );
 
     results.push({
@@ -493,18 +446,16 @@ async function startEvaluationTask(
  * @param abortSignal Signal to fire when this process should be aborted.
  */
 async function generateInitialFiles(
+  options: AssessmentConfig,
   evalID: EvalID,
-  gateway: Gateway<Environment>,
-  model: string,
   env: Environment,
   promptDef: RootPromptDefinition,
   codegenContext: LlmGenerateFilesContext,
   contextFiles: LlmContextFile[],
-  localMode: boolean,
   abortSignal: AbortSignal,
   progress: ProgressLogger,
 ): Promise<LlmGenerateFilesResponse> {
-  if (localMode) {
+  if (options.localMode) {
     const localFilesDirectory = join(LLM_OUTPUT_DIR, env.id, promptDef.name);
     const filePaths = globSync('**/*', {cwd: localFilesDirectory});
 
@@ -531,10 +482,10 @@ async function generateInitialFiles(
 
   progress.log(promptDef, 'codegen', 'Generating code with AI');
 
-  const response = await gateway.generateInitialFiles(
+  const response = await env.gateway.generateInitialFiles(
     evalID,
     codegenContext,
-    model,
+    options.model,
     contextFiles,
     abortSignal,
   );

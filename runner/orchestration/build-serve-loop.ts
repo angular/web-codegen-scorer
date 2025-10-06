@@ -2,7 +2,12 @@ import PQueue from 'p-queue';
 import {LlmGenerateFilesResponse} from '../codegen/llm-runner.js';
 import {BuildResultStatus} from '../workers/builder/builder-types.js';
 import {Environment} from '../configuration/environment.js';
-import {AttemptDetails, LlmContextFile, RootPromptDefinition} from '../shared-interfaces.js';
+import {
+  AssessmentConfig,
+  AttemptDetails,
+  LlmContextFile,
+  RootPromptDefinition,
+} from '../shared-interfaces.js';
 import {DEFAULT_MAX_REPAIR_ATTEMPTS} from '../configuration/constants.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {runBuild} from './build-worker.js';
@@ -31,9 +36,9 @@ import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
  * @param workerConcurrencyQueue Concurrency queue for controlling parallelism of worker invocations (as they are more expensive than LLM calls).
  */
 export async function attemptBuild(
+  config: AssessmentConfig,
   evalID: EvalID,
   gateway: Gateway<Environment>,
-  model: string,
   env: Environment,
   rootPromptDef: RootPromptDefinition,
   directory: string,
@@ -43,12 +48,7 @@ export async function attemptBuild(
   abortSignal: AbortSignal,
   workerConcurrencyQueue: PQueue,
   progress: ProgressLogger,
-  skipScreenshots: boolean,
-  skipAxeTesting: boolean,
-  enableAutoCsp: boolean,
-  skipLighthouse: boolean,
   userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined,
-  maxAxeRepairAttempts: number,
 ) {
   const initialBuildResult = await runBuild(
     evalID,
@@ -93,7 +93,7 @@ export async function attemptBuild(
     const attempt = await repairAndBuild(
       evalID,
       gateway,
-      model,
+      config.model,
       env,
       rootPromptDef,
       directory,
@@ -115,6 +115,7 @@ export async function attemptBuild(
     // Now that we got a working app, try to serve it and collect
     // findings from the running app.
     lastAttempt.serveTestingResult = await serveAndTestApp(
+      config,
       evalID,
       gateway,
       directory,
@@ -123,10 +124,6 @@ export async function attemptBuild(
       workerConcurrencyQueue,
       abortSignal,
       progress,
-      skipScreenshots,
-      skipAxeTesting,
-      enableAutoCsp,
-      skipLighthouse,
       userJourneyAgentTaskInput,
     );
   }
@@ -138,7 +135,7 @@ export async function attemptBuild(
   while (
     lastAttempt.serveTestingResult &&
     (lastAttempt.serveTestingResult.axeViolations?.length ?? 0) > 0 &&
-    axeRepairAttempts < maxAxeRepairAttempts
+    axeRepairAttempts < (config.a11yRepairAttempts ?? 0)
   ) {
     axeRepairAttempts++;
     progress.log(
@@ -158,7 +155,7 @@ export async function attemptBuild(
     const attempt = await repairAndBuild(
       evalID,
       gateway,
-      model,
+      config.model,
       env,
       rootPromptDef,
       directory,
@@ -185,6 +182,7 @@ export async function attemptBuild(
     // Re-run serving & tests after Axe repair.
     // This allows us to check if we fixed the violations.
     attempt.serveTestingResult = await serveAndTestApp(
+      config,
       evalID,
       gateway,
       directory,
@@ -193,10 +191,6 @@ export async function attemptBuild(
       workerConcurrencyQueue,
       abortSignal,
       progress,
-      skipScreenshots,
-      skipAxeTesting,
-      enableAutoCsp,
-      skipLighthouse,
       userJourneyAgentTaskInput,
     );
 

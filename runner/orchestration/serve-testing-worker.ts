@@ -2,7 +2,7 @@ import {ChildProcess, fork} from 'node:child_process';
 import path from 'node:path';
 import {Environment} from '../configuration/environment.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
-import {RootPromptDefinition} from '../shared-interfaces.js';
+import {AssessmentConfig, RootPromptDefinition} from '../shared-interfaces.js';
 import {killChildProcessGracefully} from '../utils/kill-gracefully.js';
 import {
   ServeTestingResult,
@@ -15,6 +15,7 @@ import PQueue from 'p-queue';
 
 /** Attempts to run & test an eval app. */
 export async function serveAndTestApp(
+  config: AssessmentConfig,
   evalID: EvalID,
   gateway: Gateway<Environment>,
   appDirectoryPath: string,
@@ -23,10 +24,6 @@ export async function serveAndTestApp(
   workerConcurrencyQueue: PQueue,
   abortSignal: AbortSignal,
   progress: ProgressLogger,
-  skipScreenshots: boolean,
-  skipAxeTesting: boolean,
-  enableAutoCsp: boolean,
-  skipLighthouse: boolean,
   userJourneyAgentTaskInput?: BrowserAgentTaskInput,
 ): Promise<ServeTestingResult> {
   progress.log(rootPromptDef, 'serve-testing', `Testing the app`);
@@ -41,10 +38,10 @@ export async function serveAndTestApp(
       const serveParams: ServeTestingWorkerMessage = {
         serveUrl,
         appName: rootPromptDef.name,
-        enableAutoCsp,
-        includeAxeTesting: skipAxeTesting === false,
-        takeScreenshots: skipScreenshots === false,
-        includeLighthouseData: skipLighthouse === false,
+        enableAutoCsp: !!config.enableAutoCsp,
+        includeAxeTesting: config.skipAxeTesting === false,
+        takeScreenshots: config.skipScreenshots === false,
+        includeLighthouseData: config.skipLighthouse === false,
         userJourneyAgentTaskInput,
       };
 
