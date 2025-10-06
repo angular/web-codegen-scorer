@@ -28,6 +28,12 @@
             }
           </select>
         }
+        @if (allLabels().length > 0) {
+          <multi-select
+            [options]="allLabels()"
+            [(selected)]="selectedLabels"
+            [label]="selectedLabels().length === 0 ? 'Filter by labels' : `Showing reports with ${selectedLabels().length} label(s)`"/>
+        }
       </div>
       <div class="button-group">
         @if (isCompareMode()) {

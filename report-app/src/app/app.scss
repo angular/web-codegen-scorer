@@ -54,10 +54,10 @@
 .report-body {
   display: flex;
   flex-grow: 1;
-  overflow: hidden;
   max-width: var(--main-container-width);
   margin: auto;
-  padding: 0 1rem 2rem;
+  // Add some padding on the bottom so there's some space for dropdowns to open.
+  padding: 0 1rem 10rem;
 }
 
 .reports-link.active {
