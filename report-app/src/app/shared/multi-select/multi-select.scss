@@ -1,0 +1,61 @@
+:host {
+  display: inline-flex;
+}
+
+button {
+  border-radius: var(--control-border-radius);
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg-color);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0 36px 0 16px;
+  height: var(--control-height);
+  display: inline-block;
+  transition: background-color var(--transition-speed) ease;
+  position: relative;
+  cursor: pointer;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292.4 292.4"><path fill="%23007bff" d="M287 69.4a17.6 17.6 0 0 0-13-5.4H18.4c-5 0-9.3 1.8-12.9 5.4A17.6 17.6 0 0 0 0 82.2c0 5 1.8 9.3 5.4 12.9l128 127.9c3.6 3.6 7.8 5.4 12.8 5.4s9.2-1.8 12.8-5.4L287 95.1c3.6-3.6 5.4-7.8 5.4-12.8 0-5-1.8-9.2-5.4-12.9z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 0.65rem auto;
+
+  &:not(.open):focus, &:not(.open):hover {
+    border-color: var(--accent-blue);
+  }
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--card-bg-color);
+  min-width: 380px;
+  box-shadow: var(--shadow);
+  z-index: 1;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 10px;
+  max-height: 300px;
+  overflow: auto;
+  text-align: left;
+
+  .open & {
+    display: block;
+    color: var(--text-primary);
+  }
+}
+
+label {
+  display: flex;
+  padding: 8px 12px;
+  cursor: pointer;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+label:hover {
+  background-color: #eff6ff;
+  border-radius: var(--border-radius);
+}

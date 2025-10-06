@@ -240,16 +240,11 @@
 
     <h2>Generated applications</h2>
     @if (allFailedChecks().length > 0) {
-      <details class="filter-dropdown" #dropdown>
-        <summary>Filter by failed checks ({{ selectedChecks().size }} selected)</summary>
-        <div class="dropdown-content">
-          <failed-checks-filter
-            [allFailedChecks]="allFailedChecks()"
-            [selectedChecks]="selectedChecks()"
-            (toggleCheck)="toggleCheckFilter($event)"
-          />
-        </div>
-      </details>
+      <multi-select
+        [label]="`Filter by failed checks (${selectedChecks().length} selected)`"
+        [options]="allFailedChecks()"
+        [(selected)]="selectedChecks"
+        class="check-filter"/>
     }
     <div class="apps-list">
       @for (result of filteredResults(); track result) {

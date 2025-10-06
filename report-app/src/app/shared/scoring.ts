@@ -55,8 +55,6 @@ export function getHardcodedColor(
     CACHED_COLORS[colorMode][varName] = value;
   }
 
-  console.log(CACHED_COLORS);
-
   return CACHED_COLORS[colorMode][varName];
 }
 

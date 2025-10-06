@@ -32,7 +32,6 @@ import {
   StackedBarChartData,
 } from '../../shared/visualization/stacked-bar-chart/stacked-bar-chart';
 import {formatFile} from './formatter';
-import {FailedChecksFilter} from './failed-checks-filter';
 import {MessageSpinner} from '../../shared/message-spinner';
 import {createPromptDebuggingZip} from '../../shared/debugging-zip';
 import {Score} from '../../shared/score/score';
@@ -42,6 +41,7 @@ import {ExpansionPanelHeader} from '../../shared/expansion-panel/expansion-panel
 import {ProviderLabel} from '../../shared/provider-label';
 import {AiAssistant} from '../../shared/ai-assistant/ai-assistant';
 import {LighthouseCategory} from './lighthouse-category';
+import {MultiSelect} from '../../shared/multi-select/multi-select';
 
 const localReportRegex = /-l\d+$/;
 
@@ -51,7 +51,6 @@ const localReportRegex = /-l\d+$/;
     CodeViewer,
     DatePipe,
     DecimalPipe,
-    FailedChecksFilter,
     MessageSpinner,
     Score,
     ExpansionPanel,
@@ -60,12 +59,10 @@ const localReportRegex = /-l\d+$/;
     NgxJsonViewerModule,
     AiAssistant,
     LighthouseCategory,
+    MultiSelect,
   ],
   templateUrl: './report-viewer.html',
   styleUrls: ['./report-viewer.scss'],
-  host: {
-    '(document:click)': 'closeDropdownIfOpen($event)',
-  },
 })
 export class ReportViewer {
   private clipboard = inject(Clipboard);
@@ -107,7 +104,7 @@ export class ReportViewer {
     return this.reportsFetcher.reportGroups().find(group => group.id === id);
   });
 
-  protected selectedChecks = signal<Set<string>>(new Set());
+  protected selectedChecks = signal<string[]>([]);
 
   protected allFailedChecks = computed(() => {
     if (!this.selectedReport.hasValue()) {
@@ -136,11 +133,11 @@ export class ReportViewer {
     }
 
     const failedChecksArray = Array.from(failedChecksMap.entries()).map(([name, count]) => ({
-      name,
-      count,
+      label: `${name} (${count})`,
+      value: name,
     }));
 
-    return failedChecksArray.sort((a, b) => a.name.localeCompare(b.name));
+    return failedChecksArray.sort((a, b) => a.label.localeCompare(b.label));
   });
 
   protected filteredResults = computed(() => {
@@ -151,7 +148,7 @@ export class ReportViewer {
       return [];
     }
 
-    if (checks.size === 0) {
+    if (checks.length === 0) {
       return report.results;
     }
 
@@ -164,7 +161,7 @@ export class ReportViewer {
           if (this.isSkippedAssessment(assessment)) {
             continue;
           }
-          if (assessment.successPercentage < 1 && checks.has(assessment.name)) {
+          if (assessment.successPercentage < 1 && checks.includes(assessment.name)) {
             return true;
           }
         }
@@ -351,27 +348,6 @@ export class ReportViewer {
     value: IndividualAssessment | SkippedIndividualAssessment,
   ): value is SkippedIndividualAssessment {
     return value.state === IndividualAssessmentState.SKIPPED;
-  }
-
-  protected dropdownRef = viewChild<ElementRef>('dropdown');
-
-  protected closeDropdownIfOpen(event: MouseEvent): void {
-    const detailsElement = this.dropdownRef()?.nativeElement;
-    if (detailsElement?.hasAttribute('open') && !detailsElement.contains(event.target)) {
-      detailsElement.removeAttribute('open');
-    }
-  }
-
-  protected toggleCheckFilter(check: string): void {
-    this.selectedChecks.update(currentChecks => {
-      const checks = new Set(currentChecks);
-      if (checks.has(check)) {
-        checks.delete(check);
-      } else {
-        checks.add(check);
-      }
-      return checks;
-    });
   }
 
   protected async format(file: LlmResponseFile): Promise<void> {

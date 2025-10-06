@@ -147,51 +147,8 @@ lighthouse-category + lighthouse-category {
   margin-bottom: 2em;
 }
 
-.filter-dropdown {
-  position: relative;
-  display: inline-block;
-
-  margin-bottom: 1.5rem;
-  gap: 0.5rem;
-  background-color: var(--card-bg-color);
-  padding: 0;
-  border-radius: var(--control-border-radius);
-  border: 1px solid var(--border-color);
-  transition: background-color var(--transition-speed) ease;
-
-  &:hover {
-    background-color: var(--button-active-bg-color);
-  }
-
-  & summary {
-    cursor: pointer;
-    padding: 0.5rem 1.25rem;
-    border-radius: 4px;
-    background-color: transparent;
-    list-style: none;
-    font-weight: 500;
-    color: var(--text-secondary);
-    transition: color var(--transition-speed) ease;
-  }
-
-  &[open] .dropdown-content {
-    display: block;
-    color: var(--text-primary);
-  }
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: var(--card-bg-color);
-  min-width: 380px;
-  box-shadow: var(--shadow);
-  z-index: 1;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 10px;
-  max-height: 300px;
-  overflow: auto;
+.check-filter {
+  margin-bottom: 1rem;
 }
 
 .no-failed-checks {
