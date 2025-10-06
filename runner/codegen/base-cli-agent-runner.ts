@@ -3,10 +3,10 @@ import {join, relative} from 'path';
 import {existsSync} from 'fs';
 import assert from 'assert';
 import {
-  LlmConstrainedOutputGenerateResponse,
-  LlmGenerateFilesRequestOptions,
-  LlmGenerateFilesResponse,
-  LlmGenerateTextResponse,
+  LocalLlmConstrainedOutputGenerateResponse,
+  LocalLlmGenerateFilesRequestOptions,
+  LocalLlmGenerateFilesResponse,
+  LocalLlmGenerateTextResponse,
 } from './llm-runner.js';
 import {DirectorySnapshot} from './directory-snapshot.js';
 import {LlmResponseFile} from '../shared-interfaces.js';
@@ -17,8 +17,8 @@ export abstract class BaseCliAgentRunner {
   abstract readonly displayName: string;
   protected abstract readonly binaryName: string;
   protected abstract readonly ignoredFilePatterns: string[];
-  protected abstract getCommandLineFlags(options: LlmGenerateFilesRequestOptions): string[];
-  protected abstract writeAgentFiles(options: LlmGenerateFilesRequestOptions): Promise<void>;
+  protected abstract getCommandLineFlags(options: LocalLlmGenerateFilesRequestOptions): string[];
+  protected abstract writeAgentFiles(options: LocalLlmGenerateFilesRequestOptions): Promise<void>;
   protected inactivityTimeoutMins = 2;
   protected totalRequestTimeoutMins = 10;
 
@@ -27,7 +27,9 @@ export abstract class BaseCliAgentRunner {
   private binaryPath: string | null = null;
   private commonIgnoredPatterns = ['**/node_modules/**', '**/dist/**', '**/.angular/**'];
 
-  async generateFiles(options: LlmGenerateFilesRequestOptions): Promise<LlmGenerateFilesResponse> {
+  async generateFiles(
+    options: LocalLlmGenerateFilesRequestOptions,
+  ): Promise<LocalLlmGenerateFilesResponse> {
     const {context} = options;
 
     // TODO: Consider removing these assertions when we have better types.
@@ -64,12 +66,12 @@ export abstract class BaseCliAgentRunner {
     return {files, reasoning, toolLogs: []};
   }
 
-  generateText(): Promise<LlmGenerateTextResponse> {
+  generateText(): Promise<LocalLlmGenerateTextResponse> {
     // Technically we can make this work, but we don't need it at the time of writing.
     throw new UserFacingError(`Generating text with ${this.displayName} is not supported.`);
   }
 
-  generateConstrained(): Promise<LlmConstrainedOutputGenerateResponse<any>> {
+  generateConstrained(): Promise<LocalLlmConstrainedOutputGenerateResponse<any>> {
     // We can't support this, because there's no straightforward
     // way to tell the agent to follow a schema.
     throw new UserFacingError(`Constrained output with ${this.displayName} is not supported.`);
@@ -117,7 +119,7 @@ export abstract class BaseCliAgentRunner {
   }
 
   /** Gets the common system instructions for all agents. */
-  protected getCommonInstructions(options: LlmGenerateFilesRequestOptions) {
+  protected getCommonInstructions(options: LocalLlmGenerateFilesRequestOptions) {
     return [
       `# Important Rules`,
       `The following instructions dictate how you should behave. It is CRITICAL that you follow them AS CLOSELY AS POSSIBLE:`,
@@ -170,7 +172,7 @@ export abstract class BaseCliAgentRunner {
     return binaryPath;
   }
 
-  private runAgentProcess(options: LlmGenerateFilesRequestOptions): Promise<string> {
+  private runAgentProcess(options: LocalLlmGenerateFilesRequestOptions): Promise<string> {
     return new Promise<string>(resolve => {
       let stdoutBuffer = '';
       let stdErrBuffer = '';

@@ -1,4 +1,4 @@
-import {LlmGenerateFilesRequestOptions, LlmRunner} from './llm-runner.js';
+import {LocalLlmGenerateFilesRequestOptions, LlmRunner} from './llm-runner.js';
 import {join} from 'path';
 import {mkdirSync} from 'fs';
 import {writeFile} from 'fs/promises';
@@ -22,7 +22,7 @@ export class CodexRunner extends BaseCliAgentRunner implements LlmRunner {
     return Object.keys(MODEL_MAPPING);
   }
 
-  protected getCommandLineFlags(options: LlmGenerateFilesRequestOptions): string[] {
+  protected getCommandLineFlags(options: LocalLlmGenerateFilesRequestOptions): string[] {
     return [
       'exec',
       '--model',
@@ -34,7 +34,7 @@ export class CodexRunner extends BaseCliAgentRunner implements LlmRunner {
     ];
   }
 
-  protected async writeAgentFiles(options: LlmGenerateFilesRequestOptions): Promise<void> {
+  protected async writeAgentFiles(options: LocalLlmGenerateFilesRequestOptions): Promise<void> {
     const {context} = options;
     const instructionFilePath = join(context.directory, 'AGENTS.md');
     const settingsDir = join(context.directory, '.codex');

@@ -1,12 +1,10 @@
 export * from './shared-interfaces.js';
 export * from './configuration/environment-config.js';
-export * from './orchestration/gateway.js';
-export * from './orchestration/gateways/local_gateway.js';
-export {
-  type RemoteEnvironmentConfig,
-  RemoteEnvironment,
-} from './configuration/environment-remote.js';
-export {type LocalEnvironmentConfig, LocalEnvironment} from './configuration/environment-local.js';
+export * from './orchestration/executors/executor.js';
+export * from './orchestration/executors/local-executor-config.js';
+export * from './orchestration/executors/local-executor.js';
+export {type EnvironmentConfig} from './configuration/environment-config.js';
+export {Environment} from './configuration/environment.js';
 export * from './ratings/built-in.js';
 export * from './ratings/rating-types.js';
 export * from './ratings/built-in-ratings/index.js';
@@ -29,13 +27,13 @@ export {generateCodeAndAssess} from './orchestration/generate.js';
 export {groupSimilarReports} from './orchestration/grouping.js';
 export {
   type LlmRunner,
-  type LlmGenerateFilesContext,
-  type LlmGenerateFilesRequestOptions,
-  type LlmGenerateTextRequestOptions,
-  type LlmConstrainedOutputGenerateRequestOptions,
-  type LlmConstrainedOutputGenerateResponse,
-  type LlmGenerateFilesResponse,
-  type LlmGenerateTextResponse,
+  type LocalLlmGenerateFilesContext,
+  type LocalLlmGenerateFilesRequestOptions,
+  type LocalLlmGenerateTextRequestOptions,
+  type LocalLlmConstrainedOutputGenerateRequestOptions,
+  type LocalLlmConstrainedOutputGenerateResponse,
+  type LocalLlmGenerateFilesResponse,
+  type LocalLlmGenerateTextResponse,
   type McpServerOptions,
   type PromptDataMessage,
 } from './codegen/llm-runner.js';
@@ -43,10 +41,10 @@ export {GenkitRunner} from './codegen/genkit/genkit-runner.js';
 export {GeminiCliRunner} from './codegen/gemini-cli-runner.js';
 export {getRunnerByName, type RunnerName} from './codegen/runner-creation.js';
 export {getEnvironmentByPath} from './configuration/environment-resolution.js';
-export {type Environment} from './configuration/environment.js';
 export {autoRateFiles} from './ratings/autoraters/rate-files.js';
 export {fetchReportsFromDisk} from './reporting/report-local-disk.js';
 export {type ProgressLogger, type ProgressType} from './progress/progress-logger.js';
 export {DynamicProgressLogger} from './progress/dynamic-progress-logger.js';
 export {NoopProgressLogger} from './progress/noop-progress-logger.js';
 export {TextProgressLogger} from './progress/text-progress-logger.js';
+export {type ServeTestingResult} from './workers/serve-testing/worker-types.js';

@@ -15,7 +15,7 @@ import {globSync} from 'tinyglobby';
 import {executeCommand} from '../utils/exec.js';
 import {UserFacingError} from '../utils/errors.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
-import {LocalEnvironment} from '../configuration/environment-local.js';
+import {LocalExecutor} from './executors/local-executor.js';
 
 const SYMLINK_PROJECT_PATHS = new Set(['node_modules']);
 const PENDING_INSTALLS = new Map<string, Promise<void>>();
@@ -59,26 +59,42 @@ export async function setupProjectStructure(
 
   const directoriesToCopy: string[] = [];
 
-  if (env instanceof LocalEnvironment && env.projectTemplatePath) {
+  if (env.executor instanceof LocalExecutor && env.executor.config.projectTemplate) {
+    const projectTemplatePath = join(env.rootPath, env.executor.config.projectTemplate);
+
     // Copy the template files first.
-    directoriesToCopy.push(env.projectTemplatePath);
+    directoriesToCopy.push(projectTemplatePath);
 
     // Run the install command in the template directory directly. This way multiple
     // evals can reuse the same dependencies. It also allows pnpm workspaces to work
     // properly since we might not have copied the `pnpm-workspaces.yml`.
     if (!env.isBuiltIn) {
-      await installDependenciesInDirectory(env, rootPromptDef, env.projectTemplatePath, progress);
+      await installDependenciesInDirectory(
+        env,
+        env.executor,
+        rootPromptDef,
+        projectTemplatePath,
+        progress,
+      );
     }
   }
 
-  if (env instanceof LocalEnvironment && env.sourceDirectory) {
+  if (env.executor instanceof LocalExecutor && env.executor.config.sourceDirectory) {
+    const sourceDirectory = join(env.rootPath, env.executor.config.sourceDirectory);
+
     // Push this after the project so the environment's files that precedence.
-    directoriesToCopy.push(env.sourceDirectory);
+    directoriesToCopy.push(sourceDirectory);
 
     // Also try to install dependencies in the source directory,
     // because it may be overriding the ones from the template.
     if (!env.isBuiltIn) {
-      await installDependenciesInDirectory(env, rootPromptDef, env.sourceDirectory, progress);
+      await installDependenciesInDirectory(
+        env,
+        env.executor,
+        rootPromptDef,
+        sourceDirectory,
+        progress,
+      );
     }
   }
 
@@ -95,8 +111,8 @@ export async function setupProjectStructure(
   // If the environment is built in, it'll likely be inside of the user's `node_modules`.
   // Since running an installation inside `node_modules` can be problematic, we install
   // in the temporary directory instead. This can be slower, but is more reliable.
-  if (env instanceof LocalEnvironment && env.isBuiltIn) {
-    await installDependenciesInDirectory(env, rootPromptDef, directory, progress);
+  if (env.executor instanceof LocalExecutor && env.isBuiltIn) {
+    await installDependenciesInDirectory(env, env.executor, rootPromptDef, directory, progress);
   }
 
   return {directory, cleanup};
@@ -104,17 +120,19 @@ export async function setupProjectStructure(
 
 /** Run the package manager install command in a specific directory. */
 function installDependenciesInDirectory(
-  env: LocalEnvironment,
+  env: Environment,
+  localExecutor: LocalExecutor,
   rootPromptDef: RootPromptDefinition,
   directory: string,
   progress: ProgressLogger,
 ): Promise<void> {
   // The install script will error out if there's no `package.json`.
-  if (env.skipInstall || !existsSync(join(directory, 'package.json'))) {
+  if (localExecutor.config.skipInstall || !existsSync(join(directory, 'package.json'))) {
     return Promise.resolve();
   }
 
-  const key = `${directory}#${env.installCommand}`;
+  const installCommand = localExecutor.getInstallCommand();
+  const key = `${directory}#${installCommand}`;
   let pendingCommand = PENDING_INSTALLS.get(key);
   progress.log(rootPromptDef, 'build', 'Installing dependencies');
 
@@ -124,7 +142,7 @@ function installDependenciesInDirectory(
     return pendingCommand;
   }
 
-  pendingCommand = executeCommand(env.installCommand, directory, undefined, {
+  pendingCommand = executeCommand(installCommand, directory, undefined, {
     forwardStderrToParent: true,
   })
     .then(() => {

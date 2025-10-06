@@ -11,13 +11,12 @@ import {repairCodeWithAI} from './codegen.js';
 import {writeResponseFiles} from './file-system.js';
 import {runBuild} from './build-worker.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
-import {EvalID, Gateway} from './gateway.js';
+import {EvalID, Executor} from './executors/executor.js';
 
 /**
  * Calls the LLM to repair code, handles the response, and attempts to build the project again.
  *
  * @param evalID ID of the eval being executed.
- * @param gateway Gateway.
  * @param model The model name to use for the repair.
  * @param env The environment configuration.
  * @param directory The working directory.
@@ -33,7 +32,6 @@ import {EvalID, Gateway} from './gateway.js';
  */
 export async function repairAndBuild(
   evalID: EvalID,
-  gateway: Gateway<Environment>,
   model: string,
   env: Environment,
   rootPromptDef: RootPromptDefinition,
@@ -49,7 +47,6 @@ export async function repairAndBuild(
 ): Promise<AttemptDetails> {
   const repairResponse = await repairCodeWithAI(
     evalID,
-    gateway,
     model,
     env,
     rootPromptDef,
@@ -64,7 +61,6 @@ export async function repairAndBuild(
 
   return await handleRepairResponse(
     evalID,
-    gateway,
     repairResponse,
     previousAttemptFiles,
     env,
@@ -83,7 +79,6 @@ export async function repairAndBuild(
  */
 async function handleRepairResponse(
   evalID: EvalID,
-  gateway: Gateway<Environment>,
   repairResponse: LlmResponse,
   previousAttemptFiles: LlmResponseFile[],
   env: Environment,
@@ -114,7 +109,6 @@ async function handleRepairResponse(
 
   const buildResult = await runBuild(
     evalID,
-    gateway,
     directory,
     env,
     rootPromptDef,

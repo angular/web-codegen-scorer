@@ -2,17 +2,16 @@ import {
   BuildResult,
   BuildResultStatus,
   EvalID,
-  Gateway,
+  Executor,
   LlmContextFile,
+  LlmGenerateFilesRequest,
   LlmResponse,
   LlmResponseFile,
-  RemoteEnvironment,
   RootPromptDefinition,
 } from '../../../runner';
-import { LlmGenerateFilesContext } from '../../../runner/codegen/llm-runner';
-import { ProgressLogger } from '../../../runner/progress/progress-logger';
+import {ProgressLogger} from '../../../runner/progress/progress-logger';
 
-export class FakeRemoteGateway implements Gateway<RemoteEnvironment> {
+export class FakeRemoteExecutor implements Executor {
   ids = 0;
 
   async initializeEval() {
@@ -26,46 +25,45 @@ export class FakeRemoteGateway implements Gateway<RemoteEnvironment> {
   async performFakeLlmRequest(): Promise<LlmResponse> {
     return {
       success: true,
-      outputFiles: [{ code: 'Works!', filePath: 'main.ts' }],
+      outputFiles: [{code: 'Works!', filePath: 'main.ts'}],
       reasoning: '',
       errors: [],
-      usage: { inputTokens: 0, totalTokens: 0, outputTokens: 0 },
+      usage: {inputTokens: 0, totalTokens: 0, outputTokens: 0},
     };
   }
 
   generateInitialFiles(
     id: EvalID,
-    requestCtx: LlmGenerateFilesContext,
+    requestCtx: LlmGenerateFilesRequest,
     model: string,
     contextFiles: LlmContextFile[],
-    abortSignal: AbortSignal
+    abortSignal: AbortSignal,
   ): Promise<LlmResponse> {
     // Generate the initial files of the eval app.
     // This generation can happen on a remote service with access to private models.
     return this.performFakeLlmRequest();
   }
 
-  repairBuild(
+  generateRepairFiles(
     id: EvalID,
-    requestCtx: LlmGenerateFilesContext,
+    requestCtx: LlmGenerateFilesRequest,
     model: string,
     errorMessage: string,
     appFiles: LlmResponseFile[],
     contextFiles: LlmContextFile[],
-    abortSignal: AbortSignal
+    abortSignal: AbortSignal,
   ): Promise<LlmResponse> {
     // Repair the given eval app.
     // This generation can happen on a remote service with access to private models.
     return this.performFakeLlmRequest();
   }
 
-  async serveBuild<T>(
+  async serveWebApplication<T>(
     id: EvalID,
-    env: RemoteEnvironment,
     appDirectoryPath: string,
     rootPromptDef: RootPromptDefinition,
     progress: ProgressLogger,
-    logicWhileServing: (serveUrl: string) => Promise<T>
+    logicWhileServing: (serveUrl: string) => Promise<T>,
   ): Promise<T> {
     // Start serving of the app.
     // Invoke the logic while the server is running.
@@ -74,12 +72,10 @@ export class FakeRemoteGateway implements Gateway<RemoteEnvironment> {
     return result;
   }
 
-  async tryBuild(
+  async performBuild(
     id: EvalID,
-    env: RemoteEnvironment,
     appDirectoryPath: string,
     rootPromptDef: RootPromptDefinition,
-    progress: ProgressLogger
   ): Promise<BuildResult> {
     // Here, building can happen in the remote service.
     // Eval ID is useful here for storing the build on a server, for re-using later when serving.
@@ -89,7 +85,7 @@ export class FakeRemoteGateway implements Gateway<RemoteEnvironment> {
     };
   }
 
-  shouldRetryFailedBuilds() {
+  async shouldRepairFailedBuilds() {
     // Some environments have a builtin retry loop as part of initial generation.
     // In those cases, you may want to skip retrying.
     return true;
@@ -98,4 +94,18 @@ export class FakeRemoteGateway implements Gateway<RemoteEnvironment> {
   async finalizeEval() {
     // Do your cleanup.
   }
+
+  async isSupportedModel() {
+    return {supported: true};
+  }
+
+  async getExecutorInfo() {
+    return {
+      id: 'fake-executor',
+      displayName: 'Fake Executor',
+      mcpServersLaunched: 0,
+    };
+  }
+
+  async destroy() {}
 }

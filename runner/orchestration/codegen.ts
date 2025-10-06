@@ -1,17 +1,18 @@
 import {
   LlmContextFile,
+  LlmGenerateFilesRequest,
   LlmResponse,
   LlmResponseFile,
   RootPromptDefinition,
   ToolLogEntry,
   Usage,
 } from '../shared-interfaces.js';
-import {LlmGenerateFilesContext, LlmRunner, PromptDataMessage} from '../codegen/llm-runner.js';
+import {LlmRunner, LocalLlmGenerateFilesContext, PromptDataMessage} from '../codegen/llm-runner.js';
 import {Environment} from '../configuration/environment.js';
 import {getPossiblePackageManagers} from '../configuration/environment-config.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
-import {EvalID, Gateway} from './gateway.js';
-import {LocalEnvironment} from '../configuration/environment-local.js';
+import {EvalID} from './executors/executor.js';
+import {LocalExecutor} from './executors/local-executor.js';
 
 /**
  * Generates code using the configured AI model based on the provided prompt.
@@ -19,7 +20,7 @@ import {LocalEnvironment} from '../configuration/environment-local.js';
 export async function generateCodeWithAI(
   llm: LlmRunner,
   model: string,
-  codegenContext: LlmGenerateFilesContext,
+  codegenContext: LocalLlmGenerateFilesContext,
   contextFiles: LlmContextFile[],
   abortSignal: AbortSignal,
 ): Promise<LlmResponse> {
@@ -88,7 +89,6 @@ export async function generateCodeWithAI(
  */
 export async function repairCodeWithAI(
   evalID: EvalID,
-  gateway: Gateway<Environment>,
   model: string,
   env: Environment,
   promptDef: RootPromptDefinition,
@@ -111,19 +111,16 @@ export async function repairCodeWithAI(
     ...appFiles.map(file => `${file.filePath}:\n\`\`\`\n${file.code}\`\`\`\n\n`),
   ].join('\n');
 
-  const context: LlmGenerateFilesContext = {
+  const context: LlmGenerateFilesRequest = {
     directory,
     systemInstructions: repairSystemInstructions,
     executablePrompt: repairPrompt,
     combinedPrompt: `${repairSystemInstructions}\n${repairPrompt}`,
-    packageManager: env instanceof LocalEnvironment ? env.packageManager : undefined,
-    buildCommand: env instanceof LocalEnvironment ? env.buildCommand : undefined,
-    possiblePackageManagers: getPossiblePackageManagers().slice(),
   };
 
   progress.log(promptDef, 'codegen', 'Repairing code with AI');
 
-  const response = await gateway.repairBuild(
+  const response = await env.executor.generateRepairFiles(
     evalID,
     context,
     model,

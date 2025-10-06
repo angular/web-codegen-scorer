@@ -4,13 +4,13 @@ import {GenkitPlugin, GenkitPluginV2} from 'genkit/plugin';
 import {z} from 'zod';
 import {
   McpServerOptions,
-  LlmConstrainedOutputGenerateRequestOptions,
-  LlmConstrainedOutputGenerateResponse,
+  LocalLlmConstrainedOutputGenerateRequestOptions,
+  LocalLlmConstrainedOutputGenerateResponse,
   LlmRunner,
-  LlmGenerateFilesResponse,
-  LlmGenerateTextResponse,
-  LlmGenerateTextRequestOptions,
-  LlmGenerateFilesRequestOptions,
+  LocalLlmGenerateFilesResponse,
+  LocalLlmGenerateTextResponse,
+  LocalLlmGenerateTextRequestOptions,
+  LocalLlmGenerateFilesRequestOptions,
 } from '../llm-runner.js';
 import {setTimeout} from 'node:timers/promises';
 import {callWithTimeout} from '../../utils/timeout.js';
@@ -34,8 +34,8 @@ export class GenkitRunner implements LlmRunner {
   private toolLogs: ToolLogEntry[] = [];
 
   async generateConstrained<T extends z.ZodTypeAny = z.ZodTypeAny>(
-    options: LlmConstrainedOutputGenerateRequestOptions<T>,
-  ): Promise<LlmConstrainedOutputGenerateResponse<T>> {
+    options: LocalLlmConstrainedOutputGenerateRequestOptions<T>,
+  ): Promise<LocalLlmConstrainedOutputGenerateResponse<T>> {
     const {provider, model} = this.resolveModel(options.model);
     const result = await this._genkitRequest(provider, model, options);
 
@@ -46,8 +46,10 @@ export class GenkitRunner implements LlmRunner {
     };
   }
 
-  async generateFiles(options: LlmGenerateFilesRequestOptions): Promise<LlmGenerateFilesResponse> {
-    const requestOptions: LlmConstrainedOutputGenerateRequestOptions = {
+  async generateFiles(
+    options: LocalLlmGenerateFilesRequestOptions,
+  ): Promise<LocalLlmGenerateFilesResponse> {
+    const requestOptions: LocalLlmConstrainedOutputGenerateRequestOptions = {
       ...options,
       prompt: options.context.combinedPrompt,
       schema: z.object({
@@ -80,7 +82,9 @@ export class GenkitRunner implements LlmRunner {
     return this.toolLogs.splice(0);
   }
 
-  async generateText(options: LlmGenerateTextRequestOptions): Promise<LlmGenerateTextResponse> {
+  async generateText(
+    options: LocalLlmGenerateTextRequestOptions,
+  ): Promise<LocalLlmGenerateTextResponse> {
     const {provider, model} = this.resolveModel(options.model);
     const result = await this._genkitRequest(provider, model, options);
 
@@ -103,14 +107,14 @@ export class GenkitRunner implements LlmRunner {
   private async _genkitRequest(
     provider: GenkitModelProvider,
     model: ModelReference<any>,
-    options: LlmGenerateTextRequestOptions | LlmConstrainedOutputGenerateRequestOptions,
+    options: LocalLlmGenerateTextRequestOptions | LocalLlmConstrainedOutputGenerateRequestOptions,
   ) {
     return await rateLimitLLMRequest(
       provider,
       model,
       {messages: options.messages || [], prompt: options.prompt},
       () => {
-        const schema = (options as Partial<LlmConstrainedOutputGenerateRequestOptions>).schema;
+        const schema = (options as Partial<LocalLlmConstrainedOutputGenerateRequestOptions>).schema;
         const performRequest = async () => {
           let tools: ToolAction[] | undefined;
           let resources: DynamicResourceAction[] | undefined;

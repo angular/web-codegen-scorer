@@ -1,4 +1,4 @@
-import {LlmGenerateFilesRequestOptions, LlmRunner} from './llm-runner.js';
+import {LocalLlmGenerateFilesRequestOptions, LlmRunner} from './llm-runner.js';
 import {join} from 'path';
 import {mkdirSync} from 'fs';
 import {writeFile} from 'fs/promises';
@@ -18,7 +18,7 @@ export class GeminiCliRunner extends BaseCliAgentRunner implements LlmRunner {
     return SUPPORTED_MODELS;
   }
 
-  protected getCommandLineFlags(options: LlmGenerateFilesRequestOptions): string[] {
+  protected getCommandLineFlags(options: LocalLlmGenerateFilesRequestOptions): string[] {
     return [
       '--prompt',
       options.context.executablePrompt,
@@ -30,7 +30,7 @@ export class GeminiCliRunner extends BaseCliAgentRunner implements LlmRunner {
     ];
   }
 
-  protected async writeAgentFiles(options: LlmGenerateFilesRequestOptions): Promise<void> {
+  protected async writeAgentFiles(options: LocalLlmGenerateFilesRequestOptions): Promise<void> {
     const {context} = options;
     const ignoreFilePath = join(context.directory, '.geminiignore');
     const instructionFilePath = join(context.directory, 'GEMINI.md');

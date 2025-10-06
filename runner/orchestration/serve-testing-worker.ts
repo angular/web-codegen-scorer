@@ -9,7 +9,7 @@ import {
   ServeTestingWorkerMessage,
   ServeTestingWorkerResponseMessage,
 } from '../workers/serve-testing/worker-types.js';
-import {EvalID, Gateway} from './gateway.js';
+import {EvalID, Executor} from './executors/executor.js';
 import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
 import PQueue from 'p-queue';
 
@@ -17,7 +17,6 @@ import PQueue from 'p-queue';
 export async function serveAndTestApp(
   config: AssessmentConfig,
   evalID: EvalID,
-  gateway: Gateway<Environment>,
   appDirectoryPath: string,
   env: Environment,
   rootPromptDef: RootPromptDefinition,
@@ -28,9 +27,8 @@ export async function serveAndTestApp(
 ): Promise<ServeTestingResult> {
   progress.log(rootPromptDef, 'serve-testing', `Testing the app`);
 
-  const result = await gateway.serveBuild(
+  const result = await env.executor.serveWebApplication(
     evalID,
-    env,
     appDirectoryPath,
     rootPromptDef,
     progress,

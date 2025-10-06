@@ -1,5 +1,5 @@
 import PQueue from 'p-queue';
-import {LlmGenerateFilesResponse} from '../codegen/llm-runner.js';
+import {LocalLlmGenerateFilesResponse} from '../codegen/llm-runner.js';
 import {BuildResultStatus} from '../workers/builder/builder-types.js';
 import {Environment} from '../configuration/environment.js';
 import {
@@ -12,7 +12,7 @@ import {DEFAULT_MAX_REPAIR_ATTEMPTS} from '../configuration/constants.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {runBuild} from './build-worker.js';
 import {repairAndBuild} from './build-repair.js';
-import {EvalID, Gateway} from './gateway.js';
+import {EvalID, Executor} from './executors/executor.js';
 import {serveAndTestApp} from './serve-testing-worker.js';
 import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
 
@@ -20,9 +20,8 @@ import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
  * Attempts to build the code that an LLM generated. If the build fails, attempts
  * to fix the breakage and build again.
  *
+ * @param config Assessment config.
  * @param evalID ID of the eval being attempted for build.
- * @param gateway Gateway.
- * @param model Model to be used for repair generation requests.
  * @param env Environment that is currently being run.
  * @param rootPromptDef Definition of the root prompt.
  * @param directory Directory on disk to which to write.
@@ -38,12 +37,11 @@ import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
 export async function attemptBuild(
   config: AssessmentConfig,
   evalID: EvalID,
-  gateway: Gateway<Environment>,
   env: Environment,
   rootPromptDef: RootPromptDefinition,
   directory: string,
   contextFiles: LlmContextFile[],
-  initialResponse: LlmGenerateFilesResponse,
+  initialResponse: LocalLlmGenerateFilesResponse,
   attemptDetails: AttemptDetails[],
   abortSignal: AbortSignal,
   workerConcurrencyQueue: PQueue,
@@ -52,7 +50,6 @@ export async function attemptBuild(
 ) {
   const initialBuildResult = await runBuild(
     evalID,
-    gateway,
     directory,
     env,
     rootPromptDef,
@@ -61,7 +58,7 @@ export async function attemptBuild(
     progress,
   );
   let repairAttempts = 0;
-  const maxRepairAttempts = gateway.shouldRetryFailedBuilds(evalID)
+  const maxRepairAttempts = (await env.executor.shouldRepairFailedBuilds(evalID))
     ? DEFAULT_MAX_REPAIR_ATTEMPTS
     : 0;
 
@@ -92,7 +89,6 @@ export async function attemptBuild(
 
     const attempt = await repairAndBuild(
       evalID,
-      gateway,
       config.model,
       env,
       rootPromptDef,
@@ -117,7 +113,6 @@ export async function attemptBuild(
     lastAttempt.serveTestingResult = await serveAndTestApp(
       config,
       evalID,
-      gateway,
       directory,
       env,
       rootPromptDef,
@@ -154,7 +149,6 @@ export async function attemptBuild(
 
     const attempt = await repairAndBuild(
       evalID,
-      gateway,
       config.model,
       env,
       rootPromptDef,
@@ -184,7 +178,6 @@ export async function attemptBuild(
     attempt.serveTestingResult = await serveAndTestApp(
       config,
       evalID,
-      gateway,
       directory,
       env,
       rootPromptDef,
