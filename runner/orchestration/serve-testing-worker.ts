@@ -73,7 +73,6 @@ export async function serveAndTestApp(
               reject(err);
             });
           }),
-        {throwOnTimeout: true},
       );
     },
   );
