@@ -101,6 +101,7 @@ async function getPackageJson(
     version: string;
     scripts?: unknown;
     devDependencies?: unknown;
+    engines?: unknown;
   };
 
   if (version) {
@@ -116,6 +117,7 @@ async function getPackageJson(
   // Delete some fields that aren't relevant for end users.
   delete parsed.scripts;
   delete parsed.devDependencies;
+  delete parsed.engines;
 
   return JSON.stringify(parsed, undefined, 2);
 }
