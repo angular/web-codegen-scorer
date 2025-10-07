@@ -93,12 +93,12 @@
   "optionalDependencies": {
     "@anthropic-ai/claude-code": "^2.0.0",
     "@google/gemini-cli": "^0.7.0",
-    "@openai/codex": "^0.44.0"
+    "@openai/codex": "^0.45.0"
   },
   "devDependencies": {
     "@anthropic-ai/claude-code": "^2.0.0",
     "@google/gemini-cli": "^0.7.0",
-    "@openai/codex": "^0.44.0",
+    "@openai/codex": "^0.45.0",
     "prettier": "^3.5.3",
     "tsx": "^4.20.3"
   }
