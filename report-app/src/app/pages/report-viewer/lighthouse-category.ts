@@ -24,7 +24,14 @@ import {Score} from '../../shared/score/score';
       @for (audit of audits; track audit.id) {
         <li>
           @if (audit.score != null) {
-            <score size="tiny" [total]="audit.score" [max]="1"/>
+            @if (audit.scoreDisplayMode === 'binary') {
+              @let isPass = audit.score === 1;
+              <span class="status-text material-symbols-outlined {{isPass ? 'success' : 'error'}}">
+                {{isPass ? 'check' : 'close'}}
+              </span>
+            } @else {
+              <score size="tiny" [total]="audit.score" [max]="1"/>
+            }
           }
           {{audit.title}}{{audit.displayValue ? ': ' + audit.displayValue : ''}}
 
