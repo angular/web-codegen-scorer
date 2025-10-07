@@ -1,0 +1,33 @@
+@if (allFrameworks().length > 1) {
+  <select (change)="selectedFramework.set($any($event.target).value)">
+    <option value="">All Frameworks</option>
+    @for (framework of allFrameworks(); track framework.id) {
+      <option [value]="framework.id">{{ framework.displayName }}</option>
+    }
+  </select>
+}
+
+@if (allModels().length > 1) {
+  <select (change)="selectedModel.set($any($event.target).value)">
+    <option value="">All Models</option>
+    @for (model of allModels(); track model.id) {
+      <option [value]="model.id">{{ model.displayName }}</option>
+    }
+  </select>
+}
+
+@if (allRunners().length > 1) {
+  <select (change)="selectedRunner.set($any($event.target).value)">
+    <option value="">All Runners</option>
+    @for (runner of allRunners(); track runner.id) {
+      <option [value]="runner.id">{{ runner.displayName }}</option>
+    }
+  </select>
+}
+
+@if (allLabels().length > 0) {
+  <multi-select
+    [options]="allLabels()"
+    [(selected)]="selectedLabels"
+    [label]="selectedLabels().length === 0 ? 'Filter by labels' : `${selectedLabels().length} label(s)`"/>
+}

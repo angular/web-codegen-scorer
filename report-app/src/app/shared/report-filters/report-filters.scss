@@ -1,0 +1,9 @@
+:host {
+  display: flex;
+  gap: 1rem;
+}
+
+select,
+multi-select {
+  max-width: 200px;
+}
