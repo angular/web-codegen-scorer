@@ -56,6 +56,6 @@ label {
 }
 
 label:hover {
-  background-color: #eff6ff;
+  background-color: var(--button-active-bg-color);
   border-radius: var(--border-radius);
 }
