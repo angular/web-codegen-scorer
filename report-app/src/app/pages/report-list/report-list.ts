@@ -11,7 +11,7 @@ import {MessageSpinner} from '../../shared/message-spinner';
 import {Score} from '../../shared/score/score';
 import {ProviderLabel} from '../../shared/provider-label';
 import {bucketToScoreVariable} from '../../shared/scoring';
-import {MultiSelect} from '../../shared/multi-select/multi-select';
+import {ReportFilters} from '../../shared/report-filters/report-filters';
 
 @Component({
   selector: 'app-report-list',
@@ -22,7 +22,7 @@ import {MultiSelect} from '../../shared/multi-select/multi-select';
     MessageSpinner,
     Score,
     ProviderLabel,
-    MultiSelect,
+    ReportFilters,
   ],
   templateUrl: './report-list.html',
   styleUrls: ['./report-list.scss'],
@@ -30,90 +30,10 @@ import {MultiSelect} from '../../shared/multi-select/multi-select';
 export class ReportListComponent {
   private reportsFetcher = inject(ReportsFetcher);
   private router = inject(Router);
-  private allGroups = this.reportsFetcher.reportGroups;
 
   protected isLoading = this.reportsFetcher.isLoadingReportsList;
   protected reportsToCompare = signal<string[]>([]);
   protected isServer = isPlatformServer(inject(PLATFORM_ID));
-
-  protected selectedFramework = signal<string | null>(null);
-  protected selectedModel = signal<string | null>(null);
-  protected selectedRunner = signal<string | null>(null);
-  protected selectedLabels = signal<string[]>([]);
-
-  protected allFrameworks = computed(() => {
-    const frameworks = new Map<string, string>();
-    this.allGroups().forEach(group => {
-      const framework = group.framework.fullStackFramework;
-      frameworks.set(framework.id, framework.displayName);
-    });
-    return Array.from(frameworks.entries()).map(([id, displayName]) => ({
-      id,
-      displayName,
-    }));
-  });
-
-  protected allModels = computed(() => {
-    const models = new Set(this.allGroups().map(g => g.model));
-
-    return Array.from(models).map(model => ({
-      id: model,
-      displayName: model,
-    }));
-  });
-
-  protected allRunners = computed(() => {
-    const runners = new Map<string, string>();
-
-    this.allGroups().forEach(group => {
-      if (group.runner) {
-        runners.set(group.runner.id, group.runner.displayName);
-      }
-    });
-
-    return Array.from(runners.entries()).map(([id, displayName]) => ({
-      id,
-      displayName,
-    }));
-  });
-
-  protected allLabels = computed(() => {
-    const labels = new Set<string>();
-
-    for (const group of this.allGroups()) {
-      for (const label of group.labels) {
-        const trimmed = label.trim();
-
-        if (trimmed) {
-          labels.add(trimmed);
-        }
-      }
-    }
-
-    return Array.from(labels)
-      .sort()
-      .map(label => ({
-        label,
-        value: label,
-      }));
-  });
-
-  protected reportGroups = computed(() => {
-    const framework = this.selectedFramework();
-    const model = this.selectedModel();
-    const runner = this.selectedRunner();
-    const labels = this.selectedLabels();
-    const groups = this.allGroups();
-
-    return groups.filter(group => {
-      const frameworkMatch = !framework || group.framework.fullStackFramework.id === framework;
-      const modelMatch = !model || group.model === model;
-      const runnerMatch = !runner || group.runner?.id === runner;
-      const labelsMatch = labels.length === 0 || group.labels.some(l => labels.includes(l.trim()));
-      return frameworkMatch && modelMatch && runnerMatch && labelsMatch;
-    });
-  });
-
   protected isCompareMode = signal(false);
 
   protected handleCompare() {

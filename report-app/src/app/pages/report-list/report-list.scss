@@ -93,63 +93,10 @@ h1, h2 {
   flex-shrink: 0;
 }
 
-.report-item-container {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.report-checkbox {
-  appearance: none;
-  -webkit-appearance: none;
-  margin: 0;
-  font: inherit;
-  color: currentColor;
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 0.15rem solid var(--border-color);
-  border-radius: 0.35rem;
-  transform: translateY(-0.075em);
-  display: grid;
-  place-content: center;
-  cursor: pointer;
-  transition: all 0.1s ease-in-out;
-}
-
-.report-checkbox::before {
-  content: '';
-  width: 0.75rem;
-  height: 0.75rem;
-  transform: scale(0);
-  transition: 120ms transform ease-in-out;
-  box-shadow: inset 1em 1em var(--card-bg-color);
-  // Use a CSS trick to create a checkmark
-  transform-origin: bottom left;
-  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-}
-
-.report-checkbox:checked::before {
-  transform: scale(1);
-}
-
-.report-checkbox:checked {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
-}
-
-.report-checkbox:hover {
-  border-color: var(--accent-blue);
-}
-
 .toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.filter-container {
-  display: flex;
-  gap: 1rem;
 }
 
 .select-for-comparison {
