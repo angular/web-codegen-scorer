@@ -38,7 +38,19 @@ export async function getLighthouseData(
     const isAllowedDisplayMode = displayMode === 'binary' || displayMode === 'numeric';
 
     if (audit.score != null && isAllowedType && isAllowedDisplayMode) {
-      availableAudits.set(audit.id, audit);
+      availableAudits.set(audit.id, {
+        // Only capture the properties we care about in order to keep
+        // the report size small and avoid serialization errors.
+        id: audit.id,
+        score: audit.score,
+        title: audit.title,
+        displayValue: audit.displayValue ?? null,
+        description: audit.description,
+        explanation: audit.explanation ?? null,
+        scoreDisplayMode: displayMode,
+        numericValue: audit.numericValue ?? null,
+        numericUnit: audit.numericUnit ?? null,
+      });
     }
   }
 

@@ -66,7 +66,17 @@ export type ServeTestingWorkerResponseMessage =
   | ServeTestingProgressLogMessage
   | ServeTestingResultMessage;
 
-export type LighthouseAudit = LighthouseRunnerResult['lhr']['audits']['x']; // Lighthouse doesn't export this so we need to dig for it.
+export interface LighthouseAudit {
+  id: string;
+  score: number | null;
+  title: string;
+  displayValue: string | null;
+  description: string | null;
+  explanation: string | null;
+  scoreDisplayMode: 'numeric' | 'binary';
+  numericValue: number | null;
+  numericUnit: string | null;
+}
 
 export interface LighthouseCategory {
   id: string;
