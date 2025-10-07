@@ -105,14 +105,16 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
     // We need Chrome to collect runtime information.
     await installChrome();
 
-    if (
+    const mcpServerDetails =
       env instanceof LocalEnvironment &&
       options.startMcp &&
       env.mcpServerOptions.length &&
       env.llm.startMcpServerHost
-    ) {
-      env.llm.startMcpServerHost(`mcp-${env.clientSideFramework.id}`, env.mcpServerOptions);
-    }
+        ? await env.llm.startMcpServerHost(
+            `mcp-${env.clientSideFramework.id}`,
+            env.mcpServerOptions,
+          )
+        : undefined;
 
     progress.initialize(promptsToProcess.length);
 
@@ -196,6 +198,8 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
               name: m.name,
               command: m.command,
               args: m.args,
+              tools: mcpServerDetails?.tools || [],
+              resources: mcpServerDetails?.resources || [],
             })),
             logs: env.llm.flushMcpServerLogs().join('\n'),
           }
