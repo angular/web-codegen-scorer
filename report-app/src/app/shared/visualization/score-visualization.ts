@@ -2,6 +2,7 @@ import {afterRenderEffect, Component, ElementRef, inject, input, viewChild} from
 import {RunGroup} from '../../../../../runner/shared-interfaces';
 import {GoogleChartsLoader} from '../../services/google-charts-loader';
 import {AppResizeNotifier} from '../../services/app-resize-notifier';
+import {AppColorMode} from '../../services/app-color-mode';
 
 @Component({
   selector: 'score-visualization',
@@ -10,6 +11,7 @@ import {AppResizeNotifier} from '../../services/app-resize-notifier';
 export class ScoreVisualization {
   private googleChartsLoader = inject(GoogleChartsLoader);
   private notifier = inject(AppResizeNotifier);
+  private colorModeService = inject(AppColorMode);
 
   readonly groups = input.required<RunGroup[]>();
   readonly chartContainer = viewChild.required<ElementRef>('chart');
@@ -57,6 +59,7 @@ export class ScoreVisualization {
     // Note: we need to call `_processData` synchronously
     // so the wrapping effect picks up the data dependency.
     const {dataRows, averageAppsCount} = this._processData();
+    const colorMode = this.colorModeService.colorMode();
 
     await this.googleChartsLoader.ready;
 
@@ -77,19 +80,29 @@ export class ScoreVisualization {
     );
 
     const chart = new google.visualization.LineChart(this.chartContainer().nativeElement);
+    const textColor = colorMode === 'dark' ? '#f9fafb' : '#1e293b';
+
     chart.draw(table, {
       curveType: 'function',
       title: `Score average over time (~${averageAppsCount.toFixed(0)} apps generated per day)`,
+      titleTextStyle: {color: textColor},
+      backgroundColor: 'transparent',
       vAxis: {
         format: 'percent',
+        viewWindowMode: 'maximized',
+        textStyle: {color: textColor},
+        maxValue: 1,
       },
+      legend: {textStyle: {color: textColor}},
       hAxis: {
         minTextSpacing: 20,
-        textStyle: {fontSize: 10},
+        textStyle: {fontSize: 10, color: textColor},
       },
       chartArea: {
         left: 50,
-        right: 300,
+        right: 155,
+        bottom: 10,
+        top: 50,
       },
       // TODO: Consider enabling trendlines.
       // trendlines: { 0: {}, 1: {} },
