@@ -18,11 +18,11 @@ importers:
         specifier: ^1.19.1
         version: 1.20.0(encoding@0.1.13)(genkit@1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))(ws@8.18.3)(zod@3.25.76)
       '@genkit-ai/googleai':
-        specifier: 1.20.0
-        version: 1.20.0(encoding@0.1.13)(genkit@1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
+        specifier: 1.21.0
+        version: 1.21.0(encoding@0.1.13)(genkit@1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
       '@genkit-ai/mcp':
-        specifier: 1.20.0
-        version: 1.20.0(@modelcontextprotocol/sdk@1.19.1)(genkit@1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
+        specifier: 1.21.0
+        version: 1.21.0(@modelcontextprotocol/sdk@1.19.1)(genkit@1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
       '@google/genai':
         specifier: 1.22.0
         version: 1.22.0(@modelcontextprotocol/sdk@1.19.1)(encoding@0.1.13)
@@ -904,16 +904,16 @@ packages:
     peerDependencies:
       genkit: ^1.20.0
 
-  '@genkit-ai/googleai@1.20.0':
-    resolution: {integrity: sha512-jp6/4gkMW3AngHYctX3ZlT6TdxvR4EdO6qJ3PAYBYedo1URj4odFVJ5xU+hWkCPgOW8Swb5UlR3hARwphdtoyA==}
+  '@genkit-ai/googleai@1.21.0':
+    resolution: {integrity: sha512-sJauWpr0vu0cnA05UwQAfd2Vh04+Lar1YC3Nn/YBbwBow3Y7KWAqQUNaGHSka/ZYiUHxlzjYyhaDtodmnObepw==}
     peerDependencies:
-      genkit: ^1.20.0
+      genkit: ^1.21.0
 
-  '@genkit-ai/mcp@1.20.0':
-    resolution: {integrity: sha512-Q7hYsQIXRcfnrFtB3WyaIbV/1RJtFRw0QPi798B0mKEg0fo33fN+4zcmVtgt6nS+Ut7sPOzRRRsrvRwVqeFHjA==}
+  '@genkit-ai/mcp@1.21.0':
+    resolution: {integrity: sha512-l/YzGwLUK+3c0MBPKYLzEh7rPaM0BaynNaWMWqahTJMlJn/LqHwaTvzUwg7/zmcxbhFKq2lgDhrvMKTgFfPecw==}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.13.0
-      genkit: ^1.20.0
+      genkit: ^1.21.0
 
   '@google-cloud/common@5.0.2':
     resolution: {integrity: sha512-V7bmBKYQyu0eVG2BFejuUjlBt+zrya6vtsKdY+JxMM/dNntPF41vZ9+LhOshEUH01zOHEqBSvI7Dad7ZS6aUeA==}
@@ -7778,7 +7778,7 @@ snapshots:
       - supports-color
     optional: true
 
-  '@genkit-ai/googleai@1.20.0(encoding@0.1.13)(genkit@1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
+  '@genkit-ai/googleai@1.21.0(encoding@0.1.13)(genkit@1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
     dependencies:
       '@google/generative-ai': 0.24.1
       genkit: 1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))
@@ -7788,7 +7788,7 @@ snapshots:
       - encoding
       - supports-color
 
-  '@genkit-ai/mcp@1.20.0(@modelcontextprotocol/sdk@1.19.1)(genkit@1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
+  '@genkit-ai/mcp@1.21.0(@modelcontextprotocol/sdk@1.19.1)(genkit@1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
     dependencies:
       '@modelcontextprotocol/sdk': 1.19.1
       genkit: 1.20.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))
