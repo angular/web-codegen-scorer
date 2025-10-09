@@ -39,7 +39,7 @@ export async function serveAndTestApp(
         enableAutoCsp: !!config.enableAutoCsp,
         includeAxeTesting: config.skipAxeTesting === false,
         takeScreenshots: config.skipScreenshots === false,
-        includeLighthouseData: config.skipLighthouse === false,
+        includeLighthouseData: config.skipLighthouse !== true,
         userJourneyAgentTaskInput,
       };
 
