@@ -322,23 +322,24 @@ async function startEvaluationTask(
       break;
     }
 
-    const userJourneys = await generateUserJourneysForApp(
-      ratingLlm,
-      rootPromptDef.name,
-      defsToExecute[0].prompt,
-      initialResponse.files,
-      abortSignal,
-    );
+    const userJourneys = config.enableUserJourneyTesting
+      ? await generateUserJourneysForApp(
+          ratingLlm,
+          rootPromptDef.name,
+          defsToExecute[0].prompt,
+          initialResponse.files,
+          abortSignal,
+        )
+      : undefined;
 
     // TODO: Only execute the serve command on the "final working attempt".
     // TODO: Incorporate usage.
-    const userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined =
-      config.enableUserJourneyTesting
-        ? {
-            userJourneys: userJourneys.result,
-            appPrompt: defsToExecute[0].prompt,
-          }
-        : undefined;
+    const userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined = userJourneys
+      ? {
+          userJourneys: userJourneys.result,
+          appPrompt: defsToExecute[0].prompt,
+        }
+      : undefined;
 
     const attemptDetails: AttemptDetails[] = []; // Store details for assessment.json
 
