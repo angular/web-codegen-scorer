@@ -132,6 +132,8 @@ You can customize the `web-codegen-scorer eval` script with the following flags:
 - `--mcp`: Whether to start an MCP for the evaluation. Defaults to `false`.
     - Example: `web-codegen-scorer eval --mcp --env=<config path>`
 
+-- `--max-build-repair-attempts`: Number of repair attempts when build errors are discovered. Defaults to `1` attempt.
+
 - `--help`: Prints out usage information about the script.
 
 ### Additional configuration options

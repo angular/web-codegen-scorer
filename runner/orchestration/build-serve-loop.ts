@@ -8,13 +8,13 @@ import {
   LlmContextFile,
   RootPromptDefinition,
 } from '../shared-interfaces.js';
-import {DEFAULT_MAX_REPAIR_ATTEMPTS} from '../configuration/constants.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {runBuild} from './build-worker.js';
 import {repairAndBuild} from './build-repair.js';
-import {EvalID, Executor} from './executors/executor.js';
+import {EvalID} from './executors/executor.js';
 import {serveAndTestApp} from './serve-testing-worker.js';
 import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
+import {DEFAULT_MAX_REPAIR_ATTEMPTS} from '../configuration/constants.js';
 
 /**
  * Attempts to build the code that an LLM generated. If the build fails, attempts
@@ -59,7 +59,7 @@ export async function attemptBuild(
   );
   let repairAttempts = 0;
   const maxRepairAttempts = (await env.executor.shouldRepairFailedBuilds(evalID))
-    ? DEFAULT_MAX_REPAIR_ATTEMPTS
+    ? (config.maxBuildRepairAttempts ?? DEFAULT_MAX_REPAIR_ATTEMPTS)
     : 0;
 
   const initialAttempt = {

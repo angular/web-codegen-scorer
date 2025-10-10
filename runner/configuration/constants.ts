@@ -24,6 +24,7 @@ export const LLM_OUTPUT_DIR = join(rootDir, 'llm-output');
  * Number of times we'll try to ask LLM to repair a build failure,
  * providing the build output and the code that causes the problem.
  */
+// Note: When updating, also adjust the default description in `README.md`.
 export const DEFAULT_MAX_REPAIR_ATTEMPTS = 1;
 
 /** Name of the folder where we store all generated reports */

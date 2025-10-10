@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import {
   BUILT_IN_ENVIRONMENTS,
   DEFAULT_AUTORATER_MODEL_NAME,
+  DEFAULT_MAX_REPAIR_ATTEMPTS,
   DEFAULT_MODEL_NAME,
 } from './configuration/constants.js';
 import {generateCodeAndAssess} from './orchestration/generate.js';
@@ -39,6 +40,7 @@ interface Options {
   a11yRepairAttempts?: number;
   logging?: 'text-only' | 'dynamic';
   skipLighthouse?: boolean;
+  maxBuildRepairAttempts?: number;
 }
 
 function builder(argv: Argv): Argv<Options> {
@@ -159,6 +161,11 @@ function builder(argv: Argv): Argv<Options> {
         default: false,
         description: 'Whether to skip collecting Lighthouse data',
       })
+      .option('max-build-repair-attempts', {
+        type: 'number',
+        default: DEFAULT_MAX_REPAIR_ATTEMPTS,
+        description: 'Number of repair attempts when build errors are discovered',
+      })
       .strict()
       .version(false)
       .help()
@@ -204,6 +211,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
       skipAiSummary: cliArgs.skipAiSummary,
       a11yRepairAttempts: cliArgs.a11yRepairAttempts,
       skipLighthouse: cliArgs.skipLighthouse,
+      maxBuildRepairAttempts: cliArgs.maxBuildRepairAttempts,
     });
 
     logReportToConsole(runInfo);
