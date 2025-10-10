@@ -29,6 +29,7 @@ export interface AssessmentConfig {
   autoraterModel?: string;
   a11yRepairAttempts?: number;
   skipLighthouse?: boolean;
+  maxBuildRepairAttempts?: number;
 }
 
 /**
