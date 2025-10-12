@@ -56,7 +56,7 @@
     "@genkit-ai/compat-oai": "^1.19.1",
     "@genkit-ai/googleai": "1.21.0",
     "@genkit-ai/mcp": "1.21.0",
-    "@google/genai": "1.23.0",
+    "@google/genai": "1.24.0",
     "@inquirer/prompts": "^7.8.4",
     "@safety-web/runner": "0.4.0-alpha.14",
     "@safety-web/types": "0.4.0-alpha.14",
