@@ -133,19 +133,16 @@ export async function attemptBuildAndTest(
       progress,
       userJourneyAgentTaskInput,
     );
-    const testResult = await runTest(
-      env,
-      evalID,
-      directory,
-      rootPromptDef,
-      abortSignal,
-      workerConcurrencyQueue,
-      progress,
-    );
-
-    if (testResult !== null) {
-      lastAttempt.testResult = testResult;
-    }
+    lastAttempt.testResult =
+      (await runTest(
+        env,
+        evalID,
+        directory,
+        rootPromptDef,
+        abortSignal,
+        workerConcurrencyQueue,
+        progress,
+      )) ?? undefined;
   }
 
   // Attempt to repair testing. This only runs when the last build
@@ -236,19 +233,16 @@ export async function attemptBuildAndTest(
       progress,
       userJourneyAgentTaskInput,
     );
-    const testResult = await runTest(
-      env,
-      evalID,
-      directory,
-      rootPromptDef,
-      abortSignal,
-      workerConcurrencyQueue,
-      progress,
-    );
-
-    if (testResult !== null) {
-      lastAttempt.testResult = testResult;
-    }
+    lastAttempt.testResult =
+      (await runTest(
+        env,
+        evalID,
+        directory,
+        rootPromptDef,
+        abortSignal,
+        workerConcurrencyQueue,
+        progress,
+      )) ?? undefined;
 
     if (hasAxeFailure && lastAttempt.serveTestingResult.axeViolations?.length === 0) {
       progress.log(rootPromptDef, 'success', `Successfully fixed all Axe accessibility violations`);
