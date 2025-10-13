@@ -47,7 +47,7 @@ import {getRunnerByName} from '../codegen/runner-creation.js';
 import {summarizeReportWithAI} from '../reporting/report-ai-summary.js';
 import {LocalExecutor} from './executors/local-executor.js';
 import {EvalID} from './executors/executor.js';
-import {attemptBuildAndTest} from './build-serve-loop.js';
+import {attemptBuildAndTest} from './build-serve-test-loop.js';
 
 /**
  * Orchestrates the entire assessment process for each prompt defined in the `prompts` array.
