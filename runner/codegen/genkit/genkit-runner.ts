@@ -20,6 +20,7 @@ import {MODEL_PROVIDERS} from './models.js';
 import {UserFacingError} from '../../utils/errors.js';
 import {GenkitModelProvider, PromptDataForCounting} from './model-provider.js';
 import {ToolLogEntry} from '../../shared-interfaces.js';
+import {combineAbortSignals} from '../../utils/abort-signal.js';
 
 const globalLogger = new GenkitLogger();
 logger.init(globalLogger);
@@ -115,7 +116,7 @@ export class GenkitRunner implements LlmRunner {
       {messages: options.messages || [], prompt: options.prompt},
       () => {
         const schema = (options as Partial<LocalLlmConstrainedOutputGenerateRequestOptions>).schema;
-        const performRequest = async () => {
+        const performRequest = async (abortSignal: AbortSignal) => {
           let tools: ToolAction[] | undefined;
           let resources: DynamicResourceAction[] | undefined;
 
@@ -148,7 +149,7 @@ export class GenkitRunner implements LlmRunner {
             messages: options.messages,
             tools,
             resources,
-            abortSignal: options.abortSignal,
+            abortSignal,
           });
 
           this._logToolUsage(response);
@@ -159,10 +160,11 @@ export class GenkitRunner implements LlmRunner {
         return options.timeout
           ? callWithTimeout(
               options.timeout.description,
-              performRequest,
+              timeoutAbortSignal =>
+                performRequest(combineAbortSignals(timeoutAbortSignal, options.abortSignal)),
               options.timeout.durationInMins,
             )
-          : performRequest();
+          : performRequest(options.abortSignal);
       },
     );
   }
