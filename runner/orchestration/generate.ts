@@ -117,8 +117,10 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
                   workerConcurrencyQueue,
                   progress,
                 ),
-              // 10min max per app evaluation.  We just want to make sure it never gets stuck.
-              10,
+              // 30min max per app evaluation. We just want to make sure it never gets stuck.
+              // Note that this timeout is expected to never be hit as individual action timeouts
+              // should fire first. E.g. local executor build or test timeouts.
+              30,
             );
             return results;
           } catch (e: unknown) {
