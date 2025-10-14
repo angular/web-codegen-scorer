@@ -26,6 +26,7 @@ import {getPossiblePackageManagers} from '../../configuration/package-managers.j
 import {callWithTimeout} from '../../utils/timeout.js';
 import {executeCommand} from '../../utils/exec.js';
 import {cleanupBuildMessage} from '../../workers/builder/worker.js';
+import {combineAbortSignals} from '../../utils/abort-signal.js';
 
 let uniqueIDs = 0;
 
@@ -145,7 +146,7 @@ export class LocalExecutor implements Executor {
           `Testing ${rootPromptDef.name}`,
           timeoutAbort =>
             executeCommand(testCommand, appDirectoryPath, undefined, {
-              abortSignal: AbortSignal.any([abortSignal, timeoutAbort]),
+              abortSignal: combineAbortSignals(abortSignal, timeoutAbort),
             }),
           4, // 4min. This is a safety boundary. Lots of parallelism can slow-down.
         ),

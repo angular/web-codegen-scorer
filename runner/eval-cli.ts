@@ -190,6 +190,13 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
     process.exit(0);
   }
 
+  const abortCtrl = new AbortController();
+
+  process.on('SIGINT', () => abortCtrl.abort());
+  process.on('SIGTERM', () => abortCtrl.abort());
+  process.on('SIGTERM', () => abortCtrl.abort());
+  process.on('exit', () => abortCtrl.abort());
+
   try {
     const runInfo = await generateCodeAndAssess({
       runner: cliArgs.runner,
@@ -214,6 +221,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
       skipLighthouse: cliArgs.skipLighthouse,
       maxBuildRepairAttempts: cliArgs.maxBuildRepairAttempts,
       maxTestRepairAttempts: cliArgs.maxTestRepairAttempts,
+      abortSignal: abortCtrl.signal,
     });
 
     logReportToConsole(runInfo);

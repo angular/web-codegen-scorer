@@ -26,6 +26,7 @@ import {LocalExecutor} from './executors/local-executor.js';
 import {startEvaluationTask} from './generate-eval-task.js';
 import {prepareSummary} from './generate-summary.js';
 import {getRunGroupId} from './grouping.js';
+import {combineAbortSignals} from '../utils/abort-signal.js';
 
 /**
  * Orchestrates the entire assessment process for each prompt defined in the `prompts` array.
@@ -42,6 +43,13 @@ import {getRunGroupId} from './grouping.js';
  */
 export async function generateCodeAndAssess(options: AssessmentConfig): Promise<RunInfo> {
   const env = await getEnvironmentByPath(options.environmentConfigPath, options.runner);
+  const cleanup = async () => {
+    await env.executor.destroy();
+  };
+
+  // Ensure cleanup logic runs when the evaluation is aborted.
+  options.abortSignal?.addEventListener('abort', cleanup);
+
   const ratingLlm = await getRunnerByName('genkit');
 
   await assertValidModelName(options.model, env.executor);
@@ -106,14 +114,14 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
           try {
             results = await callWithTimeout(
               `Evaluation of ${rootPromptDef.name}`,
-              async abortSignal =>
+              async timeoutAbortSignal =>
                 startEvaluationTask(
                   options,
                   evalID,
                   env,
                   ratingLlm,
                   rootPromptDef,
-                  abortSignal,
+                  combineAbortSignals(timeoutAbortSignal, options.abortSignal),
                   workerConcurrencyQueue,
                   progress,
                 ),
@@ -189,7 +197,10 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
       details,
     } satisfies RunInfo;
   } finally {
-    await env.executor.destroy();
+    await cleanup();
+
+    // Remove potential abort listeners to avoid memory leaks.
+    options.abortSignal?.removeEventListener('abort', cleanup);
   }
 }
 

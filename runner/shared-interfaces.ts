@@ -30,6 +30,7 @@ export interface AssessmentConfig {
   skipLighthouse?: boolean;
   maxTestRepairAttempts?: number;
   maxBuildRepairAttempts?: number;
+  abortSignal?: AbortSignal;
 }
 
 /**
