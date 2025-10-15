@@ -85,14 +85,10 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
     // We need Chrome to collect runtime information.
     await installChrome();
 
-  const mcpServerDetails =
-    env.executor instanceof LocalExecutor &&
-    options.startMcp &&
-    env.executor.startMcpServerHost
-      ? await env.executor.startMcpServerHost(
-          `mcp-${env.clientSideFramework.id}`
-        )
-      : undefined;
+    const mcpServerDetails =
+      env.executor instanceof LocalExecutor && options.startMcp && env.executor.startMcpServerHost
+        ? await env.executor.startMcpServerHost(`mcp-${env.clientSideFramework.id}`)
+        : undefined;
 
     progress.initialize(promptsToProcess.length);
 
