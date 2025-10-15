@@ -1,7 +1,7 @@
 import {ChildProcess, fork} from 'node:child_process';
 import path, {join} from 'node:path';
 import PQueue from 'p-queue';
-import {LlmRunner} from '../../codegen/llm-runner.js';
+import {LlmRunner, McpServerDetails} from '../../codegen/llm-runner.js';
 import {getRunnerByName, RunnerName} from '../../codegen/runner-creation.js';
 import {ProgressLogger} from '../../progress/progress-logger.js';
 import {
@@ -225,16 +225,16 @@ export class LocalExecutor implements Executor {
     };
   }
 
-  async startMcpServerHost(hostName: string) {
+  async startMcpServerHost(hostName: string): Promise<McpServerDetails | undefined> {
     const llm = await this.llm;
     if (llm.startMcpServerHost === undefined) {
-      return;
+      return undefined;
     }
 
-    llm.startMcpServerHost(hostName, this.config.mcpServers ?? []);
+    return llm.startMcpServerHost(hostName, this.config.mcpServers ?? []);
   }
 
-  async collectMcpServerLogs() {
+  async collectMcpServerLogs(mcpServerDetails: McpServerDetails | undefined) {
     const llm = await this.llm;
     if (llm.flushMcpServerLogs === undefined) {
       return;
@@ -245,6 +245,8 @@ export class LocalExecutor implements Executor {
         name: m.name,
         command: m.command,
         args: m.args,
+        tools: mcpServerDetails?.tools ?? [],
+        resources: mcpServerDetails?.resources ?? [],
       })),
       logs: llm.flushMcpServerLogs().join('\n'),
     };

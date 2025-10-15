@@ -168,8 +168,7 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
 
     const mcp =
       env.executor instanceof LocalExecutor && options.startMcp
-        ? {...await env.executor.collectMcpServerLogs(), tools: mcpServerDetails?.tools || [],
-              resources: mcpServerDetails?.resources || [],}
+        ? await env.executor.collectMcpServerLogs(mcpServerDetails)
         : undefined;
 
     const timestamp = new Date();
