@@ -437,7 +437,15 @@ export interface RunDetails {
   /** Information about configured MCP servers, if any. */
   mcp?: {
     /** MCP servers that were configured. */
-    servers: {name: string; command: string; args: string[]}[];
+    servers: {
+      name: string;
+      command: string;
+      args: string[];
+      /** Tools reported for this server. */
+      tools?: string[];
+      /** Resources reported for this server. */
+      resources?: string[];
+    }[];
 
     /** Logs produced by all of the servers. */
     logs: string;

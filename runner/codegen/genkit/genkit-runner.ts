@@ -1,4 +1,11 @@
-import {DynamicResourceAction, GenerateResponse, genkit, ModelReference, ToolAction} from 'genkit';
+import {
+  Action,
+  DynamicResourceAction,
+  GenerateResponse,
+  genkit,
+  ModelReference,
+  ToolAction,
+} from 'genkit';
 import {GenkitMcpHost, McpServerConfig, createMcpHost} from '@genkit-ai/mcp';
 import {GenkitPlugin, GenkitPluginV2} from 'genkit/plugin';
 import {z} from 'zod';
@@ -11,6 +18,7 @@ import {
   LocalLlmGenerateTextResponse,
   LocalLlmGenerateTextRequestOptions,
   LocalLlmGenerateFilesRequestOptions,
+  McpServerDetails,
 } from '../llm-runner.js';
 import {setTimeout} from 'node:timers/promises';
 import {callWithTimeout} from '../../utils/timeout.js';
@@ -21,9 +29,17 @@ import {UserFacingError} from '../../utils/errors.js';
 import {GenkitModelProvider, PromptDataForCounting} from './model-provider.js';
 import {ToolLogEntry} from '../../shared-interfaces.js';
 import {combineAbortSignals} from '../../utils/abort-signal.js';
+import {toToolDefinition} from 'genkit/tool';
 
 const globalLogger = new GenkitLogger();
 logger.init(globalLogger);
+
+/**
+ * Gets the name of a Genkit action.
+ */
+function getActionName(action: Action<any, any>): string {
+  return toToolDefinition(action).name;
+}
 
 /** Runner that uses the Genkit API under the hood. */
 export class GenkitRunner implements LlmRunner {
@@ -199,7 +215,10 @@ export class GenkitRunner implements LlmRunner {
     }
   }
 
-  startMcpServerHost(hostName: string, servers: McpServerOptions[]): void {
+  async startMcpServerHost(
+    hostName: string,
+    servers: McpServerOptions[],
+  ): Promise<McpServerDetails> {
     if (this.mcpHost !== null) {
       throw new Error('MCP host is already started');
     }
@@ -216,6 +235,12 @@ export class GenkitRunner implements LlmRunner {
 
     globalLogger.startCapturingLogs();
     this.mcpHost = createMcpHost({name: hostName, mcpServers});
+    const tools = await this.mcpHost.getActiveTools(this.genkitInstance);
+    const resources = await this.mcpHost.getActiveResources(this.genkitInstance);
+    return {
+      tools: tools.map(getActionName),
+      resources: resources.map(getActionName),
+    };
   }
 
   flushMcpServerLogs(): string[] {

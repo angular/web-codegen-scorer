@@ -218,7 +218,7 @@
         <ul>
           @for (server of details.mcp.servers; track server) {
             <li>
-              <span>
+              <div>
                 <strong>{{ server.name }}</strong
                 >:
                 <code
@@ -227,7 +227,27 @@
                     {{ arg }}
                   }
                 </code>
-              </span>
+              </div>
+              @if (server.tools && server.tools.length > 0) {
+                <div>
+                  Tools
+                  <ul>
+                    @for (tool of server.tools; track tool) {
+                      <li>{{ tool }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+              @if (server.resources && server.resources.length > 0) {
+                <div>
+                  Resources
+                  <ul>
+                    @for (tool of server.resources; track tool) {
+                      <li>{{ tool }}</li>
+                    }
+                  </ul>
+                </div>
+              }
             </li>
           }
         </ul>
