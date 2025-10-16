@@ -24,8 +24,8 @@ importers:
         specifier: 1.21.0
         version: 1.21.0(@modelcontextprotocol/sdk@1.20.0)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
       '@google/genai':
-        specifier: 1.24.0
-        version: 1.24.0(@modelcontextprotocol/sdk@1.20.0)(encoding@0.1.13)
+        specifier: 1.25.0
+        version: 1.25.0(@modelcontextprotocol/sdk@1.20.0)(encoding@0.1.13)
       '@inquirer/prompts':
         specifier: ^7.8.4
         version: 7.8.6(@types/node@24.7.2)
@@ -1020,8 +1020,8 @@ packages:
       '@modelcontextprotocol/sdk':
         optional: true
 
-  '@google/genai@1.24.0':
-    resolution: {integrity: sha512-e3jZF9Dx3dDaDCzygdMuYByHI2xJZ0PaD3r2fRgHZe2IOwBnmJ/Tu5Lt/nefTCxqr1ZnbcbQK9T13d8U/9UMWg==}
+  '@google/genai@1.25.0':
+    resolution: {integrity: sha512-IBNyel/umavam98SQUfvQSvh/Rp6Ql2fysQLqPyWZr5K8d768X9AO+JZU4o+3qvFDUBA0dVYUSkxyYonVcICvA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.11.4
@@ -8122,7 +8122,7 @@ snapshots:
       - utf-8-validate
     optional: true
 
-  '@google/genai@1.24.0(@modelcontextprotocol/sdk@1.20.0)(encoding@0.1.13)':
+  '@google/genai@1.25.0(@modelcontextprotocol/sdk@1.20.0)(encoding@0.1.13)':
     dependencies:
       google-auth-library: 9.15.1(encoding@0.1.13)
       ws: 8.18.3
