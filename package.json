@@ -51,7 +51,7 @@
     "wcs": "./runner/bin/cli.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.65.0",
+    "@anthropic-ai/sdk": "^0.67.0",
     "@axe-core/puppeteer": "^4.10.2",
     "@genkit-ai/compat-oai": "^1.19.1",
     "@genkit-ai/googleai": "1.21.0",
@@ -92,13 +92,13 @@
   },
   "optionalDependencies": {
     "@anthropic-ai/claude-code": "^2.0.0",
-    "@google/gemini-cli": "^0.8.0",
-    "@openai/codex": "^0.46.0"
+    "@google/gemini-cli": "^0.9.0",
+    "@openai/codex": "^0.47.0"
   },
   "devDependencies": {
     "@anthropic-ai/claude-code": "^2.0.0",
-    "@google/gemini-cli": "^0.8.0",
-    "@openai/codex": "^0.46.0",
+    "@google/gemini-cli": "^0.9.0",
+    "@openai/codex": "^0.47.0",
     "prettier": "^3.5.3",
     "tsx": "^4.20.3"
   }
