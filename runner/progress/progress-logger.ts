@@ -5,7 +5,7 @@ import {AssessmentResult, RootPromptDefinition} from '../shared-interfaces.js';
 export type ProgressType =
   | 'codegen'
   | 'build'
-  | 'test'
+  | 'project-test'
   | 'serve-testing'
   | 'success'
   | 'error'
@@ -19,7 +19,7 @@ export function progressTypeToIcon(type: ProgressType): string {
       return '🤖';
     case 'build':
       return '🔨';
-    case 'test':
+    case 'project-test':
       return '🧪';
     case 'serve-testing':
       return '🌊';

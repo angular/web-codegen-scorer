@@ -184,7 +184,7 @@ export async function attemptBuildAndTest(
       testRepairAttempts++;
       progress.log(
         rootPromptDef,
-        'test',
+        'project-test',
         `Trying to repair test failures (attempt #${attemptId})...`,
       );
 
