@@ -25,7 +25,7 @@ export async function serveAndTestApp(
   progress: ProgressLogger,
   userJourneyAgentTaskInput?: BrowserAgentTaskInput,
 ): Promise<ServeTestingResult> {
-  progress.log(rootPromptDef, 'serve-testing', `Testing the app`);
+  progress.log(rootPromptDef, 'serve-testing', `Validating the running app`);
 
   const result = await env.executor.serveWebApplication(
     evalID,

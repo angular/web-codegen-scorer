@@ -148,7 +148,7 @@ export class DynamicProgressLogger implements ProgressLogger {
     switch (type) {
       case 'success':
       case 'serve-testing':
-      case 'test':
+      case 'project-test':
       case 'build':
         return chalk.green;
       case 'error':

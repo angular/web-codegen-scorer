@@ -13,7 +13,7 @@ export async function runTest(
   workerConcurrencyQueue: PQueue,
   progress: ProgressLogger,
 ): Promise<TestExecutionResult | null> {
-  progress.log(rootPromptDef, 'test', `Running tests`);
+  progress.log(rootPromptDef, 'project-test', `Running project tests`);
 
   try {
     const result = await env.executor.executeProjectTests(
