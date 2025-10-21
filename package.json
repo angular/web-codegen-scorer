@@ -71,7 +71,7 @@
     "genkit": "^1.19.1",
     "genkitx-anthropic": "0.25.0",
     "handlebars": "^4.7.8",
-    "lighthouse": "^12.8.2",
+    "lighthouse": "^13.0.0",
     "limiter": "^3.0.0",
     "marked": "^16.1.1",
     "node-fetch": "^3.3.2",
