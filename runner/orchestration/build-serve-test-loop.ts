@@ -64,10 +64,15 @@ export async function attemptBuildAndTest(
     progress,
   );
   let repairAttempts = 0;
-  const maxRepairAttempts = (await env.executor.shouldRepairFailedBuilds(evalID))
-    ? (config.maxBuildRepairAttempts ?? DEFAULT_MAX_BUILD_REPAIR_ATTEMPTS)
-    : 0;
-  const maxTestRepairAttempts = config.maxTestRepairAttempts ?? DEFAULT_MAX_TEST_REPAIR_ATTEMPTS;
+  let maxRepairAttempts: number;
+  let maxTestRepairAttempts: number;
+
+  if (await env.executor.shouldRepairFailedBuilds(evalID)) {
+    maxRepairAttempts = config.maxBuildRepairAttempts ?? DEFAULT_MAX_BUILD_REPAIR_ATTEMPTS;
+    maxTestRepairAttempts = config.maxTestRepairAttempts ?? DEFAULT_MAX_TEST_REPAIR_ATTEMPTS;
+  } else {
+    maxRepairAttempts = maxTestRepairAttempts = 0;
+  }
 
   const initialAttempt = {
     outputFiles: initialResponse.files,
