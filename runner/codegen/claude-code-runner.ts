@@ -4,7 +4,7 @@ import {
   LlmRunner,
 } from './llm-runner.js';
 import {join} from 'path';
-import {mkdirSync} from 'fs';
+import {existsSync, mkdirSync} from 'fs';
 import {writeFile} from 'fs/promises';
 import {BaseCliAgentRunner} from './base-cli-agent-runner.js';
 
@@ -48,7 +48,9 @@ export class ClaudeCodeRunner extends BaseCliAgentRunner implements LlmRunner {
     const instructionFilePath = join(context.directory, 'CLAUDE.md');
     const settingsDir = join(context.directory, '.claude');
 
-    mkdirSync(settingsDir);
+    if (!existsSync(settingsDir)) {
+      mkdirSync(settingsDir);
+    }
 
     await Promise.all([
       writeFile(join(settingsDir, 'settings.json'), this.getSettingsJsonFile(options.context)),

@@ -1,6 +1,6 @@
 import {LocalLlmGenerateFilesRequestOptions, LlmRunner} from './llm-runner.js';
 import {join} from 'path';
-import {mkdirSync} from 'fs';
+import {existsSync, mkdirSync} from 'fs';
 import {writeFile} from 'fs/promises';
 import {BaseCliAgentRunner} from './base-cli-agent-runner.js';
 
@@ -36,7 +36,9 @@ export class GeminiCliRunner extends BaseCliAgentRunner implements LlmRunner {
     const instructionFilePath = join(context.directory, 'GEMINI.md');
     const settingsDir = join(context.directory, '.gemini');
 
-    mkdirSync(settingsDir);
+    if (!existsSync(settingsDir)) {
+      mkdirSync(settingsDir);
+    }
 
     const commonIgnorePatterns = super.getCommonIgnorePatterns();
     const ignoreFileContent = [
