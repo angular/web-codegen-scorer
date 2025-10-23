@@ -85,6 +85,10 @@ export class FakeRemoteExecutor implements Executor {
     };
   }
 
+  async executeProjectTests() {
+    return null;
+  }
+
   async shouldRepairFailedBuilds() {
     // Some environments have a builtin retry loop as part of initial generation.
     // In those cases, you may want to skip retrying.

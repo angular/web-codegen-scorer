@@ -232,7 +232,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
     } else {
       console.error(chalk.red('An error occurred during the assessment process:'));
       console.error(chalk.red(error));
-      if ((error as Partial<Error>).stack) {
+      if (process.env.DEBUG === '1' && (error as Partial<Error>).stack) {
         console.error(chalk.red((error as Error).stack));
       }
     }

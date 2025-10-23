@@ -1,6 +1,7 @@
 import {readdirSync, readFileSync, statSync} from 'fs';
-import {basename, dirname, extname, join, resolve} from 'path';
+import {basename, extname, join, resolve} from 'path';
 import {globSync} from 'tinyglobby';
+import {Executor} from '../orchestration/executors/executor.js';
 import {Rating} from '../ratings/rating-types.js';
 import {
   FrameworkInfo,
@@ -13,10 +14,7 @@ import {generateId} from '../utils/id-generation.js';
 import {lazy} from '../utils/lazy-creation.js';
 import {EnvironmentConfig} from './environment-config.js';
 import {MultiStepPrompt} from './multi-step-prompt.js';
-import {renderHandlebarsTemplate} from './prompt-templating.js';
-import {RunnerName} from '../codegen/runner-creation.js';
-import {Executor} from '../orchestration/executors/executor.js';
-import {LocalExecutor} from '../orchestration/executors/local-executor.js';
+import {renderPromptTemplate} from './prompt-templating.js';
 
 /** Represents a single prompt evaluation environment. */
 export class Environment {
@@ -133,8 +131,8 @@ export class Environment {
     promptFilePath: string | null,
     additionalContext: Record<string, string> = {},
   ) {
-    return renderHandlebarsTemplate(content, {
-      rootDir: promptFilePath ? dirname(promptFilePath) : null,
+    return renderPromptTemplate(content, {
+      containingFile: promptFilePath ? promptFilePath : null,
       FULL_STACK_FRAMEWORK_NAME: this.fullStackFramework.displayName,
       CLIENT_SIDE_FRAMEWORK_NAME: this.clientSideFramework.displayName,
       ...additionalContext,
