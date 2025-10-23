@@ -28,8 +28,6 @@ export class Environment {
   readonly fullStackFramework: FrameworkInfo;
   /** Information about the client-side framework used within the environment. */
   readonly clientSideFramework: FrameworkInfo;
-  /** Prompts that should be executed as a part of the evaluation. */
-  readonly executablePrompts: RootPromptDefinition[];
   /** Path from which to read the code rating prompt. */
   readonly codeRatingPromptPath: string | null;
   /** Whether the prompts should be removed from the final report. */
@@ -58,10 +56,6 @@ export class Environment {
             this.getFrameworkDisplayName(config.fullStackFramework) || config.clientSideFramework,
         }
       : {...this.clientSideFramework};
-    this.executablePrompts = this.resolveExecutablePrompts(
-      config.executablePrompts,
-      config.ratings,
-    );
     this.codeRatingPromptPath = config.codeRatingPrompt
       ? join(rootPath, config.codeRatingPrompt)
       : null;
@@ -70,22 +64,27 @@ export class Environment {
     this.executor = config.executor;
   }
 
-  systemPromptGeneration = lazy(() => {
-    return this.renderRelativePrompt(this.config.generationSystemPrompt).result;
+  /** Prompts that should be executed as a part of the evaluation. */
+  executablePrompts = lazy(async () => {
+    return this.resolveExecutablePrompts(this.config.executablePrompts, this.config.ratings);
   });
 
-  systemPromptRepair = lazy(() => {
+  systemPromptGeneration = lazy(async () => {
+    return (await this.renderSystemPrompt(this.config.generationSystemPrompt)).result;
+  });
+
+  systemPromptRepair = lazy(async () => {
     if (!this.config.repairSystemPrompt) {
       return 'Please fix the given errors and return the corrected code.';
     }
-    return this.renderRelativePrompt(this.config.repairSystemPrompt).result;
+    return (await this.renderSystemPrompt(this.config.repairSystemPrompt)).result;
   });
 
-  systemPromptEditing = lazy(() => {
+  systemPromptEditing = lazy(async () => {
     if (!this.config.editingSystemPrompt) {
       return this.systemPromptGeneration();
     }
-    return this.renderRelativePrompt(this.config.editingSystemPrompt).result;
+    return (await this.renderSystemPrompt(this.config.editingSystemPrompt)).result;
   });
 
   /**
@@ -100,8 +99,8 @@ export class Environment {
   ): Promise<string> {
     const systemPrompt =
       type === 'generation'
-        ? this.systemPromptGeneration()
-        : (this.systemPromptEditing() ?? this.systemPromptGeneration());
+        ? await this.systemPromptGeneration()
+        : await this.systemPromptEditing();
 
     if (!ragEndpoint) {
       return [systemPrompt, userPrompt].join('\n\n');
@@ -168,11 +167,11 @@ export class Environment {
    * @param prompts Prompts to be resolved.
    * @param envRatings Environment-level ratings.
    */
-  private resolveExecutablePrompts(
+  private async resolveExecutablePrompts(
     prompts: EnvironmentConfig['executablePrompts'],
     envRatings: Rating[],
-  ) {
-    const result: RootPromptDefinition[] = [];
+  ): Promise<RootPromptDefinition[]> {
+    const result: Promise<RootPromptDefinition>[] = [];
 
     for (const def of prompts) {
       if (def instanceof MultiStepPrompt) {
@@ -191,20 +190,21 @@ export class Environment {
           name = def.name;
         }
 
-        globSync(path, {cwd: this.rootPath}).forEach(relativePath => {
-          result.push(
-            this.getStepPromptDefinition(
-              name ?? basename(relativePath, extname(relativePath)),
-              relativePath,
-              ratings,
-              /* isEditing */ false,
-            ),
-          );
-        });
+        result.push(
+          ...globSync(path, {cwd: this.rootPath}).map(
+            async relativePath =>
+              await this.getStepPromptDefinition(
+                name ?? basename(relativePath, extname(relativePath)),
+                relativePath,
+                ratings,
+                /* isEditing */ false,
+              ),
+          ),
+        );
       }
     }
 
-    return result;
+    return Promise.all(result);
   }
 
   /**
@@ -216,13 +216,13 @@ export class Environment {
    * @param ratings Ratings to run against the definition.
    * @param isEditing Whether this is an editing or generation step.
    */
-  private getStepPromptDefinition(
+  private async getStepPromptDefinition(
     name: string,
     relativePath: string,
     ratings: Rating[],
     isEditing: boolean,
-  ): PromptDefinition {
-    const {result, contextFiles} = this.renderRelativePrompt(relativePath);
+  ): Promise<PromptDefinition> {
+    const {result, contextFiles} = await this.renderEnvironmentPrompt(relativePath);
 
     return {
       name: name,
@@ -240,10 +240,10 @@ export class Environment {
    * @param def Definition of the prompt.
    * @param envRatings Environment-level ratings.
    */
-  private getMultiStepPrompt(
+  private async getMultiStepPrompt(
     def: MultiStepPrompt,
     envRatings: Rating[],
-  ): MultiStepPromptDefinition {
+  ): Promise<MultiStepPromptDefinition> {
     const promptRoot = resolve(this.rootPath, def.directoryPath);
     const name = basename(promptRoot);
     const steps: PromptDefinition[] = [];
@@ -288,7 +288,7 @@ export class Environment {
       if (stepNum === 0) {
         throw new UserFacingError('Multi-step prompts start with `step-1`.');
       }
-      const step = this.getStepPromptDefinition(
+      const step = await this.getStepPromptDefinition(
         `${name}-step-${stepNum}`,
         join(def.directoryPath, current.name),
         ratings,
@@ -317,8 +317,20 @@ export class Environment {
   }
 
   /** Renders a prompt from a path relative to the environment config. */
-  private renderRelativePrompt(relativePath: string) {
+  private async renderEnvironmentPrompt(relativePath: string) {
     const path = resolve(this.rootPath, relativePath);
     return this.renderPrompt(readFileSync(path, 'utf8'), path);
+  }
+
+  private async renderSystemPrompt(relativePath: string) {
+    const result = await this.renderEnvironmentPrompt(relativePath);
+
+    // Optional hooks for post processing environment system prompts. Useful for e.g.
+    // supporting `@` references from Gemini CLI or inside g3.
+    if (this.executor.postProcessSystemPrompt !== undefined) {
+      result.result = await this.executor.postProcessSystemPrompt(result.result, this.rootPath);
+    }
+
+    return result;
   }
 }

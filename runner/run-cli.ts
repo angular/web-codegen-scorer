@@ -146,13 +146,14 @@ async function resolveConfig(options: Options) {
     );
   }
 
-  const rootPromptDef = environment.executablePrompts.find(p => p.name === options.prompt);
+  const executablePrompts = await environment.executablePrompts();
+  const rootPromptDef = executablePrompts.find(p => p.name === options.prompt);
 
   if (!rootPromptDef) {
     throw new UserFacingError(
       `Environment "${environment.displayName}" does not have a prompt with a name of "${options.prompt}".\n` +
         `The following prompts are available:\n` +
-        environment.executablePrompts.map(p => ` - ${p.name}`).join('\n'),
+        executablePrompts.map(p => ` - ${p.name}`).join('\n'),
     );
   }
 

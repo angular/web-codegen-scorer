@@ -63,11 +63,10 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
   await assertValidModelName(options.model, env.executor);
 
   try {
-    const promptsToProcess = getCandidateExecutablePrompts(
-      env,
-      options.localMode,
-      options.promptFilter,
+    const promptsToProcess = (
+      await getCandidateExecutablePrompts(env, options.localMode, options.promptFilter)
     ).slice(0, options.limit);
+
     const progress =
       options.logging === 'dynamic' ? new DynamicProgressLogger() : new TextProgressLogger();
     const appConcurrency =
@@ -196,8 +195,10 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
       ),
       timestamp: timestamp.toISOString(),
       reportName: options.reportName,
-      systemPromptGeneration: env.classifyPrompts ? 'Classified 🕵️' : env.systemPromptGeneration(),
-      systemPromptRepair: env.classifyPrompts ? 'Classified 🕵️' : env.systemPromptRepair(),
+      systemPromptGeneration: env.classifyPrompts
+        ? 'Classified 🕵️'
+        : await env.systemPromptGeneration(),
+      systemPromptRepair: env.classifyPrompts ? 'Classified 🕵️' : await env.systemPromptRepair(),
       // Deduplicate labels before finalizing the report.
       labels: Array.from(new Set(options.labels)),
       mcp,
@@ -219,13 +220,13 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
 }
 
 /** Gets prompts that are candidates to be executed. */
-function getCandidateExecutablePrompts(
+async function getCandidateExecutablePrompts(
   env: Environment,
   localMode: boolean,
   promptFilter: string | undefined,
-): RootPromptDefinition[] {
+): Promise<RootPromptDefinition[]> {
   const envDir = join(LLM_OUTPUT_DIR, env.id);
-  let result = env.executablePrompts;
+  let result = await env.executablePrompts();
 
   // In local mode filter the list of prompts down to
   // only the ones that we have local output for.

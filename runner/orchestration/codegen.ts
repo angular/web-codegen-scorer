@@ -98,7 +98,7 @@ export async function repairCodeWithAI(
   progress: ProgressLogger,
   repairType: 'build' | 'test',
 ): Promise<LlmResponse> {
-  const repairSystemInstructions = env.systemPromptRepair();
+  const repairSystemInstructions = await env.systemPromptRepair();
   const repairPrompt = [
     ...errors.map(({errorContext, errorMessage}) =>
       [errorContext, '```', errorMessage, '```'].join('\n'),

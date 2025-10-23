@@ -48,3 +48,4 @@ export {DynamicProgressLogger} from './progress/dynamic-progress-logger.js';
 export {NoopProgressLogger} from './progress/noop-progress-logger.js';
 export {TextProgressLogger} from './progress/text-progress-logger.js';
 export {type ServeTestingResult} from './workers/serve-testing/worker-types.js';
+export {replaceAtReferencesInPrompt} from './utils/prompt-at-references.js';

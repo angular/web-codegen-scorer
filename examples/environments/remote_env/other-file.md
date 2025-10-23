@@ -1,3 +1,3 @@
 Use XYZ.
 
-@./other-file-2.md
+@/other-file-2.md

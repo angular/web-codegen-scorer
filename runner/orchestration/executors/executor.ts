@@ -104,6 +104,12 @@ export const executorSchema = z.object({
       }),
     ),
   ),
+  postProcessSystemPrompt: z
+    .function(
+      z.tuple([z.string().describe('Prompt'), z.string().describe('Environment root path')]),
+      z.promise(z.string()),
+    )
+    .optional(),
   destroy: z.function(z.tuple([]), z.promise(z.void())),
   getExecutorInfo: z.function(
     z.tuple([]),
