@@ -7,6 +7,7 @@ import {
   LlmGenerateFilesRequest,
   LlmResponse,
   LlmResponseFile,
+  replaceAtReferencesInPrompt,
   RootPromptDefinition,
 } from '../../../runner';
 import {ProgressLogger} from '../../../runner/progress/progress-logger';
@@ -109,6 +110,14 @@ export class FakeRemoteExecutor implements Executor {
       displayName: 'Fake Executor',
       mcpServersLaunched: 0,
     };
+  }
+
+  async postProcessSystemPrompt(prompt: string, environmentRootPath: string) {
+    return replaceAtReferencesInPrompt(
+      prompt,
+      `${environmentRootPath}/prompt.md`,
+      environmentRootPath,
+    );
   }
 
   async destroy() {}
