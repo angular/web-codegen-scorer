@@ -44,7 +44,15 @@ import {combineAbortSignals} from '../utils/abort-signal.js';
 export async function generateCodeAndAssess(options: AssessmentConfig): Promise<RunInfo> {
   const env = await getEnvironmentByPath(options.environmentConfigPath, options.runner);
   const cleanup = async () => {
-    await env.executor.destroy();
+    // Clean-up should never interrupt a potentially passing completion.
+    try {
+      await env.executor.destroy();
+    } catch (e) {
+      console.error(`Failed to destroy executor: ${e}`);
+      if (e instanceof Error) {
+        console.error(e.stack);
+      }
+    }
   };
 
   // Ensure cleanup logic runs when the evaluation is aborted.
@@ -147,8 +155,13 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
             progress.log(rootPromptDef, 'error', 'Failed to evaluate code', details);
             return [] satisfies AssessmentResult[];
           } finally {
+            // Gracefully finalize the eval. Errors in finalization should not propagate.
+            try {
+              await env.executor.finalizeEval(evalID);
+            } catch (e) {
+              progress.log(rootPromptDef, 'error', 'Failed to finalize eval', `${e}`);
+            }
             progress.evalFinished(rootPromptDef, results || []);
-            await env.executor.finalizeEval(evalID);
           }
         }),
       );

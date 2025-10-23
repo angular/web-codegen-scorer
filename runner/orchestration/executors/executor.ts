@@ -58,21 +58,23 @@ export const executorSchema = z.object({
     ]),
     z.promise(z.custom<BuildResult>()),
   ),
-  serveWebApplication: z.function(
-    z.tuple([
-      z.custom<EvalID>().describe('ID of the eval'),
-      z.string().describe('Path to the application directory'),
-      z.custom<RootPromptDefinition>().describe('Root prompt definition'),
-      z.custom<ProgressLogger>().describe('Progress logger'),
-      z
-        .function(
-          z.tuple([z.string().describe('URL of the running server')]),
-          z.promise(z.custom<ServeTestingResult>()),
-        )
-        .describe('Call this function while the server is running'),
-    ]),
-    z.promise(z.custom<ServeTestingResult>()),
-  ),
+  serveWebApplication: z
+    .function(
+      z.tuple([
+        z.custom<EvalID>().describe('ID of the eval'),
+        z.string().describe('Path to the application directory'),
+        z.custom<RootPromptDefinition>().describe('Root prompt definition'),
+        z.custom<ProgressLogger>().describe('Progress logger'),
+        z
+          .function(
+            z.tuple([z.string().describe('URL of the running server')]),
+            z.promise(z.custom<ServeTestingResult>()),
+          )
+          .describe('Call this function while the server is running'),
+      ]),
+      z.promise(z.custom<ServeTestingResult>()),
+    )
+    .nullable(),
   executeProjectTests: z.function(
     z.tuple([
       z.custom<EvalID>().describe('ID of the eval'),

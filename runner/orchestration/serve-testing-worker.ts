@@ -9,7 +9,7 @@ import {
   ServeTestingWorkerMessage,
   ServeTestingWorkerResponseMessage,
 } from '../workers/serve-testing/worker-types.js';
-import {EvalID, Executor} from './executors/executor.js';
+import {EvalID} from './executors/executor.js';
 import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
 import PQueue from 'p-queue';
 
@@ -24,61 +24,71 @@ export async function serveAndTestApp(
   abortSignal: AbortSignal,
   progress: ProgressLogger,
   userJourneyAgentTaskInput?: BrowserAgentTaskInput,
-): Promise<ServeTestingResult> {
-  progress.log(rootPromptDef, 'serve-testing', `Validating the running app`);
-
-  const result = await env.executor.serveWebApplication(
-    evalID,
-    appDirectoryPath,
-    rootPromptDef,
-    progress,
-    async serveUrl => {
-      const serveParams: ServeTestingWorkerMessage = {
-        serveUrl,
-        appName: rootPromptDef.name,
-        enableAutoCsp: !!config.enableAutoCsp,
-        includeAxeTesting: config.skipAxeTesting === false,
-        takeScreenshots: config.skipScreenshots === false,
-        includeLighthouseData: config.skipLighthouse !== true,
-        userJourneyAgentTaskInput,
-      };
-
-      return await workerConcurrencyQueue.add(
-        () =>
-          new Promise<ServeTestingResult>((resolve, reject) => {
-            const child: ChildProcess = fork(
-              path.resolve(import.meta.dirname, '../workers/serve-testing/worker.js'),
-              {signal: abortSignal},
-            );
-            child.send(serveParams);
-
-            child.on('message', async (result: ServeTestingWorkerResponseMessage) => {
-              if (result.type === 'result') {
-                await killChildProcessGracefully(child);
-                resolve(result.payload);
-              } else {
-                progress.log(
-                  rootPromptDef,
-                  result.payload.state,
-                  result.payload.message,
-                  result.payload.details,
-                );
-              }
-            });
-            child.on('error', async err => {
-              await killChildProcessGracefully(child);
-              reject(err);
-            });
-          }),
-      );
-    },
-  );
-
-  if (result.errorMessage === undefined) {
-    progress.log(rootPromptDef, 'success', 'Testing is successful');
-  } else {
-    progress.log(rootPromptDef, 'error', 'Testing has failed', result.errorMessage);
+): Promise<ServeTestingResult | null> {
+  if (env.executor.serveWebApplication === null) {
+    return null;
   }
 
-  return result;
+  progress.log(rootPromptDef, 'serve-testing', `Validating the running app`);
+
+  try {
+    const result = await env.executor.serveWebApplication(
+      evalID,
+      appDirectoryPath,
+      rootPromptDef,
+      progress,
+      async serveUrl => {
+        const serveParams: ServeTestingWorkerMessage = {
+          serveUrl,
+          appName: rootPromptDef.name,
+          enableAutoCsp: !!config.enableAutoCsp,
+          includeAxeTesting: config.skipAxeTesting === false,
+          takeScreenshots: config.skipScreenshots === false,
+          includeLighthouseData: config.skipLighthouse !== true,
+          userJourneyAgentTaskInput,
+        };
+
+        return await workerConcurrencyQueue.add(
+          () =>
+            new Promise<ServeTestingResult>((resolve, reject) => {
+              const child: ChildProcess = fork(
+                path.resolve(import.meta.dirname, '../workers/serve-testing/worker.js'),
+                {signal: abortSignal},
+              );
+              child.send(serveParams);
+
+              child.on('message', async (result: ServeTestingWorkerResponseMessage) => {
+                if (result.type === 'result') {
+                  await killChildProcessGracefully(child);
+                  resolve(result.payload);
+                } else {
+                  progress.log(
+                    rootPromptDef,
+                    result.payload.state,
+                    result.payload.message,
+                    result.payload.details,
+                  );
+                }
+              });
+              child.on('error', async err => {
+                await killChildProcessGracefully(child);
+                reject(err);
+              });
+            }),
+        );
+      },
+    );
+
+    if (result.errorMessage === undefined) {
+      progress.log(rootPromptDef, 'success', 'Validation of running app is successful');
+    } else {
+      progress.log(rootPromptDef, 'error', 'Validation of running app failed', result.errorMessage);
+    }
+
+    return result;
+  } catch (e) {
+    progress.log(rootPromptDef, 'error', 'Error while trying to validate running app', `${e}`);
+  }
+
+  return null;
 }
