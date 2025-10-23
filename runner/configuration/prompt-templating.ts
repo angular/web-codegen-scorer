@@ -15,7 +15,7 @@ function initializeHandlebars() {
 
     const fullPath = path.join(dirname(ctx.containingFile), ctx.file);
     let content = readFileSync(fullPath, 'utf8');
-    content = processAtFileReferencesSync(content, ctx.containingFile);
+    content = processAtFileReferencesSync(content, fullPath);
 
     // Recursively support `embed`.
     return Handlebars.compile(content, {strict: true})({
