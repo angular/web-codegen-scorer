@@ -249,7 +249,7 @@ export async function attemptBuildAndTest(
         progress,
       )) ?? undefined;
 
-    if (hasAxeFailure && lastAttempt.serveTestingResult.axeViolations?.length === 0) {
+    if (hasAxeFailure && lastAttempt.serveTestingResult?.axeViolations?.length === 0) {
       progress.log(rootPromptDef, 'success', `Successfully fixed all Axe accessibility violations`);
     }
     if (hasTestFailure && lastAttempt.testResult?.passed) {
