@@ -96,6 +96,8 @@ interface BaseLlmRequestOptions {
 export interface LocalLlmGenerateTextRequestOptions extends BaseLlmRequestOptions {
   /** Prompt to send. */
   prompt: string;
+  /** System prompt. */
+  systemPrompt?: string;
 }
 
 /** Context needed for an file generation context. */
@@ -123,6 +125,8 @@ export interface LocalLlmConstrainedOutputGenerateRequestOptions<
 > extends BaseLlmRequestOptions {
   /** Prompt to send. */
   prompt: string;
+  /** System prompt. */
+  systemPrompt?: string;
   /** Schema that the response should conform to. */
   schema: T;
 }
