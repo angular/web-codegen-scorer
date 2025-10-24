@@ -68,7 +68,8 @@ export class GenkitRunner implements LlmRunner {
   ): Promise<LocalLlmGenerateFilesResponse> {
     const requestOptions: LocalLlmConstrainedOutputGenerateRequestOptions = {
       ...options,
-      prompt: options.context.combinedPrompt,
+      prompt: options.context.executablePrompt,
+      systemPrompt: options.context.systemInstructions,
       schema: z.object({
         outputFiles: z.array(
           z.object({
@@ -145,6 +146,7 @@ export class GenkitRunner implements LlmRunner {
 
           const response = await this.genkitInstance.generate({
             prompt: options.prompt,
+            system: options.systemPrompt,
             model,
             output: schema
               ? {
