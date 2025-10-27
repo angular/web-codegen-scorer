@@ -41,14 +41,16 @@ export async function prepareSummary(
 
   let aiSummary: string | undefined = undefined;
   if (!opts.skipAiSummary) {
+    console.log(`✨ Generating AI summary for evaluation run..`);
     try {
       const result = await summarizeReportWithAI(genkit, abortSignal, assessments);
       inputTokens += result.usage.inputTokens;
       outputTokens += result.usage.outputTokens;
       totalTokens += result.usage.totalTokens;
       aiSummary = result.responseHtml;
+      console.log(`✅ Generated AI summary.`);
     } catch (e) {
-      console.error(`${redX()} Failed to generate AI summary for report: ${e}`);
+      console.log(`${redX()} Failed to generate AI summary, skipping summary.`);
       if ((e as Partial<Error>).stack) {
         console.error((e as Error).stack);
       }
