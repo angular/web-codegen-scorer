@@ -56,7 +56,7 @@
     "@genkit-ai/compat-oai": "^1.19.1",
     "@genkit-ai/googleai": "1.21.0",
     "@genkit-ai/mcp": "1.21.0",
-    "@google/genai": "1.25.0",
+    "@google/genai": "1.27.0",
     "@inquirer/prompts": "^7.8.4",
     "@safety-web/runner": "0.4.0-alpha.14",
     "@safety-web/types": "0.4.0-alpha.14",
@@ -92,8 +92,8 @@
   },
   "devDependencies": {
     "@anthropic-ai/claude-code": "^2.0.0",
-    "@google/gemini-cli": "^0.9.0",
-    "@openai/codex": "^0.47.0",
+    "@google/gemini-cli": "^0.10.0",
+    "@openai/codex": "^0.50.0",
     "prettier": "^3.5.3",
     "tsx": "^4.20.3"
   }
