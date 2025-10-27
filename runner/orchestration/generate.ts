@@ -58,9 +58,10 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
   // Ensure cleanup logic runs when the evaluation is aborted.
   options.abortSignal?.addEventListener('abort', cleanup);
 
-  const ratingLlm = await getRunnerByName('genkit');
-
   await assertValidModelName(options.model, env.executor);
+
+  const ratingLlm = await getRunnerByName('genkit');
+  const allTasksAbortCtrl = new AbortController();
 
   try {
     const promptsToProcess = (
@@ -129,7 +130,11 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
                   env,
                   ratingLlm,
                   rootPromptDef,
-                  combineAbortSignals(timeoutAbortSignal, options.abortSignal),
+                  combineAbortSignals(
+                    allTasksAbortCtrl.signal,
+                    timeoutAbortSignal,
+                    options.abortSignal,
+                  ),
                   workerConcurrencyQueue,
                   progress,
                 ),
@@ -183,7 +188,7 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
     const details = {
       summary: await prepareSummary(
         ratingLlm,
-        new AbortController().signal, // Note: AI summarization is currently not abortable.
+        allTasksAbortCtrl.signal,
         options.model,
         env,
         results,
@@ -211,6 +216,10 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
       results,
       details,
     } satisfies RunInfo;
+  } catch (e) {
+    // Ensure all other running evaluations are cancelled.
+    allTasksAbortCtrl.abort();
+    throw e;
   } finally {
     await cleanup();
 
