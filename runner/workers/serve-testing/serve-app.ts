@@ -1,5 +1,5 @@
 import {ChildProcess, exec} from 'child_process';
-import {killChildProcessGracefully} from '../../utils/kill-gracefully.js';
+import {killChildProcessWithSigterm} from '../../utils/kill-gracefully.js';
 import {cleanupBuildMessage} from '../builder/worker.js';
 import {ProgressLogger} from '../../progress/progress-logger.js';
 import {RootPromptDefinition} from '../../shared-interfaces.js';
@@ -96,7 +96,13 @@ export async function serveApp<T>(
         'Terminating browser process for app',
         `(PID: ${serveProcess.pid})`,
       );
-      await killChildProcessGracefully(serveProcess);
+
+      try {
+        await killChildProcessWithSigterm(serveProcess);
+      } catch (e) {
+        progress.debugLog(`Error while killing serve process: ${e}`);
+      }
+
       serveProcess = null;
     }
   }

@@ -12,7 +12,7 @@ import {
   RootPromptDefinition,
   TestExecutionResult,
 } from '../../shared-interfaces.js';
-import {killChildProcessGracefully} from '../../utils/kill-gracefully.js';
+import {killChildProcessWithSigterm} from '../../utils/kill-gracefully.js';
 import {
   BuildResult,
   BuildWorkerMessage,
@@ -111,11 +111,19 @@ export class LocalExecutor implements Executor {
           child.send(buildParams);
 
           child.on('message', async (result: BuildWorkerResponseMessage) => {
-            await killChildProcessGracefully(child);
+            try {
+              await killChildProcessWithSigterm(child);
+            } catch (e) {
+              progress.debugLog(`Error while killing build worker: ${e}`);
+            }
             resolve(result.payload);
           });
           child.on('error', async err => {
-            await killChildProcessGracefully(child);
+            try {
+              await killChildProcessWithSigterm(child);
+            } catch (e) {
+              progress.debugLog(`Error while killing build worker: ${e}`);
+            }
             reject(err);
           });
         }),

@@ -3,7 +3,7 @@ import path from 'node:path';
 import {Environment} from '../configuration/environment.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {AssessmentConfig, RootPromptDefinition} from '../shared-interfaces.js';
-import {killChildProcessGracefully} from '../utils/kill-gracefully.js';
+import {killChildProcessWithSigterm} from '../utils/kill-gracefully.js';
 import {
   ServeTestingResult,
   ServeTestingWorkerMessage,
@@ -59,7 +59,11 @@ export async function serveAndTestApp(
 
               child.on('message', async (result: ServeTestingWorkerResponseMessage) => {
                 if (result.type === 'result') {
-                  await killChildProcessGracefully(child);
+                  try {
+                    await killChildProcessWithSigterm(child);
+                  } catch (e) {
+                    progress.debugLog(`Error while killing serve testing worker: ${e}`);
+                  }
                   resolve(result.payload);
                 } else {
                   progress.log(
@@ -71,7 +75,11 @@ export async function serveAndTestApp(
                 }
               });
               child.on('error', async err => {
-                await killChildProcessGracefully(child);
+                try {
+                  await killChildProcessWithSigterm(child);
+                } catch (e) {
+                  progress.debugLog(`Error while killing serve testing worker: ${e}`);
+                }
                 reject(err);
               });
             }),

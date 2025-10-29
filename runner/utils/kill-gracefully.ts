@@ -13,7 +13,7 @@ function treeKillPromise(pid: number, signal: string): Promise<void> {
   });
 }
 
-export function killChildProcessGracefully(
+export function killChildProcessWithSigterm(
   child: ChildProcess,
   timeoutInMs = 1000 * 10, // 10s
 ): Promise<void> {
