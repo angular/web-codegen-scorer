@@ -16,10 +16,12 @@ import {NgxJsonViewerModule} from 'ngx-json-viewer';
 import {BuildErrorType} from '../../../../../runner/workers/builder/builder-types';
 import {
   AssessmentResult,
+  AssessmentResultFromReportServer,
   IndividualAssessment,
   IndividualAssessmentState,
   LlmResponseFile,
   RunInfo,
+  RunInfoFromReportServer,
   RunSummaryBuilds,
   RunSummaryTests,
   RuntimeStats,
@@ -81,13 +83,26 @@ export class ReportViewer {
   protected formatScore = formatScore;
   protected error = computed(() => this.selectedReport.error());
   protected isAiAssistantVisible = signal(false);
+  protected openAppIDs = signal<string[]>([]);
+
+  isAppOpen(result: AssessmentResultFromReportServer): boolean {
+    return this.openAppIDs().includes(result.id);
+  }
+
+  setAppOpen(result: AssessmentResultFromReportServer, isOpen: boolean): void {
+    if (isOpen) {
+      this.openAppIDs.update(ids => [...ids, result.id]);
+    } else {
+      this.openAppIDs.update(ids => ids.filter(i => i !== result.id));
+    }
+  }
 
   private selectedReport = resource({
     params: () => ({groupId: this.reportGroupId()}),
     loader: ({params}) => this.reportsFetcher.getCombinedReport(params.groupId),
   });
 
-  protected selectedReportWithSortedResults = computed<RunInfo | null>(() => {
+  protected selectedReportWithSortedResults = computed<RunInfoFromReportServer | null>(() => {
     if (!this.selectedReport.hasValue()) {
       return null;
     }

@@ -55,19 +55,6 @@
     color: var(--text-primary);
   }
 
-  .model-selector-container {
-    display: flex;
-    align-items: center;
-    color: var(--text-secondary);
-
-    select {
-      padding-left: 6px;
-      width: 100%;
-      font-size: 0.8rem;
-      height: 1.5rem;
-    }
-  }
-
   .header-actions {
     display: flex;
     align-items: center;
@@ -99,6 +86,64 @@
   flex-direction: column;
   overflow: hidden;
   background-color: var(--card-bg-color);
+}
+
+.ai-assistant-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-top: 1px solid var(--border-color);
+
+  .context-expansion-button {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+
+  .context-options-container {
+    display: flex;
+    gap: 16px;
+  }
+
+  .context-selector-container,
+  .model-selector-container {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-secondary);
+    gap: 4px;
+    flex: 1;
+
+    label {
+      font-size: 0.75rem;
+      padding-left: 6px;
+    }
+
+    select {
+      padding: 4px 6px;
+      width: 100%;
+      font-size: 0.8rem;
+      height: auto;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      background-color: var(--background-color);
+      color: var(--text-primary);
+
+      &:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+      }
+    }
+  }
 }
 
 .messages-container {

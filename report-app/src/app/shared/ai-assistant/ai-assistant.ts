@@ -7,6 +7,9 @@ import {
   AiChatRequest,
   AiChatResponse,
   AIConfigState,
+  ReportContextFilter,
+  RatingContextFilter,
+  AiChatContextFilters,
 } from '../../../../../runner/shared-interfaces';
 import {MessageSpinner} from '../message-spinner';
 
@@ -21,12 +24,23 @@ import {MessageSpinner} from '../message-spinner';
 })
 export class AiAssistant {
   readonly reportGroupId = input.required<string>();
+  readonly openAppIDs = input<string[]>([]);
   readonly close = output();
 
   protected messages: AiChatMessage[] = [];
   protected userInput = signal('');
   protected isLoading = signal(false);
   protected isExpanded = signal(false);
+  protected isContextExpanded = signal(true);
+  protected selectedReportContext = signal<ReportContextFilter>(
+    ReportContextFilter.NonPerfectReports,
+  );
+  protected selectedRatingContext = signal<RatingContextFilter>(
+    RatingContextFilter.NonPerfectRatings,
+  );
+
+  protected ReportContextFilter = ReportContextFilter;
+  protected RatingContextFilter = RatingContextFilter;
 
   private readonly http = inject(HttpClient);
 
@@ -39,6 +53,10 @@ export class AiAssistant {
 
   protected toggleExpanded(): void {
     this.isExpanded.set(!this.isExpanded());
+  }
+
+  protected toggleContextExpanded(): void {
+    this.isContextExpanded.set(!this.isContextExpanded());
   }
 
   async send(): Promise<void> {
@@ -57,6 +75,11 @@ export class AiAssistant {
       prompt,
       pastMessages,
       model: this.selectedModel(),
+      contextFilters: {
+        reportContextFilter: this.selectedReportContext(),
+        ratingContextFilter: this.selectedRatingContext(),
+      },
+      openAppIDs: this.openAppIDs(),
     };
 
     try {

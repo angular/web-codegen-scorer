@@ -1,5 +1,10 @@
 import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
-import {AssessmentResult} from '../shared-interfaces.js';
+import {
+  AssessmentResult,
+  ReportContextFilter,
+  RatingContextFilter,
+  AiChatContextFilters,
+} from '../shared-interfaces.js';
 import {chatWithReportAI} from './report-ai-chat.js';
 
 export async function summarizeReportWithAI(
@@ -27,5 +32,10 @@ Categorize the failures and provide a brief summary of the report. Keep it short
     [],
     // For AI summaries we use lite model as it's faster and cheaper (+ reduces rate limiting)
     'gemini-2.5-flash-lite',
+    {
+      reportContextFilter: ReportContextFilter.NonPerfectReports,
+      ratingContextFilter: RatingContextFilter.NonPerfectRatings,
+    },
+    undefined,
   );
 }

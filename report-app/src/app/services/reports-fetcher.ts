@@ -1,12 +1,12 @@
 import {computed, inject, Injectable, PLATFORM_ID, resource, signal} from '@angular/core';
-import {RunGroup, RunInfo} from '../../../../runner/shared-interfaces';
+import {RunGroup, RunInfoFromReportServer} from '../../../../runner/shared-interfaces';
 import {isPlatformBrowser} from '@angular/common';
 
 @Injectable({providedIn: 'root'})
 export class ReportsFetcher {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly pendingFetches = signal(0);
-  private readonly runCache = new Map<string, RunInfo>();
+  private readonly runCache = new Map<string, RunInfoFromReportServer>();
   private readonly groupsResource = resource({
     loader: async () => {
       if (!isPlatformBrowser(this.platformId)) {
@@ -36,7 +36,7 @@ export class ReportsFetcher {
   readonly isLoadingSingleReport = computed(() => this.pendingFetches() > 0);
   readonly isLoadingReportsList = computed(() => this.groupsResource.isLoading());
 
-  async getCombinedReport(groupId: string): Promise<RunInfo> {
+  async getCombinedReport(groupId: string): Promise<RunInfoFromReportServer> {
     if (!this.runCache.has(groupId)) {
       this.pendingFetches.update(current => current + 1);
 
@@ -47,7 +47,7 @@ export class ReportsFetcher {
           throw new Error(`Response status: ${response.status}`);
         }
 
-        const allRuns = (await response.json()) as RunInfo[];
+        const allRuns = (await response.json()) as RunInfoFromReportServer[];
 
         if (!Array.isArray(allRuns) || allRuns.length === 0) {
           throw new Error(`Could not find report with id: ${groupId}`);
@@ -59,7 +59,7 @@ export class ReportsFetcher {
           group: firstRun.group,
           details: firstRun.details,
           results: allRuns.flatMap(run => run.results),
-        } satisfies RunInfo;
+        } satisfies RunInfoFromReportServer;
 
         this.runCache.set(groupId, combined);
       } finally {

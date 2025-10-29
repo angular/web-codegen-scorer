@@ -5,6 +5,10 @@ import {
   AssessmentResult,
   IndividualAssessment,
   IndividualAssessmentState,
+  ReportContextFilter,
+  RatingContextFilter,
+  AiChatContextFilters,
+  AssessmentResultFromReportServer,
 } from '../shared-interfaces.js';
 import {BuildResultStatus} from '../workers/builder/builder-types.js';
 import {BUCKET_CONFIG} from '../ratings/stats.js';
@@ -47,11 +51,38 @@ export async function chatWithReportAI(
   llm: GenkitRunner,
   message: string,
   abortSignal: AbortSignal,
-  assessments: AssessmentResult[],
+  allAssessments: AssessmentResultFromReportServer[] | AssessmentResult[],
   pastMessages: AiChatMessage[],
   model: string,
+  contextFilters: AiChatContextFilters,
+  activeReportIDs: string[] | undefined,
 ) {
-  const totalApps = assessments.length;
+  let assessmentsToProcess = allAssessments;
+
+  // Report context filtering
+  if (contextFilters.reportContextFilter === ReportContextFilter.ActiveReports) {
+    assessmentsToProcess = allAssessments.filter(
+      a => isAssessmentResultWithID(a) && activeReportIDs?.includes(a.id),
+    );
+  } else if (contextFilters.reportContextFilter === ReportContextFilter.NonPerfectReports) {
+    assessmentsToProcess = allAssessments.filter(
+      assessment => assessment.score.totalPoints < assessment.score.maxOverallPoints,
+    );
+  }
+
+  let filterDescription = '';
+  if (contextFilters.reportContextFilter === ReportContextFilter.ActiveReports) {
+    filterDescription =
+      `The user filtered to only show active apps (${assessmentsToProcess.length} apps). ` +
+      `You only have information about a subset of the total apps. ` +
+      `If asked for information about inactive apps, ask the user to update the context setting, or select more apps.`;
+  } else if (contextFilters.reportContextFilter === ReportContextFilter.NonPerfectReports) {
+    filterDescription =
+      `The user filtered to only show non-perfect apps (${assessmentsToProcess.length} apps). ` +
+      `You only have information about a subset of the total apps. ` +
+      `If asked for information about perfect apps, ask the user to update the context setting.`;
+  }
+
   const prompt = `\n${defaultAiChatPrompt}
 
 ### User Question/Message
@@ -62,10 +93,11 @@ ${message}
 ${reportLlmEvalsToolContext}
 
 ### How many apps are there?
-There are ${totalApps} apps in this report.
+There are ${allAssessments.length} apps in this report.
+${filterDescription}
 
 ### Apps:
-${serializeReportForPrompt(assessments)}
+${serializeReportForPrompt(assessmentsToProcess, contextFilters)}
 `;
 
   const result = await llm.generateText({
@@ -92,45 +124,71 @@ ${serializeReportForPrompt(assessments)}
   };
 }
 
-export function serializeReportForPrompt(assessments: AssessmentResult[]): string {
+export function serializeReportForPrompt(
+  assessments: AssessmentResult[],
+  contextFilters: AiChatContextFilters,
+): string {
+  const onlyNonPerfectRatings =
+    contextFilters.ratingContextFilter === RatingContextFilter.NonPerfectRatings;
+
   return assessments
-    .map(
-      app =>
-        `
+    .map(app => {
+      let checksToSerialize = app.score.categories.flatMap(category => category.assessments);
+      if (onlyNonPerfectRatings) {
+        checksToSerialize = checksToSerialize.filter(
+          (a): a is IndividualAssessment =>
+            a.state === IndividualAssessmentState.EXECUTED && a.successPercentage < 1,
+        );
+      }
+
+      const checksLabel = onlyNonPerfectRatings ? 'Failed checks/ratings' : 'Checks/ratings';
+
+      return `
 Name: ${app.promptDef.name}
 Score: ${app.score.totalPoints}/${app.score.maxOverallPoints}
-Failed checks/ratings: ${JSON.stringify(
-          app.score.categories
-            .flatMap(category => category.assessments)
-            .filter(
-              (a): a is IndividualAssessment =>
-                a.state === IndividualAssessmentState.EXECUTED && a.successPercentage < 1,
-            )
-            .map(c => ({
+${checksLabel}: ${JSON.stringify(
+        checksToSerialize.map(c => {
+          if (c.state === IndividualAssessmentState.SKIPPED) {
+            return {
               description: c.description,
               category: c.category,
-              scoreReduction: c.scoreReduction,
               message: c.message,
-            })),
-          null,
-          2,
-        )}
+              state: 'skipped',
+            };
+          }
+          return {
+            description: c.description,
+            category: c.category,
+            scoreReduction: c.scoreReduction,
+            message: c.message,
+            success: c.successPercentage === 1,
+          };
+        }),
+        null,
+        2,
+      )}
 Attempts: ${JSON.stringify(
-          app.attemptDetails.map(a => ({
-            attemptIndex: a.attempt,
-            buildResult: {
-              message: a.buildResult.message,
-              status: a.buildResult.status === BuildResultStatus.ERROR ? 'Error' : 'Success',
-            },
-            serveTestingResult: {
-              runtimeErrors: a.serveTestingResult?.runtimeErrors,
-              axeViolations: a.serveTestingResult?.axeViolations,
-              cspViolations: a.serveTestingResult?.cspViolations,
-            },
-          })),
-          null,
-          2,
-        )}`,
-    )
+        app.attemptDetails.map(a => ({
+          attemptIndex: a.attempt,
+          buildResult: {
+            message: a.buildResult.message,
+            status: a.buildResult.status === BuildResultStatus.ERROR ? 'Error' : 'Success',
+          },
+          serveTestingResult: {
+            runtimeErrors: a.serveTestingResult?.runtimeErrors,
+            axeViolations: a.serveTestingResult?.axeViolations,
+            cspViolations: a.serveTestingResult?.cspViolations,
+          },
+        })),
+        null,
+        2,
+      )}`;
+    })
     .join('\n------------\n');
+}
+
+function isAssessmentResultWithID(
+  value: AssessmentResult | AssessmentResultFromReportServer,
+): value is AssessmentResultFromReportServer {
+  return (value as Partial<AssessmentResultFromReportServer>).id !== undefined;
 }
