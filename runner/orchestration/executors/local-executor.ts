@@ -199,8 +199,11 @@ export class LocalExecutor implements Executor {
   }
 
   getServeCommand(): string {
-    const flags = '--port 0';
+    if (this.config.serveCommand !== undefined) {
+      return this.config.serveCommand;
+    }
 
+    const flags = '--port 0';
     // npm needs -- to pass flags to the command.
     if (this.config.packageManager === 'npm') {
       return `npm run start -- ${flags}`;
