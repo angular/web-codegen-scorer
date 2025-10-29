@@ -144,6 +144,10 @@ export class DynamicProgressLogger implements ProgressLogger {
     }
   }
 
+  debugLog(message: string): void {
+    // TODO: Implement debug logging in dynamic progress logging.
+  }
+
   private getColorFunction(type: ProgressType): (value: string) => string {
     switch (type) {
       case 'success':

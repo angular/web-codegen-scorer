@@ -24,4 +24,10 @@ export class TextProgressLogger implements ProgressLogger {
     // It's handy to know how many apps are done when one completes.
     console.log(`[${prompt.name}] 🏁 Done (${++this.done}/${this.total})`.trim());
   }
+
+  debugLog(message: string): void {
+    if (process.env.DEBUG === '1') {
+      console.log(`DEBUG: ${message}`);
+    }
+  }
 }

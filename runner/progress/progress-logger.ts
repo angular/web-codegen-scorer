@@ -58,4 +58,9 @@ export interface ProgressLogger {
    * @param details Additional information about the event.
    */
   log(prompt: RootPromptDefinition, type: ProgressType, message: string, details?: string): void;
+
+  /**
+   * Log information for debugging.
+   */
+  debugLog(message: string): void;
 }

@@ -180,6 +180,7 @@ class ErrorOnlyProgressLogger implements ProgressLogger {
   initialize(): void {}
   finalize(): void {}
   evalFinished(): void {}
+  debugLog(): void {}
 
   log(_: unknown, type: ProgressType, message: string, details?: string) {
     if (type === 'error') {
