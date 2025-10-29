@@ -10,7 +10,14 @@ import {fileURLToPath} from 'node:url';
 import {chatWithReportAI} from '../runner/reporting/report-ai-chat';
 import {convertV2ReportToV3Report} from '../runner/reporting/migrations/v2_to_v3';
 import {FetchedLocalReports, fetchReportsFromDisk} from '../runner/reporting/report-local-disk';
-import {AiChatRequest, AIConfigState, RunInfo} from '../runner/shared-interfaces';
+import {
+  AiChatRequest,
+  AIConfigState,
+  AssessmentResultFromReportServer,
+  IndividualAssessmentState,
+  RunInfo,
+  RunInfoFromReportServer,
+} from '../runner/shared-interfaces';
 
 // This will result in a lot of loading and would slow down the serving,
 // so it's loaded lazily below.
@@ -41,7 +48,7 @@ app.get('/api/reports', async (_, res) => {
   res.json(results);
 });
 
-async function fetchAndMigrateReports(id: string): Promise<RunInfo[] | null> {
+async function fetchAndMigrateReports(id: string): Promise<RunInfoFromReportServer[] | null> {
   const localData = await resolveLocalData(options.reportsRoot);
   let result: RunInfo[] | null = null;
 
@@ -55,8 +62,23 @@ async function fetchAndMigrateReports(id: string): Promise<RunInfo[] | null> {
     return null;
   }
 
-  // Convert potential older v2 reports.
-  return result.map(r => convertV2ReportToV3Report(r));
+  let checkID = 0;
+  return result.map(run => {
+    const newRun = {
+      // Convert potential older v2 reports.
+      ...convertV2ReportToV3Report(run),
+      // Augment the `RunInfo` to include IDs for individual apps.
+      // This is useful for the AI chat and context filtering.
+      results: run.results.map(
+        check =>
+          ({
+            id: `${id}-${checkID++}`,
+            ...check,
+          }) satisfies AssessmentResultFromReportServer,
+      ),
+    };
+    return newRun satisfies RunInfoFromReportServer;
+  });
 }
 
 // Endpoint for fetching a specific report group.
@@ -89,16 +111,19 @@ app.post('/api/reports/:id/chat', async (req, res) => {
   }
 
   try {
-    const {prompt, pastMessages, model} = req.body as AiChatRequest;
-    const assessments = reports.flatMap(run => run.results);
+    const {prompt, pastMessages, model, contextFilters, openAppIDs} = req.body as AiChatRequest;
+    const allAssessments = reports.flatMap(run => run.results);
+
     const abortController = new AbortController();
     const summary = await chatWithReportAI(
       await (llm ?? getOrCreateGenkitLlmRunner()),
       prompt,
       abortController.signal,
-      assessments,
+      allAssessments,
       pastMessages,
       model,
+      contextFilters,
+      openAppIDs,
     );
     res.json(summary);
   } catch (e) {

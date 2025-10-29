@@ -265,6 +265,7 @@
       <app-ai-assistant
         [class.hidden]="!isAiAssistantVisible()"
         [reportGroupId]="reportGroupId()"
+        [openAppIDs]="openAppIDs()"
         (close)="isAiAssistantVisible.set(false)"
       />
     }
@@ -280,7 +281,11 @@
     }
     <div class="apps-list">
       @for (result of filteredResults(); track result) {
-        <expansion-panel #appPanel size="small">
+        <expansion-panel
+          size="small"
+          [opened]="isAppOpen(result)"
+          (openedChange)="setAppOpen(result, $event)"
+        >
           <expansion-panel-header>
             <score
               size="small"
@@ -325,159 +330,158 @@
             </div>
           </expansion-panel-header>
 
-          @if (appPanel.opened()) {
-            <div class="app-details">
-              <div class="app-details-section">
-                <h4>Prompt</h4>
-                <pre class="callout neutral">{{ result.promptDef.prompt }}</pre>
-              </div>
+          <div class="app-details">
+            <div class="app-details-section">
+              <h4>Prompt</h4>
+              <pre class="callout neutral">{{ result.promptDef.prompt }}</pre>
+            </div>
 
-              <div class="app-details-section">
-                <h4>Results</h4>
-                @for (category of result.score.categories; track category.id) {
-                  <h5>
-                    {{ category.name }} ({{ category.points }}/{{
+            <div class="app-details-section">
+              <h4>Results</h4>
+              @for (category of result.score.categories; track category.id) {
+                <h5>
+                  {{ category.name }} ({{ category.points }}/{{
                       category.maxPoints
-                    }}
-                    points)
-                  </h5>
+                  }}
+                  points)
+                </h5>
 
-                  <div class="category-wrapper">
-                    @for (check of category.assessments; track check.id) {
-                      <div class="check-details">
-                        @if (isSkippedAssessment(check)) {
-                          <span class="status">➖</span>
-                          <span class="name">{{ check.name }}</span>
-                          <span class="status-text points">Skipped: {{ check.message }}</span>
-                        } @else {
-                          @let isMax = check.successPercentage === 1;
-                          <span
-                            class="status status-text"
-                            [class.success]="isMax"
-                            [class.error]="!isMax"
-                            >{{ isMax ? '✔' : '✘' }}</span
-                          >
-                          <span class="name">{{ check.name }}</span>
-                          <span
-                            class="status-text points"
-                            [class.success]="isMax"
-                            [class.error]="!isMax"
-                            >{{ check.message }}</span
-                          >
-                        }
-                      </div>
-                    } @empty {
-                      <div class="check-details">No checks</div>
-                    }
-                  </div>
-                }
-                <!-- Total score section -->
-                <div class="check-details total">
-                  @let totalPercent =
-                    formatScore(
-                      result.score.totalPoints,
-                      result.score.maxOverallPoints
-                    );
-                  <span class="status"></span>
-                  <span class="name">Total: &nbsp;</span>
-                  <span
-                    class="status-text points"
-                    [class.success]="totalPercent >= 90"
-                    [class.warn]="totalPercent < 90 && totalPercent >= 80"
-                    [class.error]="totalPercent < 80"
-                  >
-                    {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{totalPercent
-                    }}%)
-                  </span>
-                </div>
-              </div>
-
-              @if (result.testResult) {
-                <div class="app-details-section">
-                  <h4>Test Results</h4>
-                  <div class="test-summary">
-                    @if (result.testResult.passed) {
-                      <span class="status-text success">✔ Tests passed</span>
-                      @if ((result.testRepairAttempts || 0) > 0) {
-                        <span class="status-text"
-                          >&nbsp;after {{ result.testRepairAttempts }} repair attempt(s)</span
+                <div class="category-wrapper">
+                  @for (check of category.assessments; track check.id) {
+                    <div class="check-details">
+                      @if (isSkippedAssessment(check)) {
+                        <span class="status">➖</span>
+                        <span class="name">{{ check.name }}</span>
+                        <span class="status-text points">Skipped: {{ check.message }}</span>
+                      } @else {
+                        @let isMax = check.successPercentage === 1;
+                        <span
+                          class="status status-text"
+                          [class.success]="isMax"
+                          [class.error]="!isMax"
+                          >{{ isMax ? '✔' : '✘' }}</span
+                        >
+                        <span class="name">{{ check.name }}</span>
+                        <span
+                          class="status-text points"
+                          [class.success]="isMax"
+                          [class.error]="!isMax"
+                          >{{ check.message }}</span
                         >
                       }
-                    } @else {
-                      <span class="status-text error">✘ Tests failed</span>
-                    }
-                  </div>
-
-                  @if (result.testResult.output && !result.testResult.passed) {
-                    <details class="test-output-button">
-                      <summary class="neutral-button">See Test Output</summary>
-                      <pre class="callout neutral code">{{ result.testResult.output }}</pre>
-                    </details>
+                    </div>
+                  } @empty {
+                    <div class="check-details">No checks</div>
                   }
                 </div>
               }
+              <!-- Total score section -->
+              <div class="check-details total">
+                @let totalPercent =
+                  formatScore(
+                      result.score.totalPoints,
+                      result.score.maxOverallPoints
+                    );
+                <span class="status"></span>
+                <span class="name">Total: &nbsp;</span>
+                <span
+                  class="status-text points"
+                  [class.success]="totalPercent >= 90"
+                  [class.warn]="totalPercent < 90 && totalPercent >= 80"
+                  [class.error]="totalPercent < 80"
+                >
+                  {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{totalPercent
+                  }}%)
+                </span>
+              </div>
+            </div>
 
+            @if (result.testResult) {
               <div class="app-details-section">
-                <h4>Additional info</h4>
-                @for (attempt of result.attemptDetails; track attempt) {
-                  @let isBuilt = attempt.buildResult.status === 'success';
-                  @let axeViolations = attempt.serveTestingResult?.axeViolations;
-                  @let hasAxeViolations = axeViolations && axeViolations.length > 0;
-                  @let testsFailed = attempt.testResult?.passed === false;
+                <h4>Test Results</h4>
+                <div class="test-summary">
+                  @if (result.testResult.passed) {
+                    <span class="status-text success">✔ Tests passed</span>
+                    @if ((result.testRepairAttempts || 0) > 0) {
+                      <span class="status-text"
+                        >&nbsp;after {{ result.testRepairAttempts }} repair attempt(s)</span
+                      >
+                    }
+                  } @else {
+                    <span class="status-text error">✘ Tests failed</span>
+                  }
+                </div>
 
-                  <expansion-panel #expansionPanel>
-                    <expansion-panel-header>
-                      {{
+                @if (result.testResult.output && !result.testResult.passed) {
+                  <details class="test-output-button">
+                    <summary class="neutral-button">See Test Output</summary>
+                    <pre class="callout neutral code">{{ result.testResult.output }}</pre>
+                  </details>
+                }
+              </div>
+            }
+
+            <div class="app-details-section">
+              <h4>Additional info</h4>
+              @for (attempt of result.attemptDetails; track attempt) {
+                @let isBuilt = attempt.buildResult.status === 'success';
+                @let axeViolations = attempt.serveTestingResult?.axeViolations;
+                @let hasAxeViolations = axeViolations && axeViolations.length > 0;
+                @let testsFailed = attempt.testResult?.passed === false;
+
+                <expansion-panel #expansionPanel>
+                  <expansion-panel-header>
+                    {{
                         $index === 0
                           ? 'Initial response'
                           : `Repair attempt #${$index}`
-                      }}
+                    }}
 
+                    <span
+                      class="status-badge error"
+                      [class.error]="!isBuilt"
+                      [class.success]="isBuilt"
+                      >Build</span
+                    >
+
+                    @if (isBuilt) {
                       <span
-                        class="status-badge error"
-                        [class.error]="!isBuilt"
-                        [class.success]="isBuilt"
-                        >Build</span
+                        class="status-badge"
+                        [class.error]="hasAxeViolations"
+                        [class.success]="!hasAxeViolations"
+                        >A11y</span
                       >
+                    }
 
-                      @if (isBuilt) {
-                        <span
-                          class="status-badge"
-                          [class.error]="hasAxeViolations"
-                          [class.success]="!hasAxeViolations"
-                          >A11y</span
-                        >
-                      }
+                    @if (attempt.testResult) {
+                      <span
+                        class="status-badge"
+                        [class.error]="!attempt.testResult.passed"
+                        [class.success]="attempt.testResult.passed"
+                        >Tests</span
+                      >
+                    }
+                  </expansion-panel-header>
 
-                      @if (attempt.testResult) {
-                        <span
-                          class="status-badge"
-                          [class.error]="!attempt.testResult.passed"
-                          [class.success]="attempt.testResult.passed"
-                          >Tests</span
-                        >
-                      }
-                    </expansion-panel-header>
-
-                    @if (expansionPanel.opened()) {
-                      @if (attempt.reasoning) {
-                        <details class="thoughts-button">
-                          <summary class="neutral-button">See LLM Thoughts</summary>
-                          <pre class="callout neutral code">{{
+                  @if (expansionPanel.opened()) {
+                    @if (attempt.reasoning) {
+                      <details class="thoughts-button">
+                        <summary class="neutral-button">See LLM Thoughts</summary>
+                        <pre class="callout neutral code">{{
                             attempt.reasoning
-                          }}</pre>
-                        </details>
-                      }
-                      @if (!isBuilt) {
-                        <h4>Build Message</h4>
-                        <pre class="callout warn code">{{
-                          attempt.buildResult.message
                         }}</pre>
-                      }
+                      </details>
+                    }
+                    @if (!isBuilt) {
+                      <h4>Build Message</h4>
+                      <pre class="callout warn code">{{
+                          attempt.buildResult.message
+                      }}</pre>
+                    }
 
-                      @if (hasAxeViolations) {
-                        <h4>A11y Violations</h4>
-                        <pre class="callout neutral axe-violations">
+                    @if (hasAxeViolations) {
+                      <h4>A11y Violations</h4>
+                      <pre class="callout neutral axe-violations">
                           <ul>
                             @for (violation of axeViolations; track violation.id) {
                               <li>
@@ -491,141 +495,140 @@
                             }
                           </ul>
                         </pre>
-                      }
-
-                      @if (testsFailed) {
-                        <h4>Failed Tests</h4>
-                        <pre class="callout neutral code">{{ attempt.testResult?.output }}</pre>
-                      }
-
-                      <h4>Generated Code</h4>
-
-                      @for (file of attempt.outputFiles; track file) {
-                        <strong>{{ file.filePath }}</strong>
-                        <div class="util-buttons button-group">
-                          <button class="text-button" (click)="copy(file.code)">
-                            Copy source code
-                          </button>
-                          <button class="text-button" (click)="format(file)">
-                            Format source code
-                          </button>
-                        </div>
-                        <app-code-viewer [code]="formatted().get(file) ?? file.code" />
-                      }
-                    }
-                  </expansion-panel>
-                }
-
-                @let lighthouse = result.finalAttempt.serveTestingResult?.lighthouseResult;
-
-                @if (lighthouse) {
-                  <expansion-panel>
-                    <expansion-panel-header>Lighthouse</expansion-panel-header>
-
-                    @for (category of lighthouse.categories; track category.id) {
-                      <lighthouse-category
-                        [audits]="category.audits"
-                        [displayName]="category.displayName"
-                        [score]="category.score"
-                        [description]="category.description"
-                      />
                     }
 
-                    @if (lighthouse.uncategorized.length > 0) {
-                      <lighthouse-category
-                        [audits]="lighthouse.uncategorized"
-                        displayName="Uncategorized"
-                        [score]="null"
-                      />
+                    @if (testsFailed) {
+                      <h4>Failed Tests</h4>
+                      <pre class="callout neutral code">{{ attempt.testResult?.output }}</pre>
                     }
-                  </expansion-panel>
-                }
 
-                @if (result.userJourneys && result.userJourneys.result.length > 0) {
-                  <expansion-panel>
-                    <expansion-panel-header>User Journeys</expansion-panel-header>
-                    @for (journey of result.userJourneys.result; track journey.name) {
-                      <h4>{{ journey.name }}</h4>
+                    <h4>Generated Code</h4>
 
-                      <ol>
-                        @for (step of journey.steps; track $index) {
-                          <li>{{ step }}</li>
-                        }
-                      </ol>
+                    @for (file of attempt.outputFiles; track file) {
+                      <strong>{{ file.filePath }}</strong>
+                      <div class="util-buttons button-group">
+                        <button class="text-button" (click)="copy(file.code)">
+                          Copy source code
+                        </button>
+                        <button class="text-button" (click)="format(file)">
+                          Format source code
+                        </button>
+                      </div>
+                      <app-code-viewer [code]="formatted().get(file) ?? file.code" />
                     }
-                  </expansion-panel>
-                }
-              </div>
-
-              <div class="app-details-section">
-                <h4>Debugging Tools</h4>
-
-                <button
-                  class="neutral-button"
-                  title="Download a ZIP for debugging. You can upload the ZIP to AI Studio for further analysis of a specific app."
-                  (click)="downloadDebuggingZip(result)"
-                >
-                  Download ZIP for debugging
-                </button>
-
-                @let debugCommand = getDebugCommand(report, result);
-
-                @if (debugCommand) {
-                  <p>To see the app locally, run the following command:</p>
-                  <pre class="callout neutral code">{{debugCommand}}</pre>
-                }
-
-                @if (result.toolLogs && result.toolLogs.length > 0) {
-                  <expansion-panel>
-                    <expansion-panel-header>Tool Logs</expansion-panel-header>
-                    <ul class="tool-logs-list">
-                      @for (log of result.toolLogs; track $index) {
-                        <li>
-                          <details class="details mcp-log-entry">
-                            @let name = log.request.name;
-                            <summary>
-                              Log Entry #{{ $index + 1}}{{ name ? ' - ' + name : '' }}
-                            </summary>
-                            <div class="mcp-log-content">
-                              <h5>Request</h5>
-                              <ngx-json-viewer
-                                [json]="log.request"
-                                [expanded]="false"
-                              ></ngx-json-viewer>
-                              <h5>Response</h5>
-                              <ngx-json-viewer
-                                [json]="log.response"
-                                [expanded]="false"
-                              ></ngx-json-viewer>
-                            </div>
-                          </details>
-                        </li>
-                      } @empty {
-                        <li>No MCP logs were recorded for this run.</li>
-                      }
-                    </ul>
-                  </expansion-panel>
-                }
-              </div>
-
-              @let finalRuntimeErrors = finalAttempt.serveTestingResult?.runtimeErrors;
-              @if (finalRuntimeErrors) {
-                <div class="app-details-section">
-                  <h4>Runtime errors</h4>
-                  <pre class="callout warn code">{{ finalRuntimeErrors }}</pre>
-                </div>
+                  }
+                </expansion-panel>
               }
 
-              @let screenshot = getScreenshotUrl(result);
+              @let lighthouse = result.finalAttempt.serveTestingResult?.lighthouseResult;
 
-              @if (screenshot) {
-                <div class="app-details-section">
-                  <h4>Screenshot</h4>
-                  <img class="screenshot" [src]="screenshot" />
-                </div>
+              @if (lighthouse) {
+                <expansion-panel>
+                  <expansion-panel-header>Lighthouse</expansion-panel-header>
+
+                  @for (category of lighthouse.categories; track category.id) {
+                    <lighthouse-category
+                      [audits]="category.audits"
+                      [displayName]="category.displayName"
+                      [score]="category.score"
+                      [description]="category.description"
+                    />
+                  }
+
+                  @if (lighthouse.uncategorized.length > 0) {
+                    <lighthouse-category
+                      [audits]="lighthouse.uncategorized"
+                      displayName="Uncategorized"
+                      [score]="null"
+                    />
+                  }
+                </expansion-panel>
+              }
+
+              @if (result.userJourneys && result.userJourneys.result.length > 0) {
+                <expansion-panel>
+                  <expansion-panel-header>User Journeys</expansion-panel-header>
+                  @for (journey of result.userJourneys.result; track journey.name) {
+                    <h4>{{ journey.name }}</h4>
+
+                    <ol>
+                      @for (step of journey.steps; track $index) {
+                        <li>{{ step }}</li>
+                      }
+                    </ol>
+                  }
+                </expansion-panel>
               }
             </div>
-          }
+
+            <div class="app-details-section">
+              <h4>Debugging Tools</h4>
+
+              <button
+                class="neutral-button"
+                title="Download a ZIP for debugging. You can upload the ZIP to AI Studio for further analysis of a specific app."
+                (click)="downloadDebuggingZip(result)"
+              >
+                Download ZIP for debugging
+              </button>
+
+              @let debugCommand = getDebugCommand(report, result);
+
+              @if (debugCommand) {
+                <p>To see the app locally, run the following command:</p>
+                <pre class="callout neutral code">{{debugCommand}}</pre>
+              }
+
+              @if (result.toolLogs && result.toolLogs.length > 0) {
+                <expansion-panel>
+                  <expansion-panel-header>Tool Logs</expansion-panel-header>
+                  <ul class="tool-logs-list">
+                    @for (log of result.toolLogs; track $index) {
+                      <li>
+                        <details class="details mcp-log-entry">
+                          @let name = log.request.name;
+                          <summary>
+                            Log Entry #{{ $index + 1}}{{ name ? ' - ' + name : '' }}
+                          </summary>
+                          <div class="mcp-log-content">
+                            <h5>Request</h5>
+                            <ngx-json-viewer
+                              [json]="log.request"
+                              [expanded]="false"
+                            ></ngx-json-viewer>
+                            <h5>Response</h5>
+                            <ngx-json-viewer
+                              [json]="log.response"
+                              [expanded]="false"
+                            ></ngx-json-viewer>
+                          </div>
+                        </details>
+                      </li>
+                    } @empty {
+                      <li>No MCP logs were recorded for this run.</li>
+                    }
+                  </ul>
+                </expansion-panel>
+              }
+            </div>
+
+            @let finalRuntimeErrors = finalAttempt.serveTestingResult?.runtimeErrors;
+            @if (finalRuntimeErrors) {
+              <div class="app-details-section">
+                <h4>Runtime errors</h4>
+                <pre class="callout warn code">{{ finalRuntimeErrors }}</pre>
+              </div>
+            }
+
+            @let screenshot = getScreenshotUrl(result);
+
+            @if (screenshot) {
+              <div class="app-details-section">
+                <h4>Screenshot</h4>
+                <img class="screenshot" [src]="screenshot" />
+              </div>
+            }
+          </div>
         </expansion-panel>
       }
     </div>

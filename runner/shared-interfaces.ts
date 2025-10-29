@@ -354,6 +354,22 @@ export interface AiChatResponse {
   usage: Usage;
 }
 
+export enum ReportContextFilter {
+  AllReports = 'all_reports',
+  ActiveReports = 'active_reports',
+  NonPerfectReports = 'non_perfect_reports',
+}
+
+export enum RatingContextFilter {
+  AllRatings = 'all_ratings',
+  NonPerfectRatings = 'non_perfect_ratings',
+}
+
+export interface AiChatContextFilters {
+  reportContextFilter: ReportContextFilter;
+  ratingContextFilter: RatingContextFilter;
+}
+
 /**
  * Request body for the AI chat endpoint.
  */
@@ -361,6 +377,8 @@ export interface AiChatRequest {
   prompt: string;
   pastMessages: AiChatMessage[];
   model: string;
+  contextFilters: AiChatContextFilters;
+  openAppIDs?: string[];
 }
 
 /** Interface for capturing chat messages in an AI-assistant conversation. */
@@ -524,6 +542,17 @@ export interface RunInfo {
   results: AssessmentResult[];
   /** Detailed information about the run, including summaries and prompts used. */
   details: RunDetails;
+}
+
+/** Extended `AssessmentResult` sent by the report server to the report app. */
+export interface AssessmentResultFromReportServer extends AssessmentResult {
+  /** Unique ID of the app result. Set by the `report-server` when fetching. */
+  id: string;
+}
+
+/** Extended `RunInfo` sent by the report server to the report app. */
+export interface RunInfoFromReportServer extends RunInfo {
+  results: AssessmentResultFromReportServer[];
 }
 
 /** Autorater run information */
