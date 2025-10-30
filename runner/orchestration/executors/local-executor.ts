@@ -27,6 +27,7 @@ import {callWithTimeout} from '../../utils/timeout.js';
 import {executeCommand} from '../../utils/exec.js';
 import {cleanupBuildMessage} from '../../workers/builder/worker.js';
 import {combineAbortSignals} from '../../utils/abort-signal.js';
+import {ServeTestingResult} from '../../workers/serve-testing/worker-types.js';
 
 let uniqueIDs = 0;
 
@@ -172,13 +173,18 @@ export class LocalExecutor implements Executor {
     } satisfies TestExecutionResult;
   }
 
-  async serveWebApplication<T>(
+  async serveWebApplication(
     _id: EvalID,
     appDirectoryPath: string,
     rootPromptDef: RootPromptDefinition,
     progress: ProgressLogger,
-    logicWhileServing: (serveUrl: string) => Promise<T>,
-  ): Promise<T> {
+    logicWhileServing: (serveUrl: string) => Promise<ServeTestingResult>,
+  ): Promise<ServeTestingResult | null> {
+    // Serve testing is explicitly disabled.
+    if (this.config.serveCommand === null) {
+      return null;
+    }
+
     return await serveApp(
       this.getServeCommand(),
       rootPromptDef,
@@ -207,7 +213,7 @@ export class LocalExecutor implements Executor {
   }
 
   getServeCommand(): string {
-    if (this.config.serveCommand !== undefined) {
+    if (this.config.serveCommand != null) {
       return this.config.serveCommand;
     }
 

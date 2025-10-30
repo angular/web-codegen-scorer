@@ -72,7 +72,7 @@ export const executorSchema = z.object({
           )
           .describe('Call this function while the server is running'),
       ]),
-      z.promise(z.custom<ServeTestingResult>()),
+      z.promise(z.union([z.custom<ServeTestingResult>(), z.null()])),
     )
     .nullable(),
   executeProjectTests: z.function(

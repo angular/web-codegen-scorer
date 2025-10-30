@@ -21,9 +21,11 @@ export const localExecutorConfigSchema = z.strictObject({
   buildCommand: z.string().optional(),
   /**
    * Command to run when starting a development server inside the app.
-   * Defaults to `<package manager> run start --port 0`.
+   *
+   * When `undefined`, defaults to `<package manager> run start --port 0`.
+   * When `null`, the app has no server and no runtime testing will occur.
    */
-  serveCommand: z.string().optional(),
+  serveCommand: z.string().optional().nullable(),
   /**
    * Optional command for executing project tests.
    */
