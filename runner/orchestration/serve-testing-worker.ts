@@ -87,6 +87,12 @@ export async function serveAndTestApp(
       },
     );
 
+    // An executor might define `serveWebApplication` but conditionally decide
+    // that no web application can be started/served.
+    if (result === null) {
+      return null;
+    }
+
     if (result.errorMessage === undefined) {
       progress.log(rootPromptDef, 'success', 'Validation of running app is successful');
     } else {
