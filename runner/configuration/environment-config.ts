@@ -2,7 +2,7 @@ import z from 'zod';
 import {createMessageBuilder, fromError} from 'zod-validation-error/v3';
 import {UserFacingError} from '../utils/errors.js';
 import {ratingSchema} from '../ratings/rating-types.js';
-import {MultiStepPrompt} from './multi-step-prompt.js';
+import {EvalPrompt, EvalPromptWithMetadata, MultiStepPrompt} from './prompts.js';
 import {executorSchema} from '../orchestration/executors/executor.js';
 import {
   LocalExecutorConfig,
@@ -46,6 +46,8 @@ export const environmentConfigSchema = z.object({
         ratings: z.array(ratingSchema).optional(),
       }),
       z.custom<MultiStepPrompt>(data => data instanceof MultiStepPrompt),
+      z.custom<EvalPrompt>(data => data instanceof EvalPrompt),
+      z.custom<EvalPromptWithMetadata<unknown>>(data => data instanceof EvalPromptWithMetadata),
     ]),
   ),
   /**

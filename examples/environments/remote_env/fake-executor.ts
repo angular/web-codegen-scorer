@@ -26,7 +26,7 @@ export class FakeRemoteExecutor implements Executor {
   async performFakeLlmRequest(): Promise<LlmResponse> {
     return {
       success: true,
-      outputFiles: [{code: 'Works!', filePath: 'main.ts'}],
+      outputFiles: [{code: 'angular.dev Works', filePath: 'main.ts'}],
       reasoning: '',
       errors: [],
       usage: {inputTokens: 0, totalTokens: 0, outputTokens: 0},

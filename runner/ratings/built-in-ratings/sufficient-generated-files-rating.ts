@@ -8,8 +8,8 @@ export const sufficientGeneratedFilesRating: PerBuildRating = {
   id: 'common-generated-file-count',
   scoreReduction: '100%',
   kind: RatingKind.PER_BUILD,
-  rate: ({generatedFileCount}) => ({
+  rate: ({generatedFiles}) => ({
     state: RatingState.EXECUTED,
-    coefficient: generatedFileCount > 0 ? 1 : 0,
+    coefficient: generatedFiles.length > 0 ? 1 : 0,
   }),
 };

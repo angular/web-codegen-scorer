@@ -13,7 +13,7 @@ import {UserFacingError} from '../utils/errors.js';
 import {generateId} from '../utils/id-generation.js';
 import {lazy} from '../utils/lazy-creation.js';
 import {EnvironmentConfig} from './environment-config.js';
-import {MultiStepPrompt} from './multi-step-prompt.js';
+import {EvalPromptWithMetadata, MultiStepPrompt} from './prompts.js';
 import {renderPromptTemplate} from './prompt-templating.js';
 
 /** Represents a single prompt evaluation environment. */
@@ -176,6 +176,18 @@ export class Environment {
     for (const def of prompts) {
       if (def instanceof MultiStepPrompt) {
         result.push(this.getMultiStepPrompt(def, envRatings));
+      } else if (def instanceof EvalPromptWithMetadata) {
+        result.push(
+          Promise.resolve({
+            name: def.name,
+            kind: 'single',
+            prompt: def.text,
+            ratings: [...envRatings, ...(def.opts.extraRatings ?? [])],
+            systemPromptType: 'generation',
+            contextFilePatterns: def.opts.contextFilePatterns ?? [],
+            metadata: def.opts.metadata,
+          } satisfies PromptDefinition),
+        );
       } else {
         let path: string;
         let ratings: Rating[];
@@ -198,6 +210,7 @@ export class Environment {
                 relativePath,
                 ratings,
                 /* isEditing */ false,
+                undefined,
               ),
           ),
         );
@@ -216,12 +229,13 @@ export class Environment {
    * @param ratings Ratings to run against the definition.
    * @param isEditing Whether this is an editing or generation step.
    */
-  private async getStepPromptDefinition(
+  private async getStepPromptDefinition<Metadata>(
     name: string,
     relativePath: string,
     ratings: Rating[],
     isEditing: boolean,
-  ): Promise<PromptDefinition> {
+    metadata: Metadata,
+  ): Promise<PromptDefinition<Metadata>> {
     const {result, contextFiles} = await this.renderEnvironmentPrompt(relativePath);
 
     return {
@@ -231,7 +245,8 @@ export class Environment {
       ratings,
       systemPromptType: isEditing ? 'editing' : 'generation',
       contextFilePatterns: contextFiles,
-    } satisfies PromptDefinition;
+      metadata,
+    } satisfies PromptDefinition<Metadata>;
   }
 
   /**
@@ -284,6 +299,7 @@ export class Environment {
         ratings.unshift(...def.stepRatings[current.name]);
       }
 
+      const stepMetadata = def.stepMetadata[current.name];
       const stepNum = parseInt(match[1]);
       if (stepNum === 0) {
         throw new UserFacingError('Multi-step prompts start with `step-1`.');
@@ -293,6 +309,7 @@ export class Environment {
         join(def.directoryPath, current.name),
         ratings,
         /*isEditing */ stepNum !== 1,
+        stepMetadata,
       );
 
       stepValues[step.name] = stepNum;

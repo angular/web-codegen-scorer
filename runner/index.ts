@@ -9,7 +9,7 @@ export * from './ratings/built-in.js';
 export * from './ratings/rating-types.js';
 export * from './ratings/built-in-ratings/index.js';
 export {calculateBuildAndCheckStats, isPositiveScore} from './ratings/stats.js';
-export {MultiStepPrompt} from './configuration/multi-step-prompt.js';
+export {MultiStepPrompt, EvalPrompt, EvalPromptWithMetadata} from './configuration/prompts.js';
 export {
   BuildErrorType,
   BuildResultStatus,

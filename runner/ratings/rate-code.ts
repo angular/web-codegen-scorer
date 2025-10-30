@@ -92,19 +92,20 @@ export async function rateGeneratedCode(
     try {
       if (current.kind === RatingKind.PER_BUILD) {
         result = runPerBuildRating(
+          currentPromptDef,
           current,
           buildResult,
           serveTestingResult,
           repairAttempts,
           testResult,
           testRepairAttempts,
-          outputFiles.length,
+          outputFiles,
           axeRepairAttempts,
           ratingsResult,
         );
       } else if (current.kind === RatingKind.PER_FILE) {
         categorizedFiles ??= splitFilesIntoCategories(outputFiles);
-        result = await runPerFileRating(current, categorizedFiles, ratingsResult);
+        result = await runPerFileRating(currentPromptDef, current, categorizedFiles, ratingsResult);
       } else if (current.kind === RatingKind.LLM_BASED) {
         result = await runLlmBasedRating(
           environment,
@@ -174,13 +175,14 @@ export async function rateGeneratedCode(
 }
 
 function runPerBuildRating(
+  prompt: PromptDefinition,
   rating: PerBuildRating,
   buildResult: BuildResult,
   serveResult: ServeTestingResult | null,
   repairAttempts: number,
   testResult: TestExecutionResult | null,
   testRepairAttempts: number,
-  generatedFileCount: number,
+  generatedFiles: LlmResponseFile[],
   axeRepairAttempts: number,
   ratingsResult: RatingsResult,
 ): IndividualAssessment | SkippedIndividualAssessment {
@@ -188,11 +190,12 @@ function runPerBuildRating(
     buildResult,
     serveResult,
     repairAttempts,
-    generatedFileCount,
+    generatedFiles,
     axeRepairAttempts,
-    ratingsResult,
     testResult,
     testRepairAttempts,
+    ratingsResult,
+    prompt,
   });
 
   // If the rating was skipped (e.g., Axe test wasn't run), create a skipped assessment.
@@ -208,6 +211,7 @@ function runPerBuildRating(
 }
 
 async function runPerFileRating(
+  prompt: PromptDefinition,
   rating: PerFileRating,
   categorizedFiles: CategorizedFiles,
   ratingsResult: RatingsResult,
@@ -240,7 +244,7 @@ async function runPerFileRating(
       // Remove comments from the code to avoid false-detection of bad patterns.
       // Some keywords like `NgModule` can be used in code comments.
       const code = removeComments(file.code, contentType);
-      const result = await rating.rate(code, file.filePath, ratingsResult);
+      const result = await rating.rate(code, file.filePath, {prompt, ratingsResult});
       let coeff: number;
 
       if (typeof result === 'number') {

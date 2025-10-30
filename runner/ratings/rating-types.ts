@@ -46,6 +46,11 @@ export const CATEGORY_NAMES = {
   [RatingCategory.LOW_IMPACT]: 'Low Impact',
 };
 
+const ratingCommonContextFields = {
+  ratingsResult: z.record(z.custom<IndividualAssessment | SkippedIndividualAssessment>()),
+  prompt: z.custom<PromptDefinition>(),
+};
+
 const ratingSchemaCommonFields = {
   category: z.custom<RatingCategory>(),
   scoreReduction: z.custom<`${number}%`>(),
@@ -63,13 +68,13 @@ const perBuildRatingSchema = z
       .args(
         z.strictObject({
           buildResult: z.custom<BuildResult>(),
+          generatedFiles: z.custom<LlmResponseFile[]>(),
           serveResult: z.custom<ServeTestingResult | null>(),
           repairAttempts: z.number(),
           testResult: z.custom<TestExecutionResult | null>(),
           testRepairAttempts: z.number(),
           axeRepairAttempts: z.number(),
-          generatedFileCount: z.number(),
-          ratingsResult: z.record(z.custom<IndividualAssessment | SkippedIndividualAssessment>()),
+          ...ratingCommonContextFields,
         }),
       )
       .returns(z.custom<PerBuildRatingResult>()),
@@ -83,9 +88,9 @@ const perFileRatingSchema = z
     rate: z
       .function()
       .args(
-        z.string(),
-        z.string().optional(),
-        z.record(z.custom<IndividualAssessment | SkippedIndividualAssessment>()),
+        z.string().describe('Code'),
+        z.string().optional().describe('File path'),
+        z.object(ratingCommonContextFields).describe('Context'),
       )
       .returns(z.custom<PerFileRatingResult>()),
     filter: z.union([

@@ -36,7 +36,7 @@ export interface AssessmentConfig {
 /**
  * Represents a single prompt definition and extra metadata for it.
  */
-export interface PromptDefinition {
+export interface PromptDefinition<Metadata = unknown> {
   /**
    * A descriptive name for the prompt, used for identification (e.g., file naming).
    */
@@ -67,6 +67,14 @@ export interface PromptDefinition {
    * Relative paths to files that should be passed as context to LLM calls.
    */
   contextFilePatterns: string[];
+
+  /**
+   * Additional metadata attached to the given prompt.
+   *
+   * Metadata can be attached in advanced environments and allows for advanced
+   * raters to leverage metadata to e.g. compare with golden output.
+   */
+  metadata: Metadata;
 }
 
 /**
