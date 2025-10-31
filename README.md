@@ -21,13 +21,12 @@ code and relies primarily on well-established measures of code quality.
 * 🔧 Automatically attempt to repair issues detected during code generating.
 * 📊 View and compare results with an intuitive report viewer UI.
 
-## Setup
-
 <p align="center">
   <img src="docs/images/angular-screenshot.png" width="45%">
   <img src="docs/images/solid-screenshot.png" width="45%">
 </p>
 
+## Setup
 
 1. **Install the package:**
 
