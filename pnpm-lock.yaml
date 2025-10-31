@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@anthropic-ai/sdk':
-        specifier: ^0.67.0
-        version: 0.67.0(zod@3.25.76)
+        specifier: ^0.68.0
+        version: 0.68.0(zod@3.25.76)
       '@axe-core/puppeteer':
         specifier: ^4.10.2
         version: 4.10.2(puppeteer@24.25.0(typescript@5.9.3))
@@ -18,14 +18,14 @@ importers:
         specifier: ^1.19.1
         version: 1.21.0(encoding@0.1.13)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))(ws@8.18.3)(zod@3.25.76)
       '@genkit-ai/googleai':
-        specifier: 1.21.0
-        version: 1.21.0(encoding@0.1.13)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
+        specifier: 1.22.0
+        version: 1.22.0(encoding@0.1.13)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
       '@genkit-ai/mcp':
-        specifier: 1.21.0
-        version: 1.21.0(@modelcontextprotocol/sdk@1.20.1)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
+        specifier: 1.22.0
+        version: 1.22.0(@modelcontextprotocol/sdk@1.20.1)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
       '@google/genai':
-        specifier: 1.27.0
-        version: 1.27.0(@modelcontextprotocol/sdk@1.20.1)
+        specifier: 1.28.0
+        version: 1.28.0(@modelcontextprotocol/sdk@1.20.1)
       '@inquirer/prompts':
         specifier: ^7.8.4
         version: 7.9.0(@types/node@24.8.1)
@@ -127,8 +127,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.22
       '@google/gemini-cli':
-        specifier: ^0.10.0
-        version: 0.10.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
+        specifier: ^0.11.0
+        version: 0.11.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
       '@openai/codex':
         specifier: ^0.50.0
         version: 0.50.0
@@ -474,8 +474,8 @@ packages:
   '@anthropic-ai/sdk@0.39.0':
     resolution: {integrity: sha512-eMyDIPRZbt1CCLErRCi3exlAvNkBtRe+kW5vvJyef93PmNr/clstYgHhtvmkxN82nlKgzyGPCyGxrm0JQ1ZIdg==}
 
-  '@anthropic-ai/sdk@0.67.0':
-    resolution: {integrity: sha512-Buxbf6jYJ+pPtfCgXe1pcFtZmdXPrbdqhBjiscFt9irS1G0hCsmR/fPA+DwKTk4GPjqeNnnCYNecXH6uVZ4G/A==}
+  '@anthropic-ai/sdk@0.68.0':
+    resolution: {integrity: sha512-SMYAmbbiprG8k1EjEPMTwaTqssDT7Ae+jxcR5kWXiqTlbwMR2AthXtscEVWOHkRfyAV5+y3PFYTJRNa3OJWIEw==}
     hasBin: true
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
@@ -1059,16 +1059,16 @@ packages:
     peerDependencies:
       genkit: ^1.21.0
 
-  '@genkit-ai/googleai@1.21.0':
-    resolution: {integrity: sha512-sJauWpr0vu0cnA05UwQAfd2Vh04+Lar1YC3Nn/YBbwBow3Y7KWAqQUNaGHSka/ZYiUHxlzjYyhaDtodmnObepw==}
+  '@genkit-ai/googleai@1.22.0':
+    resolution: {integrity: sha512-6GTfrsv2acRWlXcvi8jqH044tG/eslMQCH1wxpA//wzTnsnht5f4SJ3isKU3gcmyQtoYWiaUN8/F7OYqkIYHcw==}
     peerDependencies:
-      genkit: ^1.21.0
+      genkit: ^1.22.0
 
-  '@genkit-ai/mcp@1.21.0':
-    resolution: {integrity: sha512-l/YzGwLUK+3c0MBPKYLzEh7rPaM0BaynNaWMWqahTJMlJn/LqHwaTvzUwg7/zmcxbhFKq2lgDhrvMKTgFfPecw==}
+  '@genkit-ai/mcp@1.22.0':
+    resolution: {integrity: sha512-SMq3Ct/pqZvHH+n0W9F7tJXVJwdcivn9RTfTX4gt8h1oTMxrhwEtYt+gnpFHlQ9Hm5FlfPSImIMsBx4sObFp7A==}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.13.0
-      genkit: ^1.21.0
+      genkit: ^1.22.0
 
   '@google-cloud/common@5.0.2':
     resolution: {integrity: sha512-V7bmBKYQyu0eVG2BFejuUjlBt+zrya6vtsKdY+JxMM/dNntPF41vZ9+LhOshEUH01zOHEqBSvI7Dad7ZS6aUeA==}
@@ -1157,12 +1157,12 @@ packages:
     resolution: {integrity: sha512-6xN0KNO8L/LIA5zu3CJwHkJiB6n65eykBLOb0E+RooiHYgX8CSao6lvQiKT9TBk2gL5g33LL3fmhDodZnt56rw==}
     engines: {node: '>=14'}
 
-  '@google/gemini-cli-core@0.10.0':
-    resolution: {integrity: sha512-z0/hIuVWSPy7C+88KwTbC2ejo208mlbb7UzZHzBqIvUpeU0p2JWgC24qFmpmtnuIIQMIbFs55Hqvmh6U3CYtEg==}
+  '@google/gemini-cli-core@0.11.0':
+    resolution: {integrity: sha512-yBSFuJp134TYcpoMB2aYfTwM66zFnYhRzlTRTSbV1WihE68q5zdgraUTJ5JUNb/wEUR3mx8plRLlDOSvppX58A==}
     engines: {node: '>=20'}
 
-  '@google/gemini-cli@0.10.0':
-    resolution: {integrity: sha512-ezi8Of1gTopjhERcbT7CHUNmq79qW7rNd+7nYWPFFEMjASSGd8gPYZ9SG2aNeAjz92hAMS+TuD98DVeCnVTc1g==}
+  '@google/gemini-cli@0.11.0':
+    resolution: {integrity: sha512-VC2HyT5ozmDLHnR1Bsnq5n9K0nm19thusjJR5DF8p6pmnezmz682bXqC/LZs34rsEYYSDDcj2SH/AohgB4NkBg==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -1175,8 +1175,8 @@ packages:
       '@modelcontextprotocol/sdk':
         optional: true
 
-  '@google/genai@1.27.0':
-    resolution: {integrity: sha512-sveeQqwyzO/U5kOjo3EflF1rf7v0ZGprrjPGmeT6V5u22IUTcA4wBFxW+q1n7hOX0M1iWR3944MImoNPOM+zsA==}
+  '@google/genai@1.28.0':
+    resolution: {integrity: sha512-0pfZ1EWQsM9kINsL+mFKJvpzM6NRHS9t360S1MzKq4JtIwTj/RbsPpC/K5wpKiPy9PC+J+bsz/9gvaL51++KrA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.20.1
@@ -5624,6 +5624,10 @@ packages:
   node-addon-api@7.1.1:
     resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
 
+  node-addon-api@8.5.0:
+    resolution: {integrity: sha512-/bRZty2mXUIFY/xU5HLvveNHlswNJej+RnxBjOMkidWfwZzgTbPG1E3K5TOxRLOR+5hX7bSofy8yf1hZevMS8A==}
+    engines: {node: ^18 || ^20 || >= 21}
+
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
@@ -5648,6 +5652,10 @@ packages:
 
   node-gyp-build-optional-packages@5.2.2:
     resolution: {integrity: sha512-s+w+rBWnpTMwSFbaE0UXsRlg7hU4FjekKU4eyAih5T8nJuNZT1nNsskXpxmeqSK9UzkBl6UgRlnKc8hz8IEqOw==}
+    hasBin: true
+
+  node-gyp-build@4.8.4:
+    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
     hasBin: true
 
   node-gyp@11.5.0:
@@ -6707,6 +6715,14 @@ packages:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
 
+  tree-sitter-bash@0.25.0:
+    resolution: {integrity: sha512-gZtlj9+qFS81qKxpLfD6H0UssQ3QBc/F0nKkPsiFDyfQF2YBqYvglFJUzchrPpVhZe9kLZTrJ9n2J6lmka69Vg==}
+    peerDependencies:
+      tree-sitter: ^0.25.0
+    peerDependenciesMeta:
+      tree-sitter:
+        optional: true
+
   trim-lines@3.0.1:
     resolution: {integrity: sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==}
 
@@ -6975,6 +6991,14 @@ packages:
   web-streams-polyfill@4.0.0-beta.3:
     resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}
     engines: {node: '>= 14'}
+
+  web-tree-sitter@0.25.10:
+    resolution: {integrity: sha512-Y09sF44/13XvgVKgO2cNDw5rGk6s26MgoZPXLESvMXeefBf7i6/73eFurre0IsTW6E14Y0ArIzhUMmjoc7xyzA==}
+    peerDependencies:
+      '@types/emscripten': ^1.40.0
+    peerDependenciesMeta:
+      '@types/emscripten':
+        optional: true
 
   webdriver-bidi-protocol@0.3.7:
     resolution: {integrity: sha512-wIx5Gu/LLTeexxilpk8WxU2cpGAKlfbWRO5h+my6EMD1k5PYqM1qQO1MHUFf4f3KRnhBvpbZU7VkizAgeSEf7g==}
@@ -7512,7 +7536,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@anthropic-ai/sdk@0.67.0(zod@3.25.76)':
+  '@anthropic-ai/sdk@0.68.0(zod@3.25.76)':
     dependencies:
       json-schema-to-ts: 3.1.1
     optionalDependencies:
@@ -8083,7 +8107,7 @@ snapshots:
       - supports-color
     optional: true
 
-  '@genkit-ai/googleai@1.21.0(encoding@0.1.13)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
+  '@genkit-ai/googleai@1.22.0(encoding@0.1.13)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
     dependencies:
       '@google/generative-ai': 0.24.1
       genkit: 1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))
@@ -8093,7 +8117,7 @@ snapshots:
       - encoding
       - supports-color
 
-  '@genkit-ai/mcp@1.21.0(@modelcontextprotocol/sdk@1.20.1)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
+  '@genkit-ai/mcp@1.22.0(@modelcontextprotocol/sdk@1.20.1)(genkit@1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
     dependencies:
       '@modelcontextprotocol/sdk': 1.20.1
       genkit: 1.21.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))
@@ -8270,7 +8294,7 @@ snapshots:
       - supports-color
     optional: true
 
-  '@google/gemini-cli-core@0.10.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)':
+  '@google/gemini-cli-core@0.11.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)':
     dependencies:
       '@google-cloud/logging': 11.2.1(encoding@0.1.13)
       '@google-cloud/opentelemetry-cloud-monitoring-exporter': 0.21.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
@@ -8313,7 +8337,9 @@ snapshots:
       shell-quote: 1.8.3
       simple-git: 3.28.0
       strip-ansi: 7.1.2
+      tree-sitter-bash: 0.25.0
       undici: 7.16.0
+      web-tree-sitter: 0.25.10
       ws: 8.18.3
     optionalDependencies:
       '@lydell/node-pty': 1.1.0
@@ -8328,14 +8354,16 @@ snapshots:
       - '@opentelemetry/resources'
       - '@opentelemetry/sdk-metrics'
       - '@opentelemetry/sdk-trace-base'
+      - '@types/emscripten'
       - bufferutil
       - encoding
       - supports-color
+      - tree-sitter
       - utf-8-validate
 
-  '@google/gemini-cli@0.10.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)':
+  '@google/gemini-cli@0.11.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)':
     dependencies:
-      '@google/gemini-cli-core': 0.10.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
+      '@google/gemini-cli-core': 0.11.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
       '@google/genai': 1.16.0(@modelcontextprotocol/sdk@1.20.1)(encoding@0.1.13)
       '@iarna/toml': 2.2.5
       '@modelcontextprotocol/sdk': 1.20.1
@@ -8373,11 +8401,13 @@ snapshots:
       - '@opentelemetry/resources'
       - '@opentelemetry/sdk-metrics'
       - '@opentelemetry/sdk-trace-base'
+      - '@types/emscripten'
       - '@types/react'
       - bufferutil
       - encoding
       - react-devtools-core
       - supports-color
+      - tree-sitter
       - utf-8-validate
 
   '@google/genai@1.16.0(@modelcontextprotocol/sdk@1.20.1)(encoding@0.1.13)':
@@ -8392,7 +8422,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@google/genai@1.27.0(@modelcontextprotocol/sdk@1.20.1)':
+  '@google/genai@1.28.0(@modelcontextprotocol/sdk@1.20.1)':
     dependencies:
       google-auth-library: 10.4.2
       ws: 8.18.3
@@ -13631,6 +13661,8 @@ snapshots:
   node-addon-api@7.1.1:
     optional: true
 
+  node-addon-api@8.5.0: {}
+
   node-domexception@1.0.0: {}
 
   node-fetch@2.7.0(encoding@0.1.13):
@@ -13652,6 +13684,8 @@ snapshots:
     dependencies:
       detect-libc: 2.1.2
     optional: true
+
+  node-gyp-build@4.8.4: {}
 
   node-gyp@11.5.0:
     dependencies:
@@ -14983,6 +15017,11 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
+  tree-sitter-bash@0.25.0:
+    dependencies:
+      node-addon-api: 8.5.0
+      node-gyp-build: 4.8.4
+
   trim-lines@3.0.1: {}
 
   triple-beam@1.4.1: {}
@@ -15198,6 +15237,8 @@ snapshots:
   web-streams-polyfill@3.3.3: {}
 
   web-streams-polyfill@4.0.0-beta.3: {}
+
+  web-tree-sitter@0.25.10: {}
 
   webdriver-bidi-protocol@0.3.7: {}
 
