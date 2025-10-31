@@ -23,6 +23,12 @@ code and relies primarily on well-established measures of code quality.
 
 ## Setup
 
+<p align="center">
+  <img src="docs/images/angular-screenshot.png" width="45%">
+  <img src="docs/images/solid-screenshot.png" width="45%">
+</p>
+
+
 1. **Install the package:**
 
 ```bash
