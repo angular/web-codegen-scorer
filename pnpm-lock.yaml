@@ -130,8 +130,8 @@ importers:
         specifier: ^0.11.0
         version: 0.11.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
       '@openai/codex':
-        specifier: ^0.50.0
-        version: 0.50.0
+        specifier: ^0.53.0
+        version: 0.53.0
       prettier:
         specifier: ^3.5.3
         version: 3.6.2
@@ -1782,8 +1782,8 @@ packages:
     resolution: {integrity: sha512-vaQj4nccJbAslopIvd49pQH2NhUp7G9pY4byUtmwhe37ZZuubGrx0eB9hW2F37uVNRuDDK6byFGXF+7JCuMSZg==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  '@openai/codex@0.50.0':
-    resolution: {integrity: sha512-JsyznJwTdHZIY4u5m1Ok76WMdT54qjLRqKN93EJTPUeNSdE1kzkahSqjCwTIhrnx1vvn3uJtZ24HuOcsfTEPdA==}
+  '@openai/codex@0.53.0':
+    resolution: {integrity: sha512-p9FxjMQuEU1LQ+YG2HPci1fafNAAvL2q8mXJkfTsPLUU1/uTsOohemtbvjC+LYTHd99Y6WseaAdmm1JBXqGsHw==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -8997,7 +8997,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@openai/codex@0.50.0': {}
+  '@openai/codex@0.53.0': {}
 
   '@opentelemetry/api-logs@0.203.0':
     dependencies:
