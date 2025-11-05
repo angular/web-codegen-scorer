@@ -30,7 +30,8 @@ const exactMatches: Record<string, string> = {
       height: 24px;
     }
 
-    :host-context(.dark-mode) :host(.genkit) .logo {
+    :host-context(.dark-mode) :host(.genkit) .logo,
+    :host-context(.dark-mode) :host(.next) .logo {
       filter: invert(1);
     }
   `,
