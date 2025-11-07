@@ -37,6 +37,7 @@
   font-weight: 500;
   transition: filter 0.2s ease-in-out;
   min-width: 50px;
+  user-select: none;
 
   &:first-child {
     border-top-left-radius: 8px;
