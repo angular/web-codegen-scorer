@@ -75,8 +75,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
       marked:
-        specifier: ^16.1.1
-        version: 16.4.1
+        specifier: ^17.0.0
+        version: 17.0.0
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
@@ -5363,8 +5363,8 @@ packages:
     engines: {node: '>= 18'}
     hasBin: true
 
-  marked@16.4.1:
-    resolution: {integrity: sha512-ntROs7RaN3EvWfy3EZi14H4YxmT6A5YvywfhO+0pm+cH/dnSQRmdAmoFIc3B9aiwTehyk7pESH4ofyBY+V5hZg==}
+  marked@17.0.0:
+    resolution: {integrity: sha512-KkDYEWEEiYJw/KC+DVm1zzlpMQSMIu6YRltkcCvwheCp8HWPXCk9JwOmHJKBlGfzcpzcIt6x3sMnTsRm/51oDg==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -13419,7 +13419,7 @@ snapshots:
 
   marked@15.0.12: {}
 
-  marked@16.4.1: {}
+  marked@17.0.0: {}
 
   marky@1.3.0: {}
 
