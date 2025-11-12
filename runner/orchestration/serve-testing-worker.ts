@@ -38,6 +38,11 @@ export async function serveAndTestApp(
       rootPromptDef,
       progress,
       async serveUrl => {
+        progress.log(
+          rootPromptDef,
+          'serve-testing',
+          `Validating the running app (URL: ${serveUrl})`,
+        );
         const serveParams: ServeTestingWorkerMessage = {
           serveUrl,
           appName: rootPromptDef.name,
