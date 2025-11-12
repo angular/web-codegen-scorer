@@ -218,14 +218,8 @@ export async function attemptBuildAndTest(
 
     let hasBuildFailure = attempt.buildResult.status !== BuildResultStatus.SUCCESS;
     attempt.buildFailedDuringTestRepair = hasBuildFailure;
-
-    // By default, we don't preserve breaking test repair attempts as they significantly
-    // impact evaluation results by e.g. lacking serve results.
-    // TODO: In the future we should consider exploring this further, or at least capture tokens.
-    if (!hasBuildFailure || config.preserveBreakingTestRepairAttempts) {
-      attemptDetails.push(attempt);
-      lastAttempt = attempt;
-    }
+    attemptDetails.push(attempt);
+    lastAttempt = attempt;
     // If we somehow introduced build errors via the repair loop, we abort
     // further repairs and capture the failed build. This is useful insight
     // as LLMs seem to regress when asked to repair violations.
