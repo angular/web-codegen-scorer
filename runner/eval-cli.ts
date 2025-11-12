@@ -42,6 +42,7 @@ interface Options {
   skipLighthouse?: boolean;
   maxTestRepairAttempts?: number;
   maxBuildRepairAttempts?: number;
+  preserveBreakingTestRepairAttempts?: boolean;
 }
 
 function builder(argv: Argv): Argv<Options> {
@@ -168,6 +169,13 @@ function builder(argv: Argv): Argv<Options> {
         description:
           'Number of repair attempts for discovered test failures (including a11y violations and ones from testCommand)',
       })
+      .option('preserve-breaking-test-repair-attempts', {
+        type: 'boolean',
+        // See rationale for the default via:
+        // https://github.com/angular/web-codegen-scorer/pull/69
+        default: false,
+        description: `Whether test repair attempts which break a build should be captured.`,
+      })
       .strict()
       .version(false)
       .help()
@@ -221,6 +229,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
       skipLighthouse: cliArgs.skipLighthouse,
       maxBuildRepairAttempts: cliArgs.maxBuildRepairAttempts,
       maxTestRepairAttempts: cliArgs.maxTestRepairAttempts,
+      preserveBreakingTestRepairAttempts: cliArgs.preserveBreakingTestRepairAttempts,
       abortSignal: abortCtrl.signal,
     });
 
