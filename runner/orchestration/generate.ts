@@ -3,7 +3,7 @@ import {existsSync, readdirSync} from 'fs';
 import {availableParallelism} from 'os';
 import PQueue from 'p-queue';
 import {basename, join} from 'path';
-import {assertValidModelName} from '../codegen/llm-runner.js';
+import {assertValidModelName, LlmRunner} from '../codegen/llm-runner.js';
 import {getRunnerByName} from '../codegen/runner-creation.js';
 import {LLM_OUTPUT_DIR, REPORT_VERSION} from '../configuration/constants.js';
 import {getEnvironmentByPath} from '../configuration/environment-resolution.js';
@@ -27,6 +27,7 @@ import {startEvaluationTask} from './generate-eval-task.js';
 import {prepareSummary} from './generate-summary.js';
 import {getRunGroupId} from './grouping.js';
 import {combineAbortSignals} from '../utils/abort-signal.js';
+import {RatingKind} from '../ratings/rating-types.js';
 
 /**
  * Orchestrates the entire assessment process for each prompt defined in the `prompts` array.
@@ -43,10 +44,14 @@ import {combineAbortSignals} from '../utils/abort-signal.js';
  */
 export async function generateCodeAndAssess(options: AssessmentConfig): Promise<RunInfo> {
   const env = await getEnvironmentByPath(options.environmentConfigPath, options.runner);
+  const extraCleanupFns: (() => Promise<void>)[] = [];
   const cleanup = async () => {
     // Clean-up should never interrupt a potentially passing completion.
     try {
       await env.executor.destroy();
+      for (const cleanupFn of extraCleanupFns) {
+        await cleanupFn();
+      }
     } catch (e) {
       console.error(`Failed to destroy executor: ${e}`);
       if (e instanceof Error) {
@@ -58,15 +63,38 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
   // Ensure cleanup logic runs when the evaluation is aborted.
   options.abortSignal?.addEventListener('abort', cleanup);
 
-  await assertValidModelName(options.model, env.executor);
-
-  const ratingLlm = await getRunnerByName('genkit');
   const allTasksAbortCtrl = new AbortController();
 
   try {
+    await assertValidModelName(options.model, env.executor);
+
     const promptsToProcess = (
       await getCandidateExecutablePrompts(env, options.localMode, options.promptFilter)
     ).slice(0, options.limit);
+
+    const hasLlmBasedRatings = promptsToProcess.some(p =>
+      p.kind === 'single'
+        ? // Check if some ratings are LLM based.
+          p.ratings.some(r => r.kind === RatingKind.LLM_BASED)
+        : // Check if some steps contain LLM based ratings.
+          p.steps.some(s => s.ratings.some(r => r.kind === RatingKind.LLM_BASED)),
+    );
+
+    // Only construct LLMs when necessary. This is helpful in cases where WCS is invoked
+    // as a auto-rater that doesn't have access to other LLMs.
+    const autoraterLlm = hasLlmBasedRatings ? await getRunnerByName('genkit') : null;
+    const cujGenerationLlm = options.enableUserJourneyTesting
+      ? (autoraterLlm ?? (await getRunnerByName('genkit')))
+      : null;
+    const generateAiSummaryLlm = !options.skipAiSummary
+      ? (autoraterLlm ?? cujGenerationLlm ?? (await getRunnerByName('genkit')))
+      : null;
+
+    extraCleanupFns.push(async () => {
+      await autoraterLlm?.dispose();
+      await cujGenerationLlm?.dispose();
+      await generateAiSummaryLlm?.dispose();
+    });
 
     const progress =
       options.logging === 'dynamic' ? new DynamicProgressLogger() : new TextProgressLogger();
@@ -128,7 +156,8 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
                   options,
                   evalID,
                   env,
-                  ratingLlm,
+                  autoraterLlm,
+                  cujGenerationLlm,
                   rootPromptDef,
                   combineAbortSignals(
                     allTasksAbortCtrl.signal,
@@ -187,7 +216,7 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
     const timestamp = new Date();
     const details = {
       summary: await prepareSummary(
-        ratingLlm,
+        generateAiSummaryLlm,
         allTasksAbortCtrl.signal,
         options.model,
         env,
@@ -196,7 +225,6 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
           allPromptsCount: promptsToProcess.length,
           failedPrompts,
         },
-        options,
       ),
       timestamp: timestamp.toISOString(),
       reportName: options.reportName,

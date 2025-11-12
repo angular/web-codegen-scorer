@@ -9,13 +9,12 @@ import {AssessmentResult, CompletionStats, RunSummary} from '../shared-interface
  * and also some extra metadata about the run.
  */
 export async function prepareSummary(
-  genkit: GenkitRunner,
+  generateAiSummaryLlm: GenkitRunner | null,
   abortSignal: AbortSignal,
   model: string,
   env: Environment,
   assessments: AssessmentResult[],
   completionStats: CompletionStats,
-  opts: {skipAiSummary?: boolean},
 ): Promise<RunSummary> {
   let inputTokens = 0;
   let outputTokens = 0;
@@ -40,22 +39,19 @@ export async function prepareSummary(
   });
 
   let aiSummary: string | undefined = undefined;
-  if (!opts.skipAiSummary) {
+  if (generateAiSummaryLlm) {
     console.log(`✨ Generating AI summary for evaluation run..`);
     try {
-      const result = await summarizeReportWithAI(genkit, abortSignal, assessments);
-
-      if (result !== null) {
-        inputTokens += result.usage.inputTokens;
-        outputTokens += result.usage.outputTokens;
-        totalTokens += result.usage.totalTokens;
-        aiSummary = result.responseHtml;
-        console.log(`✅ Generated AI summary.`);
-      }
+      const result = await summarizeReportWithAI(generateAiSummaryLlm, abortSignal, assessments);
+      inputTokens += result.usage.inputTokens;
+      outputTokens += result.usage.outputTokens;
+      totalTokens += result.usage.totalTokens;
+      aiSummary = result.responseHtml;
+      console.log(`✅ Generated AI summary.`);
     } catch (e) {
       console.log(`${redX()} Failed to generate AI summary, skipping summary.`);
 
-      if ((e as Partial<Error>).stack) {
+      if (process.env.DEBUG === '1' && (e as Partial<Error>).stack) {
         console.error((e as Error).stack);
       }
     }
