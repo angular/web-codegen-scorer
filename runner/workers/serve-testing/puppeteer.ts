@@ -45,7 +45,10 @@ export async function runAppInPuppeteer(
       if (message.type() !== 'error') return;
 
       if (!message.text().includes('JSHandle@error')) {
-        progressLog('error', `${message.type().substring(0, 3).toUpperCase()} ${message.text()}`);
+        progressLog(
+          'error',
+          `Runtime Error: ${message.type().substring(0, 3).toUpperCase()} ${message.text()}`,
+        );
         return;
       }
       const messages = await Promise.all(
