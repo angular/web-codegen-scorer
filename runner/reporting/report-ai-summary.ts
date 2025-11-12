@@ -10,7 +10,7 @@ export async function summarizeReportWithAI(
   const model = 'gemini-2.5-flash-lite';
 
   if (!llm.getSupportedModels().includes(model)) {
-    return null;
+    throw new Error(`Unable to generate AI summary due to unsupported model: ${model}`);
   }
 
   return chatWithReportAI(

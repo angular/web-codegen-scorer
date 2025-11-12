@@ -29,6 +29,7 @@ import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {UserFacingError} from '../utils/errors.js';
 import {ServeTestingResult} from '../workers/serve-testing/worker-types.js';
+import assert from 'assert';
 
 interface FileOrEmbeddedSyntheticFile {
   /**
@@ -45,7 +46,7 @@ interface FileOrEmbeddedSyntheticFile {
 type CategorizedFiles = Record<PerFileRatingContentType, FileOrEmbeddedSyntheticFile[]>;
 
 export async function rateGeneratedCode(
-  llm: GenkitRunner,
+  autoraterLlm: GenkitRunner | null,
   environment: Environment,
   currentPromptDef: PromptDefinition,
   fullPromptText: string,
@@ -107,12 +108,13 @@ export async function rateGeneratedCode(
         categorizedFiles ??= splitFilesIntoCategories(outputFiles);
         result = await runPerFileRating(currentPromptDef, current, categorizedFiles, ratingsResult);
       } else if (current.kind === RatingKind.LLM_BASED) {
+        assert(autoraterLlm !== null, 'Expected an auto-rater LLM to be available.');
         result = await runLlmBasedRating(
           environment,
           current,
           fullPromptText,
           currentPromptDef,
-          llm,
+          autoraterLlm,
           outputFiles,
           buildResult,
           serveTestingResult,

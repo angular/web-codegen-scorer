@@ -12,11 +12,12 @@ import {EvalID} from './executors/executor.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {resolveContextFiles, setupProjectStructure, writeResponseFiles} from './file-system.js';
 import {generateInitialFiles} from './generate-initial-files.js';
-import {generateUserJourneysForApp} from './user-journeys.js';
+import {generateUserJourneysForApp, UserJourneysResult} from './user-journeys.js';
 import {BrowserAgentTaskInput} from '../testing/browser-agent/models.js';
 import {attemptBuildAndTest} from './build-serve-test-loop.js';
 import {rateGeneratedCode} from '../ratings/rate-code.js';
 import {DEFAULT_AUTORATER_MODEL_NAME} from '../configuration/constants.js';
+import assert from 'node:assert';
 
 /**
  * Creates and executes a task to generate or load code for a given prompt,
@@ -25,24 +26,14 @@ import {DEFAULT_AUTORATER_MODEL_NAME} from '../configuration/constants.js';
  * This function handles both online (AI-generated) and local (file-based) code retrieval.
  * It manages build attempts and AI-driven repair cycles.
  *
- * @param evalID ID of the evaluation task.
- * @param env Environment for this evaluation.
- * @param model Name of the LLM to use.
- * @param rootPromptDef Definition of the root prompt being processed.
- * @param localMode A boolean indicating whether to load code from local files instead of generating it.
- * @param skipScreenshots Whether to skip taking screenshot of a running application.
- * @param outputDirectory Directory in which to generate the output. Convenient for debugging.
- * @param abortSignal Abort signal for when the evaluation task should be aborted.
- * @param skipAxeTesting Whether or not to skip Axe testing of the app.
- * @param enableUserJourneyTesting Whether to enable user journey testing of generated apps.
- * @param workerConcurrencyQueue Concurrency queue for controlling parallelism of worker invocations (as they are more expensive than LLM calls).
  * @returns A Promise that resolves to an AssessmentResult object containing all details of the task's execution.
  */
 export async function startEvaluationTask(
   config: AssessmentConfig,
   evalID: EvalID,
   env: Environment,
-  ratingLlm: GenkitRunner,
+  autoraterLlm: GenkitRunner | null,
+  cujGenerationLlm: GenkitRunner | null,
   rootPromptDef: PromptDefinition | MultiStepPromptDefinition,
   abortSignal: AbortSignal,
   workerConcurrencyQueue: PQueue,
@@ -128,24 +119,25 @@ export async function startEvaluationTask(
       break;
     }
 
-    const userJourneys = config.enableUserJourneyTesting
-      ? await generateUserJourneysForApp(
-          ratingLlm,
-          rootPromptDef.name,
-          defsToExecute[0].prompt,
-          initialResponse.files,
-          abortSignal,
-        )
-      : undefined;
+    let userJourneys: UserJourneysResult | undefined = undefined;
+    let userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined = undefined;
 
-    // TODO: Only execute the serve command on the "final working attempt".
-    // TODO: Incorporate usage.
-    const userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined = userJourneys
-      ? {
-          userJourneys: userJourneys.result,
-          appPrompt: defsToExecute[0].prompt,
-        }
-      : undefined;
+    if (config.enableUserJourneyTesting) {
+      assert(cujGenerationLlm, 'Expected a CUJ generation LLM to be available.');
+      userJourneys = await generateUserJourneysForApp(
+        cujGenerationLlm,
+        rootPromptDef.name,
+        defsToExecute[0].prompt,
+        initialResponse.files,
+        abortSignal,
+      );
+
+      // TODO: Incorporate usage.
+      userJourneyAgentTaskInput = {
+        userJourneys: userJourneys.result,
+        appPrompt: defsToExecute[0].prompt,
+      };
+    }
 
     const attemptDetails: AttemptDetails[] = []; // Store details for assessment.json
 
@@ -172,7 +164,7 @@ export async function startEvaluationTask(
     }
 
     const score = await rateGeneratedCode(
-      ratingLlm,
+      autoraterLlm,
       env,
       promptDef,
       fullPromptText,
