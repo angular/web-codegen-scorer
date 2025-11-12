@@ -9,7 +9,7 @@ import {
   RootPromptDefinition,
 } from '../shared-interfaces.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
-import {runBuild} from './build-worker.js';
+import {BuildType, runBuild} from './build-worker.js';
 import {EvalID} from './executors/executor.js';
 import {serveAndTestApp} from './serve-testing-worker.js';
 import {runTest} from './test-worker.js';
@@ -62,6 +62,7 @@ export async function attemptBuildAndTest(
     abortSignal,
     workerConcurrencyQueue,
     progress,
+    BuildType.INITIAL_BUILD,
   );
   let repairAttempts = 0;
   let maxRepairAttempts: number;
