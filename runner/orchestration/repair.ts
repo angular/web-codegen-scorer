@@ -7,7 +7,7 @@ import {
   LlmResponseFile,
   RootPromptDefinition,
 } from '../shared-interfaces.js';
-import {runBuild} from './build-worker.js';
+import {BuildType, runBuild} from './build-worker.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {EvalID} from './executors/executor.js';
 import {repairCodeWithAI} from './codegen.js';
@@ -69,6 +69,7 @@ export async function repairAndBuild(
     abortSignal,
     attempts,
     progress,
+    repairType,
   );
 }
 
@@ -108,6 +109,7 @@ async function handleRepairResponse(
   abortSignal: AbortSignal,
   attempts: number,
   progress: ProgressLogger,
+  repairType: 'build' | 'test',
 ): Promise<AttemptDetails> {
   if (!repairResponse.success) {
     progress.log(
@@ -134,6 +136,7 @@ async function handleRepairResponse(
     abortSignal,
     workerConcurrencyQueue,
     progress,
+    repairType === 'build' ? BuildType.REPAIR_ATTEMPT_BUILD : BuildType.TEST_ATTEMPT_REPAIR,
   );
 
   return {
