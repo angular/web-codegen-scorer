@@ -96,6 +96,7 @@ async function runApp(options: Options) {
       rootPromptDef,
       directory,
       new NoopProgressLogger(),
+      new AbortSignal(),
       async url => {
         console.log();
         console.log(formatTitleCard(`🎉 App is up and running at ${url}`));

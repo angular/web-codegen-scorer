@@ -178,6 +178,7 @@ export class LocalExecutor implements Executor {
     appDirectoryPath: string,
     rootPromptDef: RootPromptDefinition,
     progress: ProgressLogger,
+    abortSignal: AbortSignal,
     logicWhileServing: (serveUrl: string) => Promise<ServeTestingResult>,
   ): Promise<ServeTestingResult | null> {
     // Serve testing is explicitly disabled.
@@ -190,6 +191,7 @@ export class LocalExecutor implements Executor {
       rootPromptDef,
       appDirectoryPath,
       progress,
+      abortSignal,
       logicWhileServing,
     );
   }

@@ -66,6 +66,9 @@ export const executorSchema = z.object({
         z.custom<RootPromptDefinition>().describe('Root prompt definition'),
         z.custom<ProgressLogger>().describe('Progress logger'),
         z
+          .custom<AbortSignal>()
+          .describe('Abort Signal to fire when the server should be canceled.'),
+        z
           .function(
             z.tuple([z.string().describe('URL of the running server')]),
             z.promise(z.custom<ServeTestingResult>()),

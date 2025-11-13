@@ -37,6 +37,7 @@ export async function serveAndTestApp(
       appDirectoryPath,
       rootPromptDef,
       progress,
+      abortSignal,
       async serveUrl => {
         progress.log(
           rootPromptDef,
