@@ -3,12 +3,14 @@ import type {GeminiCliRunner} from './gemini-cli-runner.js';
 import type {ClaudeCodeRunner} from './claude-code-runner.js';
 import type {GenkitRunner} from './genkit/genkit-runner.js';
 import type {CodexRunner} from './codex-runner.js';
+import type {NoopUnimplementedRunner} from './noop-unimplemented-runner.js';
 
 interface AvailableRunners {
   genkit: GenkitRunner;
   'gemini-cli': GeminiCliRunner;
   'claude-code': ClaudeCodeRunner;
   'codex': CodexRunner;
+  'noop-unimplemented': NoopUnimplementedRunner;
 }
 
 /** Names of supported runners. */
@@ -35,6 +37,10 @@ export async function getRunnerByName<T extends RunnerName>(name: T): Promise<Av
       );
     case 'codex':
       return import('./codex-runner.js').then(m => new m.CodexRunner() as AvailableRunners[T]);
+    case 'noop-unimplemented':
+      return import('./noop-unimplemented-runner.js').then(
+        m => new m.NoopUnimplementedRunner() as AvailableRunners[T],
+      );
     default:
       throw new UserFacingError(`Unsupported runner ${name}`);
   }
