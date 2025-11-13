@@ -246,3 +246,18 @@ lighthouse-category + lighthouse-category {
 .hidden {
   visibility: hidden;
 }
+
+.failed-prompt-button.neutral-button {
+  font-size: 0.8rem;
+  padding: 0.8rem;
+  height: 1.4rem;
+  margin: 0.5rem 0;
+  background-color: var(--button-active-bg-color);
+  color: color-mix(in srgb, var(--accent-yellow) 75%, transparent);
+  border-color: var(--button-active-bg-color);
+  font-weight: bold;
+
+  &:active, &:hover {
+    background-color: transparent;
+  }
+}
