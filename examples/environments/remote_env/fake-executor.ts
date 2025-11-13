@@ -64,6 +64,7 @@ export class FakeRemoteExecutor implements Executor {
     appDirectoryPath: string,
     rootPromptDef: RootPromptDefinition,
     progress: ProgressLogger,
+    abortSignal: AbortSignal,
     logicWhileServing: (serveUrl: string) => Promise<T>,
   ): Promise<T> {
     // Start serving of the app.

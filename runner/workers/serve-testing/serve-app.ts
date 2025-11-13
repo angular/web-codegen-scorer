@@ -9,12 +9,13 @@ export async function serveApp<T>(
   rootPromptDef: RootPromptDefinition,
   appDirectoryPath: string,
   progress: ProgressLogger,
+  abortSignal: AbortSignal,
   logicWhileServing: (serveUrl: string) => Promise<T>,
 ): Promise<T> {
   let serveProcess: ChildProcess | null = null;
 
   try {
-    serveProcess = exec(serveCommand, {cwd: appDirectoryPath});
+    serveProcess = exec(serveCommand, {cwd: appDirectoryPath, signal: abortSignal});
     progress.log(
       rootPromptDef,
       'eval',
