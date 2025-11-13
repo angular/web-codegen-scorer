@@ -36,7 +36,7 @@ export class LocalExecutor implements Executor {
 
   constructor(
     public config: LocalExecutorConfig,
-    runnerName: RunnerName = 'genkit',
+    runnerName: RunnerName = 'noop-unimplemented',
   ) {
     this.llm = getRunnerByName(runnerName);
   }
