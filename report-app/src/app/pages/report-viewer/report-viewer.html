@@ -146,6 +146,32 @@
             </li>
           }
         </ul>
+
+        @if (details.summary.completionStats) {
+          @let stats = details.summary.completionStats;
+          <h3>Evaluation Stats</h3>
+          <ul class="status-badge-group">
+            <li class="status-badge neutral">
+              <b>Executed evaluations:</b>
+              {{stats.allPromptsCount - stats.failedPrompts.length}}/{{stats.allPromptsCount}}
+            </li>
+          </ul>
+          <div>
+            @if (stats.failedPrompts.length > 0) {
+              <details>
+                <summary class="neutral-button failed-prompt-button">
+                  Inspect evaluation errors
+                </summary>
+                <div>
+                  @for (prompt of stats.failedPrompts; track prompt) {
+                    <b>{{ prompt.promptName }}</b>
+                    <pre class="callout neutral code">{{ prompt.error }}</pre>
+                  }
+                </div>
+              </details>
+            }
+          </div>
+        }
       }
     </div>
   </section>
@@ -390,8 +416,7 @@
                   [class.warn]="totalPercent < 90 && totalPercent >= 80"
                   [class.error]="totalPercent < 80"
                 >
-                  {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{totalPercent
-                  }}%)
+                  {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{totalPercent}}%)
                 </span>
               </div>
             </div>
