@@ -331,6 +331,7 @@ function getIndividualAssessment(
     scoreReduction: rating.scoreReduction,
     successPercentage: rateResult,
     category: rating.category,
+    groupingLabels: rating.groupingLabels,
     message,
   };
 }
@@ -342,6 +343,7 @@ function getSkippedAssessment(rating: Rating, message: string): SkippedIndividua
     description: rating.description,
     id: rating.id,
     category: rating.category,
+    groupingLabels: rating.groupingLabels,
     message,
   };
 }

@@ -16,6 +16,7 @@ export const NoInnerHtmlBindingsRating: PerFileRating = {
   name: RATING_NAME,
   id: 'no-inner-html-bindings',
   category: RatingCategory.MEDIUM_IMPACT,
+  groupingLabels: ['security'],
   scoreReduction: '50%',
   description: RATING_DESCRIPTION,
   filter: {

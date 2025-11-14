@@ -8,6 +8,7 @@ export const safetyWebRating: PerBuildRating = {
   name: 'SafetyWeb Violations',
   description: 'Checks for TrustedTypes and CSP incompatible coding patterns.',
   category: RatingCategory.HIGH_IMPACT,
+  groupingLabels: ['security'],
   id: 'safety-web',
   scoreReduction: '50%',
   rate: ({buildResult}) => {

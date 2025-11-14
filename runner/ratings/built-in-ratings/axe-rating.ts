@@ -20,6 +20,7 @@ export const axeRating: PerBuildRating = {
   name: 'Axe Accessibility Violations',
   description: 'Checks for accessibility violations using the Axe-core engine.',
   category: RatingCategory.MEDIUM_IMPACT,
+  groupingLabels: ['accessibility'],
   id: 'axe-a11y',
   scoreReduction: '10%',
   rate: ({serveResult, axeRepairAttempts}) => {

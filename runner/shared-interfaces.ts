@@ -206,6 +206,8 @@ export interface IndividualAssessment {
   message: string;
   /** LLM usage for running the assessment. */
   usage?: Usage;
+  /** Labels for this check. Useful for custom grouping of e.g. "best practice" checks. */
+  groupingLabels?: string[];
 }
 
 export interface SkippedIndividualAssessment {
@@ -220,6 +222,8 @@ export interface SkippedIndividualAssessment {
   category: RatingCategory;
   /** A message explaining why the check was skipped. */
   message: string;
+  /** Labels for this check. Useful for custom grouping of e.g. "best practice" checks. */
+  groupingLabels?: string[];
 }
 
 /**
