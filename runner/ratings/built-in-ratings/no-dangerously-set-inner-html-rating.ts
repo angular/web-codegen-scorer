@@ -16,6 +16,7 @@ export const NoDangerouslySetInnerHtmlRating: PerFileRating = {
   name: RATING_NAME,
   id: 'no-dangerously-set-inner-html',
   category: RatingCategory.MEDIUM_IMPACT,
+  groupingLabels: ['security'],
   scoreReduction: '50%',
   description: RATING_DESCRIPTION,
   filter: {

@@ -57,6 +57,7 @@ const ratingSchemaCommonFields = {
   name: z.string(),
   description: z.string(),
   id: z.string(),
+  groupingLabels: z.array(z.string()).optional(),
 } as const;
 
 const perBuildRatingSchema = z

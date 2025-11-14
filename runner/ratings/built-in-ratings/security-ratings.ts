@@ -38,6 +38,7 @@ export const cspViolationsRating: PerBuildRating = {
   description: 'Checks for Content Security Policy violations, excluding Trusted Types.',
   id: 'csp-violations',
   category: RatingCategory.HIGH_IMPACT,
+  groupingLabels: ['security'],
   scoreReduction: '50%',
   rate: ({serveResult}) => {
     if (!serveResult?.cspViolations) {
@@ -78,6 +79,7 @@ export const trustedTypesViolationsRating: PerBuildRating = {
   description: 'Checks for Trusted Types violations specifically.',
   id: 'trusted-types-violations',
   category: RatingCategory.HIGH_IMPACT,
+  groupingLabels: ['security'],
   scoreReduction: '50%',
   rate: ({serveResult}) => {
     if (!serveResult?.cspViolations) {
