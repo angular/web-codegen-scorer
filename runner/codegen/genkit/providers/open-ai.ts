@@ -11,6 +11,7 @@ export class OpenAiModelProvider extends GenkitModelProvider {
     'openai-o3': () => openAI.model('o3'),
     'openai-o4-mini': () => openAI.model('o4-mini'),
     'openai-gpt-5': () => openAI.model('gpt-5'),
+    'openai-gpt-5.1': () => openAI.model('gpt-5.1'),
   };
 
   private countTokensForModel(
@@ -60,9 +61,22 @@ export class OpenAiModelProvider extends GenkitModelProvider {
         interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side.
       }),
       tokensPerMinute: new RateLimiter({
-        tokensPerInterval: 30_000 * 0.75, // *0.75 to be more resilient to token count deviations
+        tokensPerInterval: 500_000 * 0.75, // *0.75 to be more resilient to token count deviations
         interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side.
       }),
+      countTokens: async prompt => this.countTokensForModel('gpt-5', prompt),
+    },
+    // See: https://platform.openai.com/docs/models/gpt-5.1
+    'openai/gpt-5.1': {
+      requestPerMinute: new RateLimiter({
+        tokensPerInterval: 500,
+        interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side.
+      }),
+      tokensPerMinute: new RateLimiter({
+        tokensPerInterval: 500_000 * 0.75, // *0.75 to be more resilient to token count deviations
+        interval: 1000 * 60 * 1.5, // Refresh tokens after 1.5 minutes to be on the safe side.
+      }),
+      // TODO: Consider selecting GPT5.1 if available; but it's GPT5 counting should work too.
       countTokens: async prompt => this.countTokensForModel('gpt-5', prompt),
     },
   };
