@@ -69,7 +69,7 @@ export async function generateCodeWithAI(
     success = false;
     reasoning = '';
     toolLogs = [];
-    errors.push(error + '');
+    errors.push(`${error}${error instanceof Error ? `\nStack: ${error.stack}` : ''}`);
   }
 
   return {
