@@ -7,7 +7,7 @@ export const userJourneysRating: PerBuildRating = {
   description: 'Ensures that all User Journeys are working in the generated app',
   kind: RatingKind.PER_BUILD,
   category: RatingCategory.MEDIUM_IMPACT,
-  groupingLabels: ['functionality', 'runability', 'interaction-testing'],
+  groupingLabels: ['functionality', 'running-app-checks', 'interaction-testing'],
   scoreReduction: '30%',
   rate: ({serveResult}) => {
     if (serveResult === null || serveResult.userJourneyAgentOutput === null) {

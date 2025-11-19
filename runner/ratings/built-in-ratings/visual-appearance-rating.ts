@@ -9,7 +9,7 @@ export const visualAppearanceRating: LLMBasedRating = {
   name: 'UI & Visual appearance (LLM-Rated)',
   description: 'Rates the app based on its visuals (UI visuals and feature completeness).',
   category: RatingCategory.MEDIUM_IMPACT,
-  groupingLabels: ['llm-judge', 'visual-appearance', 'runability'],
+  groupingLabels: ['llm-judge', 'visual-appearance', 'running-app-checks'],
   scoreReduction: '30%',
   id: 'common-autorater-visuals',
   rate: async ctx => {
