@@ -57,7 +57,7 @@
     "@genkit-ai/googleai": "1.22.0",
     "@genkit-ai/mcp": "1.22.0",
     "@google/genai": "1.29.1",
-    "@inquirer/prompts": "^7.8.4",
+    "@inquirer/prompts": "^8.0.0",
     "@safety-web/runner": "0.4.0-alpha.14",
     "@safety-web/types": "0.4.0-alpha.14",
     "@types/cli-progress": "^3.11.6",
