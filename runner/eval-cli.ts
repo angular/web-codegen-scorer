@@ -61,7 +61,7 @@ function builder(argv: Argv): Argv<Options> {
       .option('runner', {
         type: 'string',
         default: 'genkit' as const,
-        choices: ['genkit', 'gemini-cli', 'claude-code', 'codex'] as RunnerName[],
+        choices: ['genkit', 'ai-sdk', 'gemini-cli', 'claude-code', 'codex'] as RunnerName[],
         description: 'Runner to use to execute the eval',
       })
       .option('local', {
