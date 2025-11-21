@@ -82,7 +82,9 @@ export class GeminiModelProvider extends GenkitModelProvider {
   validateGeneratedFiles(files: LlmResponseFile[]): boolean {
     // Gemini responses occasionally get truncated on `class=`.
     // Consider these cases as invalid so they don't influence the results.
-    return files.length === 0 || !files.some(file => file.code.trim().endsWith('class='));
+    // TODO: Consider re-enabling this.
+    // return files.length === 0 || !files.some(file => file.code.trim().endsWith('class='));
+    return true;
   }
 
   private async countGeminiTokens(
