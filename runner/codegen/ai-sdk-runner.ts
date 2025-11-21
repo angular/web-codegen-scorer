@@ -17,6 +17,7 @@ import {
   SystemModelMessage,
   TextPart,
 } from 'ai';
+import {google, GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
 import {anthropic, AnthropicProviderOptions} from '@ai-sdk/anthropic';
 import z from 'zod';
 import {callWithTimeout} from '../utils/timeout.js';
@@ -27,6 +28,10 @@ const SUPPORTED_MODELS = [
   'claude-opus-4.1-with-thinking',
   'claude-sonnet-4.5-no-thinking',
   'claude-sonnet-4.5-with-thinking',
+  'gemini-2.5-flash-lite',
+  'gemini-2.5-flash',
+  'gemini-2.5-pro',
+  'gemini-3-pro-preview',
 ] as const;
 
 // Increased to a very high value as we rely on an actual timeout
@@ -131,7 +136,8 @@ export class AiSDKRunner implements LlmRunner {
   private async _getAiSdkModelOptions(
     request: LocalLlmGenerateTextRequestOptions,
   ): Promise<{model: LanguageModel; providerOptions: {}}> {
-    switch (request.model) {
+    const modelName = request.model as (typeof SUPPORTED_MODELS)[number];
+    switch (modelName) {
       case 'claude-opus-4.1-no-thinking':
       case 'claude-opus-4.1-with-thinking': {
         const thinkingEnabled = request.model.endsWith('with-thinking');
@@ -149,11 +155,23 @@ export class AiSDKRunner implements LlmRunner {
         return {
           model: anthropic('claude-sonnet-4-5'),
           providerOptions: {
-            sendReasoning: true,
-            thinking: {type: 'enabled'},
+            sendReasoning: thinkingEnabled,
+            thinking: {type: thinkingEnabled ? 'enabled' : 'disabled'},
           } satisfies AnthropicProviderOptions,
         };
       }
+      case 'gemini-2.5-flash-lite':
+      case 'gemini-2.5-flash':
+      case 'gemini-2.5-pro':
+      case 'gemini-3-pro-preview':
+        return {
+          model: google(modelName),
+          providerOptions: {
+            thinkingConfig: {
+              includeThoughts: request.thinkingConfig?.includeThoughts,
+            },
+          } satisfies GoogleGenerativeAIProviderOptions,
+        };
       default:
         throw new Error(`Unexpected model in AI SDK runner: ${request.model}.`);
     }
