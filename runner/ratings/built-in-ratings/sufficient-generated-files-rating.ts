@@ -5,7 +5,6 @@ export const sufficientGeneratedFilesRating: PerBuildRating = {
   name: 'Sufficient number of generated files',
   description: 'Ensures that the LLM produced at least one file.',
   category: RatingCategory.HIGH_IMPACT,
-  groupingLabels: ['functionality'],
   id: 'common-generated-file-count',
   scoreReduction: '100%',
   kind: RatingKind.PER_BUILD,

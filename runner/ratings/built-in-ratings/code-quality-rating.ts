@@ -7,7 +7,7 @@ export const codeQualityRating: LLMBasedRating = {
   name: 'Code Quality (LLM-rated)',
   description: `Rates the app's source code via LLM`,
   category: RatingCategory.MEDIUM_IMPACT,
-  groupingLabels: ['llm-judge'],
+  groupingLabels: ['llm-judge', 'llm-rated-code-quality'],
   id: 'common-autorater-code-quality',
   scoreReduction: '30%',
   rate: async ctx => {

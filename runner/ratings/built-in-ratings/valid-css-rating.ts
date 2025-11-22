@@ -11,7 +11,7 @@ export const validCssRating: PerFileRating = {
   name: 'Valid CSS',
   description: 'Ensures that the generated CSS code is valid',
   category: RatingCategory.MEDIUM_IMPACT,
-  groupingLabels: ['functionality', 'styling'],
+  groupingLabels: ['functionality', 'styling', 'css-validity'],
   scoreReduction: '20%',
   kind: RatingKind.PER_FILE,
   id: 'common-valid-css',

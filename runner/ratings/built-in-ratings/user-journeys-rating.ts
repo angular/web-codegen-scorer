@@ -13,7 +13,7 @@ export const userJourneysRating: PerBuildRating = {
     if (serveResult === null || serveResult.userJourneyAgentOutput === null) {
       return {
         state: RatingState.SKIPPED,
-        message: 'Was not enabled for this run',
+        message: 'Not enabled for this run.',
       };
     }
 
