@@ -28,7 +28,7 @@
     "shiki": "^3.6.0",
     "tinyglobby": "^0.2.14",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.16.0"
   },
   "devDependencies": {
     "@angular/build": "21.0.0-next.5",
