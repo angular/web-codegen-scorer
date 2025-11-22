@@ -7,7 +7,7 @@ export const successfulTestsRating: PerBuildRating = {
   id: 'common-successful-tests',
   kind: RatingKind.PER_BUILD,
   category: RatingCategory.MEDIUM_IMPACT,
-  groupingLabels: ['functionality'],
+  groupingLabels: ['functionality', 'project-tests'],
   scoreReduction: '30%',
   // Reduce the amount of points in case we've had test repair attempts.
   rate: ({testResult, testRepairAttempts}) => {
