@@ -10,6 +10,7 @@ export const sufficientCodeSizeRating: PerFileRating = {
   name: 'Sufficient Code Size (over 50b)',
   description: 'Ensures the generated code is not trivially small (e.g. < 50b).',
   category: RatingCategory.HIGH_IMPACT,
+  groupingLabels: ['sufficient-code-checks'],
   id: 'common-generated-code-size',
   scoreReduction: '30%',
   kind: RatingKind.PER_FILE,
