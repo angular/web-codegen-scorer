@@ -48,6 +48,7 @@ export async function generateCodeWithAI(
       inputTokens: response.usage?.inputTokens ?? 0,
       outputTokens: response.usage?.outputTokens ?? 0,
       totalTokens: response.usage?.totalTokens ?? 0,
+      thinkingTokens: response.usage?.thinkingTokens ?? 0,
     };
     reasoning = response.reasoning;
     toolLogs = response.toolLogs ?? [];
@@ -65,7 +66,7 @@ export async function generateCodeWithAI(
 
     success = true;
   } catch (error) {
-    usage = {inputTokens: 0, outputTokens: 0, totalTokens: 0};
+    usage = {inputTokens: 0, outputTokens: 0, totalTokens: 0, thinkingTokens: 0};
     success = false;
     reasoning = '';
     toolLogs = [];
@@ -161,7 +162,20 @@ export function prepareContextFilesMessage(
 }
 
 export function createLlmResponseTokenUsageMessage(response: LlmResponse): string | null {
-  return response.usage.inputTokens || response.usage.outputTokens || response.usage.totalTokens
-    ? `(input tokens: ${response.usage.inputTokens}, output tokens: ${response.usage.outputTokens}, total tokens: ${response.usage.totalTokens})`
-    : null;
+  const usage = response?.usage;
+  if (!usage) {
+    return null;
+  }
+
+  // 2. Build the token detail string parts
+  const input = usage.inputTokens !== undefined ? `input tokens: ${usage.inputTokens}` : '';
+  const output = usage.outputTokens !== undefined ? `output tokens: ${usage.outputTokens}` : '';
+  const thinking =
+    usage.thinkingTokens !== undefined ? `thinking tokens: ${usage.thinkingTokens}` : '';
+  const total = usage.totalTokens !== undefined ? `total tokens: ${usage.totalTokens}` : '';
+
+  // 3. Filter out empty strings and join with a separator
+  const parts = [input, output, thinking, total].filter(part => part !== '');
+
+  return parts.length > 0 ? `(${parts.join(', ')})` : null;
 }

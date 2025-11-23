@@ -109,13 +109,20 @@ export interface Usage {
   /** Number of output tokens produced. */
   outputTokens: number;
   /**
+   * Thinking tokens.
+   *
+   * This could be `0` for models not using thinking, or model providers
+   * that include tokens directly in `outputTokens`.
+   */
+  thinkingTokens: number;
+  /**
    * Number of total tokens involved.
    *
    * This number can be different from `input + output`. Presumably
    * due to e.g. thinking process of models. See:
    * https://ai.google.dev/gemini-api/docs/thinking.
-   * */
-  totalTokens?: number;
+   */
+  totalTokens: number;
 }
 
 /**

@@ -78,7 +78,7 @@ export async function attemptBuildAndTest(
   const initialAttempt = {
     outputFiles: initialResponse.files,
     usage: {
-      ...{inputTokens: 0, outputTokens: 0, totalTokens: 0},
+      ...{inputTokens: 0, outputTokens: 0, totalTokens: 0, thinkingTokens: 0},
       ...initialResponse.usage,
     },
     reasoning: initialResponse.reasoning,

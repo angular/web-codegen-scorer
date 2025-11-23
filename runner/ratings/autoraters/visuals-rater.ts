@@ -75,6 +75,7 @@ export async function autoRateAppearance(
       inputTokens: result.usage?.inputTokens ?? 0,
       outputTokens: result.usage?.outputTokens ?? 0,
       totalTokens: result.usage?.totalTokens ?? 0,
+      thinkingTokens: result.usage?.thinkingTokens ?? 0,
     },
     details: output,
   };

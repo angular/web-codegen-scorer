@@ -64,7 +64,12 @@ export class AiSDKRunner implements LlmRunner {
     return {
       reasoning: response.reasoningText ?? '',
       text: response.text,
-      usage: response.usage,
+      usage: {
+        inputTokens: response.usage.inputTokens ?? 0,
+        outputTokens: response.usage.outputTokens ?? 0,
+        thinkingTokens: response.usage.reasoningTokens ?? 0,
+        totalTokens: response.usage.totalTokens ?? 0,
+      },
       // TODO: Consider supporting `toolLogs` and MCP here.
     };
   }
@@ -85,7 +90,12 @@ export class AiSDKRunner implements LlmRunner {
     return {
       reasoning: response.reasoning ?? '',
       output: response.object,
-      usage: response.usage,
+      usage: {
+        inputTokens: response.usage.inputTokens ?? 0,
+        outputTokens: response.usage.outputTokens ?? 0,
+        thinkingTokens: response.usage.reasoningTokens ?? 0,
+        totalTokens: response.usage.totalTokens ?? 0,
+      },
       // TODO: Consider supporting `toolLogs` and MCP here.
     };
   }

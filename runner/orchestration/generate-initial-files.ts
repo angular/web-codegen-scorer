@@ -55,6 +55,8 @@ export async function generateInitialFiles(
       usage: {
         inputTokens: 0,
         outputTokens: 0,
+        thinkingTokens: 0,
+        totalTokens: 0,
       } satisfies Usage,
       // TODO: We could also try save/restore reasoning locally.
       reasoning: '',

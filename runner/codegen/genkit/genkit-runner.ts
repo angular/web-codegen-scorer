@@ -27,7 +27,7 @@ import {GenkitLogger} from './genkit-logger.js';
 import {MODEL_PROVIDERS} from './models.js';
 import {UserFacingError} from '../../utils/errors.js';
 import {GenkitModelProvider, PromptDataForCounting} from './model-provider.js';
-import {ToolLogEntry} from '../../shared-interfaces.js';
+import {ToolLogEntry, Usage} from '../../shared-interfaces.js';
 import {combineAbortSignals} from '../../utils/abort-signal.js';
 import {toToolDefinition} from 'genkit/tool';
 
@@ -58,7 +58,12 @@ export class GenkitRunner implements LlmRunner {
 
     return {
       output: result.output,
-      usage: result.usage,
+      usage: {
+        inputTokens: result.usage.inputTokens ?? 0,
+        outputTokens: result.usage.outputTokens ?? 0,
+        thinkingTokens: result.usage.thoughtsTokens ?? 0,
+        totalTokens: result.usage.totalTokens ?? 0,
+      },
       reasoning: result.reasoning,
     };
   }
@@ -93,7 +98,12 @@ export class GenkitRunner implements LlmRunner {
 
     return {
       files,
-      usage: result.usage,
+      usage: {
+        inputTokens: result.usage.inputTokens ?? 0,
+        outputTokens: result.usage.outputTokens ?? 0,
+        thinkingTokens: result.usage.thoughtsTokens ?? 0,
+        totalTokens: result.usage.totalTokens ?? 0,
+      },
       reasoning: result.reasoning,
       toolLogs: this.flushToolLogs(),
     };
@@ -111,7 +121,12 @@ export class GenkitRunner implements LlmRunner {
 
     return {
       text: result.text,
-      usage: result.usage,
+      usage: {
+        inputTokens: result.usage.inputTokens ?? 0,
+        outputTokens: result.usage.outputTokens ?? 0,
+        thinkingTokens: result.usage.thoughtsTokens ?? 0,
+        totalTokens: result.usage.totalTokens ?? 0,
+      },
       reasoning: result.reasoning,
       toolLogs: this.flushToolLogs(),
     };

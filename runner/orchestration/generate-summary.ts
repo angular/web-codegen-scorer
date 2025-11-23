@@ -18,6 +18,7 @@ export async function prepareSummary(
 ): Promise<RunSummary> {
   let inputTokens = 0;
   let outputTokens = 0;
+  let thinkingTokens = 0;
   let totalTokens = 0;
 
   assessments.forEach(result => {
@@ -25,15 +26,17 @@ export async function prepareSummary(
     if (result.score.tokenUsage) {
       inputTokens += result.score.tokenUsage.inputTokens;
       outputTokens += result.score.tokenUsage.outputTokens;
-      totalTokens += result.score.tokenUsage.totalTokens ?? 0;
+      totalTokens += result.score.tokenUsage.totalTokens;
+      thinkingTokens += result.score.tokenUsage.thinkingTokens;
     }
 
     // Incorporate usage numbers from all generate + build attempts.
     result.attemptDetails.forEach(attempt => {
       if (attempt.usage) {
-        inputTokens += attempt.usage.inputTokens ?? 0;
-        outputTokens += attempt.usage.outputTokens ?? 0;
-        totalTokens += attempt.usage.totalTokens ?? 0;
+        inputTokens += attempt.usage.inputTokens;
+        outputTokens += attempt.usage.outputTokens;
+        totalTokens += attempt.usage.totalTokens;
+        thinkingTokens += attempt.usage.thinkingTokens;
       }
     });
   });
@@ -45,6 +48,7 @@ export async function prepareSummary(
       const result = await summarizeReportWithAI(generateAiSummaryLlm, abortSignal, assessments);
       inputTokens += result.usage.inputTokens;
       outputTokens += result.usage.outputTokens;
+      thinkingTokens += result.usage.thinkingTokens;
       totalTokens += result.usage.totalTokens;
       aiSummary = result.responseHtml;
       console.log(`✅ Generated AI summary.`);
@@ -78,6 +82,7 @@ export async function prepareSummary(
     usage: {
       inputTokens,
       outputTokens,
+      thinkingTokens,
       totalTokens,
     },
     runner: {
