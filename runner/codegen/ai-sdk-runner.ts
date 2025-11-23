@@ -19,6 +19,7 @@ import {
 } from 'ai';
 import {google, GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
 import {anthropic, AnthropicProviderOptions} from '@ai-sdk/anthropic';
+import {openai, OpenAIResponsesProviderOptions} from '@ai-sdk/openai';
 import z from 'zod';
 import {callWithTimeout} from '../utils/timeout.js';
 import {combineAbortSignals} from '../utils/abort-signal.js';
@@ -32,6 +33,10 @@ const SUPPORTED_MODELS = [
   'gemini-2.5-flash',
   'gemini-2.5-pro',
   'gemini-3-pro-preview',
+  'gpt-5.1-no-thinking',
+  'gpt-5.1-thinking-low',
+  'gpt-5.1-thinking-high',
+  'gpt-5.1-thinking-medium',
 ] as const;
 
 // Increased to a very high value as we rely on an actual timeout
@@ -133,9 +138,13 @@ export class AiSDKRunner implements LlmRunner {
     );
   }
 
-  private async _getAiSdkModelOptions(
-    request: LocalLlmGenerateTextRequestOptions,
-  ): Promise<{model: LanguageModel; providerOptions: {}}> {
+  private async _getAiSdkModelOptions(request: LocalLlmGenerateTextRequestOptions): Promise<{
+    model: LanguageModel;
+    providerOptions:
+      | {anthropic: AnthropicProviderOptions}
+      | {google: GoogleGenerativeAIProviderOptions}
+      | {openai: OpenAIResponsesProviderOptions};
+  }> {
     const modelName = request.model as (typeof SUPPORTED_MODELS)[number];
     switch (modelName) {
       case 'claude-opus-4.1-no-thinking':
@@ -144,9 +153,11 @@ export class AiSDKRunner implements LlmRunner {
         return {
           model: anthropic('claude-opus-4-1'),
           providerOptions: {
-            sendReasoning: thinkingEnabled,
-            thinking: {type: thinkingEnabled ? 'enabled' : 'disabled'},
-          } satisfies AnthropicProviderOptions,
+            anthropic: {
+              sendReasoning: thinkingEnabled,
+              thinking: {type: thinkingEnabled ? 'enabled' : 'disabled'},
+            } satisfies AnthropicProviderOptions,
+          },
         };
       }
       case 'claude-sonnet-4.5-no-thinking':
@@ -155,9 +166,11 @@ export class AiSDKRunner implements LlmRunner {
         return {
           model: anthropic('claude-sonnet-4-5'),
           providerOptions: {
-            sendReasoning: thinkingEnabled,
-            thinking: {type: thinkingEnabled ? 'enabled' : 'disabled'},
-          } satisfies AnthropicProviderOptions,
+            anthropic: {
+              sendReasoning: thinkingEnabled,
+              thinking: {type: thinkingEnabled ? 'enabled' : 'disabled'},
+            } satisfies AnthropicProviderOptions,
+          },
         };
       }
       case 'gemini-2.5-flash-lite':
@@ -167,10 +180,33 @@ export class AiSDKRunner implements LlmRunner {
         return {
           model: google(modelName),
           providerOptions: {
-            thinkingConfig: {
-              includeThoughts: request.thinkingConfig?.includeThoughts,
-            },
-          } satisfies GoogleGenerativeAIProviderOptions,
+            google: {
+              thinkingConfig: {
+                includeThoughts: request.thinkingConfig?.includeThoughts,
+              },
+            } satisfies GoogleGenerativeAIProviderOptions,
+          },
+        };
+      case 'gpt-5.1-no-thinking':
+      case 'gpt-5.1-thinking-low':
+      case 'gpt-5.1-thinking-medium':
+      case 'gpt-5.1-thinking-high':
+        let reasoningEffort: string = 'none';
+        if (modelName === 'gpt-5.1-thinking-high') {
+          reasoningEffort = 'high';
+        } else if (modelName === 'gpt-5.1-thinking-medium') {
+          reasoningEffort = 'medium';
+        } else if (modelName === 'gpt-5.1-thinking-low') {
+          reasoningEffort = 'low';
+        }
+        return {
+          model: openai('gpt-5.1'),
+          providerOptions: {
+            openai: {
+              reasoningEffort,
+              reasoningSummary: 'detailed',
+            } satisfies OpenAIResponsesProviderOptions,
+          },
         };
       default:
         throw new Error(`Unexpected model in AI SDK runner: ${request.model}.`);
