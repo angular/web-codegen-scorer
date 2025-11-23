@@ -131,6 +131,7 @@ Create a modern, single-page web application that allows users to find recipes b
       inputTokens: result.usage?.inputTokens ?? 0,
       outputTokens: result.usage?.outputTokens ?? 0,
       totalTokens: result.usage?.totalTokens ?? 0,
+      thinkingTokens: result.usage?.thinkingTokens ?? 0,
     },
     result: result.output,
   };

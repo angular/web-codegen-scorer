@@ -29,7 +29,7 @@ export class FakeRemoteExecutor implements Executor {
       outputFiles: [{code: 'angular.dev Works', filePath: 'main.ts'}],
       reasoning: '',
       errors: [],
-      usage: {inputTokens: 0, totalTokens: 0, outputTokens: 0},
+      usage: {inputTokens: 0, totalTokens: 0, outputTokens: 0, thinkingTokens: 0},
     };
   }
 

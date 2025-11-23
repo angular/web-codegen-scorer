@@ -266,6 +266,7 @@ export function logReportToConsole(runInfo: RunInfo): void {
     'Usage info:',
     ` - Input tokens: ${formatTokenCount(usage.inputTokens)}`,
     ` - Output tokens: ${formatTokenCount(usage.outputTokens)}`,
+    ` - Thinking tokens: ${formatTokenCount(usage.thinkingTokens)}`,
     ` - Total tokens: ${formatTokenCount(usage.totalTokens)}`,
   ].filter(line => line != null);
 

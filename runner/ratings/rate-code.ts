@@ -9,6 +9,7 @@ import {
   PromptDefinition,
   AssessmentCategory,
   TestExecutionResult,
+  Usage,
 } from '../shared-interfaces.js';
 import {
   RatingState,
@@ -71,7 +72,8 @@ export async function rateGeneratedCode(
     inputTokens: 0,
     outputTokens: 0,
     totalTokens: 0,
-  };
+    thinkingTokens: 0,
+  } satisfies Usage;
 
   progress.log(currentPromptDef, 'eval', 'Rating generated code');
 
@@ -132,9 +134,10 @@ export async function rateGeneratedCode(
     }
 
     if (result.state === IndividualAssessmentState.EXECUTED && result.usage) {
-      tokenUsage.inputTokens += result.usage.inputTokens;
-      tokenUsage.outputTokens += result.usage.outputTokens;
+      tokenUsage.inputTokens += result.usage.inputTokens ?? 0;
+      tokenUsage.outputTokens += result.usage.outputTokens ?? 0;
       tokenUsage.totalTokens += result.usage.totalTokens ?? 0;
+      tokenUsage.thinkingTokens += result.usage.thinkingTokens ?? 0;
     }
 
     const category = categories.find(c => c.id === result.category);

@@ -140,6 +140,12 @@
             Output tokens: {{ details.summary.usage.outputTokens | number }}
           </li>
 
+          @if (details.summary.usage.thinkingTokens != null) {
+            <li class="status-badge neutral">
+              Thinking tokens: {{ details.summary.usage.thinkingTokens | number }}
+            </li>
+          }
+
           @if (details.summary.usage.totalTokens != null) {
             <li class="status-badge neutral">
               Total tokens: {{ details.summary.usage.totalTokens | number }}
