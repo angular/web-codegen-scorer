@@ -4,7 +4,7 @@ import type {ClaudeCodeRunner} from './claude-code-runner.js';
 import type {GenkitRunner} from './genkit/genkit-runner.js';
 import type {CodexRunner} from './codex-runner.js';
 import type {NoopUnimplementedRunner} from './noop-unimplemented-runner.js';
-import {AiSDKRunner} from './ai-sdk-runner.js';
+import {AiSDKRunner} from './ai-sdk/ai-sdk-runner.js';
 
 interface AvailableRunners {
   genkit: GenkitRunner;
@@ -30,7 +30,9 @@ export async function getRunnerByName<T extends RunnerName>(name: T): Promise<Av
         m => new m.GenkitRunner() as AvailableRunners[T],
       );
     case 'ai-sdk':
-      return import('./ai-sdk-runner.js').then(m => new m.AiSDKRunner() as AvailableRunners[T]);
+      return import('./ai-sdk/ai-sdk-runner.js').then(
+        m => new m.AiSDKRunner() as AvailableRunners[T],
+      );
     case 'gemini-cli':
       return import('./gemini-cli-runner.js').then(
         m => new m.GeminiCliRunner() as AvailableRunners[T],
