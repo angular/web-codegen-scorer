@@ -20,7 +20,7 @@ export const anthropicThinkingWithStructuredResponseMiddleware: LanguageModelV2M
         },
       ];
       params.toolChoice = {type: 'auto'};
-
+      params.responseFormat = {type: 'text'};
       params.prompt.push({
         role: 'user',
         content: [
@@ -32,5 +32,17 @@ export const anthropicThinkingWithStructuredResponseMiddleware: LanguageModelV2M
       });
     }
     return Promise.resolve(params);
+  },
+  wrapGenerate: async ({doGenerate}) => {
+    const result = await doGenerate();
+
+    // Extract the JSON tool call (conforming to the schema) and return it as text response.
+    for (const r of result.content) {
+      if (r.type === 'tool-call' && r.toolName === 'json') {
+        result.content.push({type: 'text', text: r.input});
+      }
+    }
+
+    return result;
   },
 };
