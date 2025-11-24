@@ -59,6 +59,12 @@ export const environmentConfigSchema = z.object({
   codeRatingPrompt: z.string().optional(),
   /** When enabled, the system prompts for this environment won't be included in the report. */
   classifyPrompts: z.boolean().optional(),
+  /**
+   * Timeout in minutes for a single prompt evaluation.
+   *
+   * E.g. if a single app takes longer than 10min, it will be aborted.
+   */
+  promptTimeoutMin: z.number().optional(),
   /** Executor to be used for this environment. */
   executor: executorSchema
     .optional()
