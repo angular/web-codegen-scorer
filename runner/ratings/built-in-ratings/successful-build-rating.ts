@@ -8,7 +8,7 @@ export const successfulBuildRating: PerBuildRating = {
   id: 'common-successful-build',
   kind: RatingKind.PER_BUILD,
   category: RatingCategory.HIGH_IMPACT,
-  groupingLabels: ['functionality', 'build-success'],
+  groupingLabels: ['functionality', 'build-failures'],
   scoreReduction: '50%',
   // Reduce the amount of points in case we've built the code with a few repair attempts.
   rate: ({buildResult, repairAttempts}) => ({
