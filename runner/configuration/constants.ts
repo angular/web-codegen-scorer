@@ -33,6 +33,9 @@ export const DEFAULT_MAX_BUILD_REPAIR_ATTEMPTS = 1;
  */
 export const DEFAULT_MAX_TEST_REPAIR_ATTEMPTS = 0;
 
+/** Default number of retries when a prompt evaluation timed out. */
+export const DEFAULT_PROMPT_TIMEOUT_RETRIES = 1;
+
 /** Name of the folder where we store all generated reports */
 export const REPORTS_ROOT_DIR = join(rootDir, 'reports');
 

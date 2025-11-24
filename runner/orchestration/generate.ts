@@ -21,7 +21,7 @@ import {
 } from '../shared-interfaces.js';
 import {UserFacingError} from '../utils/errors.js';
 import {executeCommand} from '../utils/exec.js';
-import {callWithTimeout} from '../utils/timeout.js';
+import {callWithTimeout, TimeoutError} from '../utils/timeout.js';
 import {LocalExecutor} from './executors/local-executor.js';
 import {startEvaluationTask} from './generate-eval-task.js';
 import {prepareSummary} from './generate-summary.js';
@@ -145,55 +145,74 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
     for (const rootPromptDef of promptsToProcess) {
       allTasks.push(
         appConcurrencyQueue.add(async () => {
-          const evalID = await env.executor.initializeEval();
-          let results: AssessmentResult[] | undefined;
+          const evaluate = async () => {
+            const evalID = await env.executor.initializeEval();
+            let results: AssessmentResult[] | undefined;
 
-          try {
-            results = await callWithTimeout(
-              `Evaluation of ${rootPromptDef.name}`,
-              async timeoutAbortSignal =>
-                startEvaluationTask(
-                  options,
-                  evalID,
-                  env,
-                  autoraterLlm,
-                  cujGenerationLlm,
-                  rootPromptDef,
-                  combineAbortSignals(
-                    allTasksAbortCtrl.signal,
-                    timeoutAbortSignal,
-                    options.abortSignal,
-                  ),
-                  workerConcurrencyQueue,
-                  progress,
-                ),
-              // A timeout is used to prevent from stuck evaluations.
-              env.promptTimeoutMinutes ?? 10,
-            );
-            return results;
-          } catch (e: unknown) {
-            failedPrompts.push({
-              promptName: rootPromptDef.name,
-              error: `${e}`,
-              stack: e instanceof Error ? e.stack : undefined,
-            });
-
-            let details = `Error: ${e}`;
-            if (e instanceof Error && e.stack) {
-              details += `\nStack: ${e.stack}`;
-            }
-
-            progress.log(rootPromptDef, 'error', 'Failed to evaluate code', details);
-            return [] satisfies AssessmentResult[];
-          } finally {
-            // Gracefully finalize the eval. Errors in finalization should not propagate.
             try {
-              await env.executor.finalizeEval(evalID);
-            } catch (e) {
-              progress.log(rootPromptDef, 'error', 'Failed to finalize eval', `${e}`);
+              results = await callWithTimeout(
+                `Evaluation of ${rootPromptDef.name}`,
+                async timeoutAbortSignal =>
+                  startEvaluationTask(
+                    options,
+                    evalID,
+                    env,
+                    autoraterLlm,
+                    cujGenerationLlm,
+                    rootPromptDef,
+                    combineAbortSignals(
+                      allTasksAbortCtrl.signal,
+                      timeoutAbortSignal,
+                      options.abortSignal,
+                    ),
+                    workerConcurrencyQueue,
+                    progress,
+                  ),
+                // A timeout is used to prevent from stuck evaluations.
+                env.promptTimeoutMinutes ?? 10,
+              );
+              return results;
+            } catch (e: unknown) {
+              failedPrompts.push({
+                promptName: rootPromptDef.name,
+                error: `${e}`,
+                stack: e instanceof Error ? e.stack : undefined,
+              });
+
+              let details = `Error: ${e}`;
+              if (e instanceof Error && e.stack) {
+                details += `\nStack: ${e.stack}`;
+              }
+
+              progress.log(rootPromptDef, 'error', 'Failed to evaluate code', details);
+              return [] satisfies AssessmentResult[];
+            } finally {
+              // Gracefully finalize the eval. Errors in finalization should not propagate.
+              try {
+                await env.executor.finalizeEval(evalID);
+              } catch (e) {
+                progress.log(rootPromptDef, 'error', 'Failed to finalize eval', `${e}`);
+              }
+              progress.evalFinished(rootPromptDef, results || []);
             }
-            progress.evalFinished(rootPromptDef, results || []);
+          };
+
+          // Retries + initial attempt.
+          const maxAttempts = (options.promptTimeoutRetries ?? 0) + 1;
+          for (let attemptIdx = 0; attemptIdx < maxAttempts; attemptIdx++) {
+            try {
+              return await evaluate();
+            } catch (e: unknown) {
+              if (e instanceof TimeoutError && attemptIdx < maxAttempts) {
+                continue;
+              }
+              throw e;
+            }
           }
+          throw new Error(
+            `Unexpected code path. ` +
+              `There were ${maxAttempts} attempts for evaluating: ${rootPromptDef.name}`,
+          );
         }),
       );
     }

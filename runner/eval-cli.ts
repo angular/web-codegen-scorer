@@ -6,6 +6,7 @@ import {
   DEFAULT_MAX_BUILD_REPAIR_ATTEMPTS,
   DEFAULT_MAX_TEST_REPAIR_ATTEMPTS,
   DEFAULT_MODEL_NAME,
+  DEFAULT_PROMPT_TIMEOUT_RETRIES,
 } from './configuration/constants.js';
 import {generateCodeAndAssess} from './orchestration/generate.js';
 import {logReportToConsole, writeReportToDisk} from './reporting/report-logging.js';
@@ -42,6 +43,7 @@ interface Options {
   skipLighthouse?: boolean;
   maxTestRepairAttempts?: number;
   maxBuildRepairAttempts?: number;
+  promptTimeoutRetries?: number;
 }
 
 function builder(argv: Argv): Argv<Options> {
@@ -168,6 +170,12 @@ function builder(argv: Argv): Argv<Options> {
         description:
           'Number of repair attempts for discovered test failures (including a11y violations and ones from testCommand)',
       })
+      .option('prompt-timeout-retries', {
+        type: 'number',
+        default: DEFAULT_PROMPT_TIMEOUT_RETRIES,
+        description:
+          'Maximum number of times to retry a prompt evaluation after it fails due to a timeout.',
+      })
       .strict()
       .version(false)
       .help()
@@ -221,6 +229,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
       skipLighthouse: cliArgs.skipLighthouse,
       maxBuildRepairAttempts: cliArgs.maxBuildRepairAttempts,
       maxTestRepairAttempts: cliArgs.maxTestRepairAttempts,
+      promptTimeoutRetries: cliArgs.promptTimeoutRetries,
       abortSignal: abortCtrl.signal,
     });
 
