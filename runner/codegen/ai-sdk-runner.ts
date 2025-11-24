@@ -26,9 +26,9 @@ import {combineAbortSignals} from '../utils/abort-signal.js';
 
 const SUPPORTED_MODELS = [
   'claude-opus-4.1-no-thinking',
-  'claude-opus-4.1-with-thinking',
+  'claude-opus-4.1-with-thinking-16k',
   'claude-sonnet-4.5-no-thinking',
-  'claude-sonnet-4.5-with-thinking',
+  'claude-sonnet-4.5-with-thinking-16k',
   'gemini-2.5-flash-lite',
   'gemini-2.5-flash',
   'gemini-2.5-pro',
@@ -44,6 +44,7 @@ const SUPPORTED_MODELS = [
 // even if it involves many exponential backoff-waiting.
 const DEFAULT_MAX_RETRIES = 100000;
 
+const claude16kThinkingTokenBudget = 16_000;
 export class AiSDKRunner implements LlmRunner {
   displayName = 'AI SDK';
   id = 'ai-sdk';
@@ -158,27 +159,33 @@ export class AiSDKRunner implements LlmRunner {
     const modelName = request.model as (typeof SUPPORTED_MODELS)[number];
     switch (modelName) {
       case 'claude-opus-4.1-no-thinking':
-      case 'claude-opus-4.1-with-thinking': {
-        const thinkingEnabled = request.model.endsWith('with-thinking');
+      case 'claude-opus-4.1-with-thinking-16k': {
+        const thinkingEnabled = modelName.includes('-with-thinking');
         return {
           model: anthropic('claude-opus-4-1'),
           providerOptions: {
             anthropic: {
               sendReasoning: thinkingEnabled,
-              thinking: {type: thinkingEnabled ? 'enabled' : 'disabled'},
+              thinking: {
+                type: thinkingEnabled ? 'enabled' : 'disabled',
+                budgetTokens: thinkingEnabled ? claude16kThinkingTokenBudget : undefined,
+              },
             } satisfies AnthropicProviderOptions,
           },
         };
       }
       case 'claude-sonnet-4.5-no-thinking':
-      case 'claude-sonnet-4.5-with-thinking': {
-        const thinkingEnabled = request.model.endsWith('with-thinking');
+      case 'claude-sonnet-4.5-with-thinking-16k': {
+        const thinkingEnabled = modelName.includes('-with-thinking');
         return {
           model: anthropic('claude-sonnet-4-5'),
           providerOptions: {
             anthropic: {
               sendReasoning: thinkingEnabled,
-              thinking: {type: thinkingEnabled ? 'enabled' : 'disabled'},
+              thinking: {
+                type: thinkingEnabled ? 'enabled' : 'disabled',
+                budgetTokens: thinkingEnabled ? claude16kThinkingTokenBudget : undefined,
+              },
             } satisfies AnthropicProviderOptions,
           },
         };
