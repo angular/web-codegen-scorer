@@ -36,6 +36,8 @@ export class Environment {
   readonly isBuiltIn: boolean;
   /** Configured executor. */
   readonly executor: Executor;
+  /** Timeout for a single eval prompt in minutes. */
+  readonly promptTimeoutMinutes: number | undefined;
 
   constructor(
     rootPath: string,
@@ -62,6 +64,7 @@ export class Environment {
     this.classifyPrompts = config.classifyPrompts ?? false;
     this.isBuiltIn = rootPath.includes('node_modules');
     this.executor = config.executor;
+    this.promptTimeoutMinutes = config.promptTimeoutMinutes;
   }
 
   /** Prompts that should be executed as a part of the evaluation. */
