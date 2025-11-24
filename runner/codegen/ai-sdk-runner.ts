@@ -16,6 +16,7 @@ import {
   ModelMessage,
   SystemModelMessage,
   TextPart,
+  wrapLanguageModel,
 } from 'ai';
 import {google, GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
 import {anthropic, AnthropicProviderOptions} from '@ai-sdk/anthropic';
@@ -23,6 +24,7 @@ import {openai, OpenAIResponsesProviderOptions} from '@ai-sdk/openai';
 import z from 'zod';
 import {callWithTimeout} from '../utils/timeout.js';
 import {combineAbortSignals} from '../utils/abort-signal.js';
+import {anthropicThinkingWithStructuredResponseMiddleware} from './ai-sdk-claude-thinking-patch.js';
 
 const SUPPORTED_MODELS = [
   'claude-opus-4.1-no-thinking',
@@ -159,26 +161,19 @@ export class AiSDKRunner implements LlmRunner {
     const modelName = request.model as (typeof SUPPORTED_MODELS)[number];
     switch (modelName) {
       case 'claude-opus-4.1-no-thinking':
-      case 'claude-opus-4.1-with-thinking-16k': {
-        const thinkingEnabled = modelName.includes('-with-thinking');
-        return {
-          model: anthropic('claude-opus-4-1'),
-          providerOptions: {
-            anthropic: {
-              sendReasoning: thinkingEnabled,
-              thinking: {
-                type: thinkingEnabled ? 'enabled' : 'disabled',
-                budgetTokens: thinkingEnabled ? claude16kThinkingTokenBudget : undefined,
-              },
-            } satisfies AnthropicProviderOptions,
-          },
-        };
-      }
+      case 'claude-opus-4.1-with-thinking-16k':
       case 'claude-sonnet-4.5-no-thinking':
       case 'claude-sonnet-4.5-with-thinking-16k': {
         const thinkingEnabled = modelName.includes('-with-thinking');
+        const isOpus4_1Model = modelName.includes('opus-4.1');
+        const model = anthropic(isOpus4_1Model ? 'claude-opus-4-1' : 'claude-sonnet-4-5');
         return {
-          model: anthropic('claude-sonnet-4-5'),
+          model: thinkingEnabled
+            ? wrapLanguageModel({
+                model,
+                middleware: anthropicThinkingWithStructuredResponseMiddleware,
+              })
+            : model,
           providerOptions: {
             anthropic: {
               sendReasoning: thinkingEnabled,
