@@ -212,7 +212,7 @@ export class AiSDKRunner implements LlmRunner {
         };
       case 'gemini-2.5-flash-with-dynamic-thinking':
         return {
-          model: google(modelName),
+          model: google('gemini-2.5-flash'),
           providerOptions: {
             google: {
               thinkingConfig: {
