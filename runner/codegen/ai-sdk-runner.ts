@@ -33,6 +33,7 @@ const SUPPORTED_MODELS = [
   'claude-sonnet-4.5-with-thinking-16k',
   'gemini-2.5-flash-lite',
   'gemini-2.5-flash',
+  'gemini-2.5-flash-with-dynamic-thinking',
   'gemini-2.5-pro',
   'gemini-3-pro-preview',
   'gpt-5.1-no-thinking',
@@ -195,6 +196,20 @@ export class AiSDKRunner implements LlmRunner {
             google: {
               thinkingConfig: {
                 includeThoughts: request.thinkingConfig?.includeThoughts,
+              },
+            } satisfies GoogleGenerativeAIProviderOptions,
+          },
+        };
+      case 'gemini-2.5-flash-with-dynamic-thinking':
+        return {
+          model: google(modelName),
+          providerOptions: {
+            google: {
+              thinkingConfig: {
+                // -1 means "dynamic thinking budget":
+                // https://ai.google.dev/gemini-api/docs/thinking#set-budget.
+                thinkingBudget: -1,
+                includeThoughts: true,
               },
             } satisfies GoogleGenerativeAIProviderOptions,
           },
