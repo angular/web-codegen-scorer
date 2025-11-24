@@ -35,7 +35,9 @@ const SUPPORTED_MODELS = [
   'claude-sonnet-4.5-with-thinking-32k',
   'gemini-2.5-flash-lite',
   'gemini-2.5-flash',
-  'gemini-2.5-flash-with-dynamic-thinking',
+  'gemini-2.5-flash-with-thinking-dynamic',
+  'gemini-2.5-flash-with-thinking-16k',
+  'gemini-2.5-flash-with-thinking-24k',
   'gemini-2.5-pro',
   'gemini-3-pro-preview',
   'gpt-5.1-no-thinking',
@@ -210,15 +212,23 @@ export class AiSDKRunner implements LlmRunner {
             } satisfies GoogleGenerativeAIProviderOptions,
           },
         };
-      case 'gemini-2.5-flash-with-dynamic-thinking':
+      case 'gemini-2.5-flash-with-thinking-dynamic':
+      case 'gemini-2.5-flash-with-thinking-16k':
+      case 'gemini-2.5-flash-with-thinking-24k':
+        // -1 means "dynamic thinking budget":
+        // https://ai.google.dev/gemini-api/docs/thinking#set-budget.
+        let thinkingBudget = -1;
+        if (modelName.endsWith('-16k')) {
+          thinkingBudget = 16_000;
+        } else if (modelName.endsWith('-24k')) {
+          thinkingBudget = 24_000;
+        }
         return {
           model: google('gemini-2.5-flash'),
           providerOptions: {
             google: {
               thinkingConfig: {
-                // -1 means "dynamic thinking budget":
-                // https://ai.google.dev/gemini-api/docs/thinking#set-budget.
-                thinkingBudget: -1,
+                thinkingBudget: thinkingBudget,
                 includeThoughts: true,
               },
             } satisfies GoogleGenerativeAIProviderOptions,
