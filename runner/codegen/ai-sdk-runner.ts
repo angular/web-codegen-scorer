@@ -29,8 +29,10 @@ import {anthropicThinkingWithStructuredResponseMiddleware} from './ai-sdk-claude
 const SUPPORTED_MODELS = [
   'claude-opus-4.1-no-thinking',
   'claude-opus-4.1-with-thinking-16k',
+  'claude-opus-4.1-with-thinking-32k',
   'claude-sonnet-4.5-no-thinking',
   'claude-sonnet-4.5-with-thinking-16k',
+  'claude-sonnet-4.5-with-thinking-32k',
   'gemini-2.5-flash-lite',
   'gemini-2.5-flash',
   'gemini-2.5-flash-with-dynamic-thinking',
@@ -48,6 +50,7 @@ const SUPPORTED_MODELS = [
 const DEFAULT_MAX_RETRIES = 100000;
 
 const claude16kThinkingTokenBudget = 16_000;
+const claude32kThinkingTokenBudget = 32_000;
 export class AiSDKRunner implements LlmRunner {
   displayName = 'AI SDK';
   id = 'ai-sdk';
@@ -163,9 +166,16 @@ export class AiSDKRunner implements LlmRunner {
     switch (modelName) {
       case 'claude-opus-4.1-no-thinking':
       case 'claude-opus-4.1-with-thinking-16k':
+      case 'claude-opus-4.1-with-thinking-32k':
       case 'claude-sonnet-4.5-no-thinking':
-      case 'claude-sonnet-4.5-with-thinking-16k': {
+      case 'claude-sonnet-4.5-with-thinking-16k':
+      case 'claude-sonnet-4.5-with-thinking-32k': {
         const thinkingEnabled = modelName.includes('-with-thinking');
+        const thinkingBudget = !thinkingEnabled
+          ? undefined
+          : modelName.endsWith('-32k')
+            ? claude32kThinkingTokenBudget
+            : claude16kThinkingTokenBudget;
         const isOpus4_1Model = modelName.includes('opus-4.1');
         const model = anthropic(isOpus4_1Model ? 'claude-opus-4-1' : 'claude-sonnet-4-5');
         return {
@@ -180,7 +190,7 @@ export class AiSDKRunner implements LlmRunner {
               sendReasoning: thinkingEnabled,
               thinking: {
                 type: thinkingEnabled ? 'enabled' : 'disabled',
-                budgetTokens: thinkingEnabled ? claude16kThinkingTokenBudget : undefined,
+                budgetTokens: thinkingBudget,
               },
             } satisfies AnthropicProviderOptions,
           },
