@@ -1,3 +1,18 @@
+import {AnthropicProviderOptions} from '@ai-sdk/anthropic';
+import {GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
+import {OpenAIResponsesProviderOptions} from '@ai-sdk/openai';
+import {
+  FilePart,
+  generateObject,
+  generateText,
+  LanguageModel,
+  ModelMessage,
+  SystemModelMessage,
+  TextPart,
+} from 'ai';
+import z from 'zod';
+import {combineAbortSignals} from '../../utils/abort-signal.js';
+import {callWithTimeout} from '../../utils/timeout.js';
 import {
   LlmRunner,
   LocalLlmConstrainedOutputGenerateRequestOptions,
@@ -7,52 +22,18 @@ import {
   LocalLlmGenerateTextRequestOptions,
   LocalLlmGenerateTextResponse,
   PromptDataMessage,
-} from './llm-runner.js';
-import {
-  FilePart,
-  generateObject,
-  generateText,
-  LanguageModel,
-  ModelMessage,
-  SystemModelMessage,
-  TextPart,
-  wrapLanguageModel,
-} from 'ai';
-import {google, GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
-import {anthropic, AnthropicProviderOptions} from '@ai-sdk/anthropic';
-import {openai, OpenAIResponsesProviderOptions} from '@ai-sdk/openai';
-import z from 'zod';
-import {callWithTimeout} from '../utils/timeout.js';
-import {combineAbortSignals} from '../utils/abort-signal.js';
-import {anthropicThinkingWithStructuredResponseMiddleware} from './ai-sdk-claude-thinking-patch.js';
+} from '../llm-runner.js';
+import {ANTHROPIC_MODELS, getAiSdkModelOptionsForAnthropic} from './anthropic.js';
+import {getAiSdkModelOptionsForGoogle, GOOGLE_MODELS} from './google.js';
+import {getAiSdkModelOptionsForOpenAI, OPENAI_MODELS} from './openai.js';
 
-const SUPPORTED_MODELS = [
-  'claude-opus-4.1-no-thinking',
-  'claude-opus-4.1-with-thinking-16k',
-  'claude-opus-4.1-with-thinking-32k',
-  'claude-sonnet-4.5-no-thinking',
-  'claude-sonnet-4.5-with-thinking-16k',
-  'claude-sonnet-4.5-with-thinking-32k',
-  'gemini-2.5-flash-lite',
-  'gemini-2.5-flash',
-  'gemini-2.5-flash-with-thinking-dynamic',
-  'gemini-2.5-flash-with-thinking-16k',
-  'gemini-2.5-flash-with-thinking-24k',
-  'gemini-2.5-pro',
-  'gemini-3-pro-preview',
-  'gpt-5.1-no-thinking',
-  'gpt-5.1-thinking-low',
-  'gpt-5.1-thinking-high',
-  'gpt-5.1-thinking-medium',
-] as const;
+const SUPPORTED_MODELS = [...GOOGLE_MODELS, ...ANTHROPIC_MODELS, ...OPENAI_MODELS] as const;
 
 // Increased to a very high value as we rely on an actual timeout
 // that aborts stuck LLM requests. WCS is targeting stability here;
 // even if it involves many exponential backoff-waiting.
 const DEFAULT_MAX_RETRIES = 100000;
 
-const claude16kThinkingTokenBudget = 16_000;
-const claude32kThinkingTokenBudget = 32_000;
 export class AiSDKRunner implements LlmRunner {
   displayName = 'AI SDK';
   id = 'ai-sdk';
@@ -164,100 +145,14 @@ export class AiSDKRunner implements LlmRunner {
       | {google: GoogleGenerativeAIProviderOptions}
       | {openai: OpenAIResponsesProviderOptions};
   }> {
-    const modelName = request.model as (typeof SUPPORTED_MODELS)[number];
-    switch (modelName) {
-      case 'claude-opus-4.1-no-thinking':
-      case 'claude-opus-4.1-with-thinking-16k':
-      case 'claude-opus-4.1-with-thinking-32k':
-      case 'claude-sonnet-4.5-no-thinking':
-      case 'claude-sonnet-4.5-with-thinking-16k':
-      case 'claude-sonnet-4.5-with-thinking-32k': {
-        const thinkingEnabled = modelName.includes('-with-thinking');
-        const thinkingBudget = !thinkingEnabled
-          ? undefined
-          : modelName.endsWith('-32k')
-            ? claude32kThinkingTokenBudget
-            : claude16kThinkingTokenBudget;
-        const isOpus4_1Model = modelName.includes('opus-4.1');
-        const model = anthropic(isOpus4_1Model ? 'claude-opus-4-1' : 'claude-sonnet-4-5');
-        return {
-          model: thinkingEnabled
-            ? wrapLanguageModel({
-                model,
-                middleware: anthropicThinkingWithStructuredResponseMiddleware,
-              })
-            : model,
-          providerOptions: {
-            anthropic: {
-              sendReasoning: thinkingEnabled,
-              thinking: {
-                type: thinkingEnabled ? 'enabled' : 'disabled',
-                budgetTokens: thinkingBudget,
-              },
-            } satisfies AnthropicProviderOptions,
-          },
-        };
-      }
-      case 'gemini-2.5-flash-lite':
-      case 'gemini-2.5-flash':
-      case 'gemini-2.5-pro':
-      case 'gemini-3-pro-preview':
-        return {
-          model: google(modelName),
-          providerOptions: {
-            google: {
-              thinkingConfig: {
-                includeThoughts: request.thinkingConfig?.includeThoughts,
-              },
-            } satisfies GoogleGenerativeAIProviderOptions,
-          },
-        };
-      case 'gemini-2.5-flash-with-thinking-dynamic':
-      case 'gemini-2.5-flash-with-thinking-16k':
-      case 'gemini-2.5-flash-with-thinking-24k':
-        // -1 means "dynamic thinking budget":
-        // https://ai.google.dev/gemini-api/docs/thinking#set-budget.
-        let thinkingBudget = -1;
-        if (modelName.endsWith('-16k')) {
-          thinkingBudget = 16_000;
-        } else if (modelName.endsWith('-24k')) {
-          thinkingBudget = 24_000;
-        }
-        return {
-          model: google('gemini-2.5-flash'),
-          providerOptions: {
-            google: {
-              thinkingConfig: {
-                thinkingBudget: thinkingBudget,
-                includeThoughts: true,
-              },
-            } satisfies GoogleGenerativeAIProviderOptions,
-          },
-        };
-      case 'gpt-5.1-no-thinking':
-      case 'gpt-5.1-thinking-low':
-      case 'gpt-5.1-thinking-medium':
-      case 'gpt-5.1-thinking-high':
-        let reasoningEffort: string = 'none';
-        if (modelName === 'gpt-5.1-thinking-high') {
-          reasoningEffort = 'high';
-        } else if (modelName === 'gpt-5.1-thinking-medium') {
-          reasoningEffort = 'medium';
-        } else if (modelName === 'gpt-5.1-thinking-low') {
-          reasoningEffort = 'low';
-        }
-        return {
-          model: openai('gpt-5.1'),
-          providerOptions: {
-            openai: {
-              reasoningEffort,
-              reasoningSummary: 'detailed',
-            } satisfies OpenAIResponsesProviderOptions,
-          },
-        };
-      default:
-        throw new Error(`Unexpected model in AI SDK runner: ${request.model}.`);
+    const result =
+      (await getAiSdkModelOptionsForGoogle(request.model)) ??
+      (await getAiSdkModelOptionsForAnthropic(request.model)) ??
+      (await getAiSdkModelOptionsForOpenAI(request.model));
+    if (result === null) {
+      throw new Error(`Unexpected unsupported model: ${request.model}`);
     }
+    return result;
   }
 
   private _convertRequestToMessagesList(
