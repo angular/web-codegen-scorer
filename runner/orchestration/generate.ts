@@ -189,7 +189,7 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
             try {
               return await evaluate();
             } catch (e: unknown) {
-              if (e instanceof TimeoutError && attemptIdx < maxAttempts) {
+              if (e instanceof TimeoutError && attemptIdx < maxAttempts - 1) {
                 continue;
               }
 
