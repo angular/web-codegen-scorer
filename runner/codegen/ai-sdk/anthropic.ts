@@ -40,7 +40,7 @@ export async function getAiSdkModelOptionsForAnthropic(
       if (modelName.includes('opus-4.1')) {
         apiModelName = 'claude-opus-4-1';
       } else if (modelName.includes('opus-4.5')) {
-        apiModelName = 'claude-opus-4.5';
+        apiModelName = 'claude-opus-4-5';
       }
       const model = anthropic(apiModelName);
       return {
