@@ -7,6 +7,9 @@ export const ANTHROPIC_MODELS = [
   'claude-opus-4.1-no-thinking',
   'claude-opus-4.1-with-thinking-16k',
   'claude-opus-4.1-with-thinking-32k',
+  'claude-opus-4.5-no-thinking',
+  'claude-opus-4.5-with-thinking-16k',
+  'claude-opus-4.5-with-thinking-32k',
   'claude-sonnet-4.5-no-thinking',
   'claude-sonnet-4.5-with-thinking-16k',
   'claude-sonnet-4.5-with-thinking-32k',
@@ -21,6 +24,9 @@ export async function getAiSdkModelOptionsForAnthropic(
     case 'claude-opus-4.1-no-thinking':
     case 'claude-opus-4.1-with-thinking-16k':
     case 'claude-opus-4.1-with-thinking-32k':
+    case 'claude-opus-4.5-no-thinking':
+    case 'claude-opus-4.5-with-thinking-16k':
+    case 'claude-opus-4.5-with-thinking-32k':
     case 'claude-sonnet-4.5-no-thinking':
     case 'claude-sonnet-4.5-with-thinking-16k':
     case 'claude-sonnet-4.5-with-thinking-32k': {
@@ -30,8 +36,13 @@ export async function getAiSdkModelOptionsForAnthropic(
         : modelName.endsWith('-32k')
           ? 32_000
           : 16_000;
-      const isOpus4_1Model = modelName.includes('opus-4.1');
-      const model = anthropic(isOpus4_1Model ? 'claude-opus-4-1' : 'claude-sonnet-4-5');
+      let apiModelName: Parameters<typeof anthropic>[0] = 'claude-sonnet-4-5';
+      if (modelName.includes('opus-4.1')) {
+        apiModelName = 'claude-opus-4-1';
+      } else if (modelName.includes('opus-4.5')) {
+        apiModelName = 'claude-opus-4.5';
+      }
+      const model = anthropic(apiModelName);
       return {
         model: thinkingEnabled
           ? wrapLanguageModel({

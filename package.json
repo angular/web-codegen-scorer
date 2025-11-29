@@ -51,7 +51,7 @@
     "wcs": "./runner/bin/cli.js"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^2.0.45",
+    "@ai-sdk/anthropic": "^2.0.50",
     "@ai-sdk/google": "^2.0.39",
     "@ai-sdk/openai": "^2.0.71",
     "@ai-sdk/provider": "^2.0.0",
