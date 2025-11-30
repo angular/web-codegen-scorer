@@ -7,7 +7,7 @@ export const noRuntimeExceptionsRating: PerBuildRating = {
   description: "Ensures the app doesn't have runtime exceptions.",
   kind: RatingKind.PER_BUILD,
   category: RatingCategory.HIGH_IMPACT,
-  groupingLabels: ['functionality', 'runtime-errors', 'running-app-checks'],
+  groupingLabels: ['functionality', 'no-runtime-errors', 'running-app-checks'],
   scoreReduction: '50%',
   id: 'common-no-runtime-errors',
   rate: ({buildResult, serveResult}) => ({
