@@ -442,6 +442,13 @@ export interface RunSummary {
    * Optional since some older reports might not have it.
    */
   runner?: CodegenRunnerInfo;
+
+  /**
+   * Hash of the environment-level ratings. Can be used to
+   * validate that the ratings haven't changed between runs.
+   * This field is optional, because older reports might not have it.
+   */
+  ratingHash?: string;
 }
 
 /**
