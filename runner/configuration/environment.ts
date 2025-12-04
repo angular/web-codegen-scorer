@@ -2,7 +2,7 @@ import {readdirSync, readFileSync, statSync} from 'fs';
 import {basename, extname, join, resolve} from 'path';
 import {globSync} from 'tinyglobby';
 import {Executor} from '../orchestration/executors/executor.js';
-import {Rating} from '../ratings/rating-types.js';
+import {Rating, RatingCategory} from '../ratings/rating-types.js';
 import {
   FrameworkInfo,
   MultiStepPromptDefinition,
@@ -38,6 +38,12 @@ export class Environment {
   readonly executor: Executor;
   /** Timeout for a single eval prompt in minutes. */
   readonly promptTimeoutMinutes: number | undefined;
+  /** Configuration for the individual rating categories. */
+  readonly ratingCategories: {
+    [RatingCategory.HIGH_IMPACT]: {name: string; maxPoints: number};
+    [RatingCategory.MEDIUM_IMPACT]: {name: string; maxPoints: number};
+    [RatingCategory.LOW_IMPACT]: {name: string; maxPoints: number};
+  };
 
   constructor(
     rootPath: string,
@@ -65,6 +71,7 @@ export class Environment {
     this.isBuiltIn = rootPath.includes('node_modules');
     this.executor = config.executor;
     this.promptTimeoutMinutes = config.promptTimeoutMinutes;
+    this.ratingCategories = this.getRatingCategories(config);
   }
 
   /** Prompts that should be executed as a part of the evaluation. */
@@ -369,5 +376,27 @@ export class Environment {
     }
 
     return result;
+  }
+
+  private getRatingCategories(config: EnvironmentConfig) {
+    const overrides = config.categoryOverrides;
+
+    return {
+      [RatingCategory.HIGH_IMPACT]: {
+        name: 'High Impact',
+        maxPoints: 60,
+        ...overrides?.[RatingCategory.HIGH_IMPACT],
+      },
+      [RatingCategory.MEDIUM_IMPACT]: {
+        name: 'Medium Impact',
+        maxPoints: 30,
+        ...overrides?.[RatingCategory.MEDIUM_IMPACT],
+      },
+      [RatingCategory.LOW_IMPACT]: {
+        name: 'Low Impact',
+        maxPoints: 10,
+        ...overrides?.[RatingCategory.LOW_IMPACT],
+      },
+    };
   }
 }

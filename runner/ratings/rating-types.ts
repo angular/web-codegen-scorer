@@ -32,20 +32,6 @@ export enum RatingCategory {
   LOW_IMPACT = 'low-impact',
 }
 
-/** Points correspond to each `RatingCategory`. */
-export const POINTS_FOR_CATEGORIES = {
-  [RatingCategory.HIGH_IMPACT]: 60,
-  [RatingCategory.MEDIUM_IMPACT]: 30,
-  [RatingCategory.LOW_IMPACT]: 10,
-};
-
-/** Display names for each `RatingCategory`. */
-export const CATEGORY_NAMES = {
-  [RatingCategory.HIGH_IMPACT]: 'High Impact',
-  [RatingCategory.MEDIUM_IMPACT]: 'Medium Impact',
-  [RatingCategory.LOW_IMPACT]: 'Low Impact',
-};
-
 const ratingCommonContextFields = {
   ratingsResult: z.record(z.custom<IndividualAssessment | SkippedIndividualAssessment>()),
   prompt: z.custom<PromptDefinition>(),

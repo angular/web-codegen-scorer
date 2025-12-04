@@ -174,7 +174,7 @@ export interface LlmContextFile {
 export interface AssessmentCategory {
   /** Unique ID of the category. */
   id: RatingCategory;
-  /** Display name of the cateogry. */
+  /** Display name of the category. */
   name: string;
   /** Points that have been awarded to the category. */
   points: number;

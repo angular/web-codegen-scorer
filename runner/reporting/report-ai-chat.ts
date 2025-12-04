@@ -12,27 +12,6 @@ import {
 } from '../shared-interfaces.js';
 import {BuildResultStatus} from '../workers/builder/builder-types.js';
 import {BUCKET_CONFIG} from '../ratings/stats.js';
-import {POINTS_FOR_CATEGORIES} from '../ratings/rating-types.js';
-
-export const reportLlmEvalsToolContext = `## What is a report?
-A report consists of many apps that were LLM generated. You will have information
-about checks that failed for this LLM generated app.
-
-Note that there may be multiple attempts for an app. E.g. an initial build may fail and
-another attempt might have repaired the build failure. The last attempt reflects the final
-state of the app. E.g. whether it does build, or if there are runtime errors.
-
-## Scoring mechanism
-Apps are rated based on their scores in the following buckets:
-${BUCKET_CONFIG.map(b => `* ${b.name}: ${b.min}-${b.max}`).join('\n')}
-
-The overall score of an app is determined based on score reductions.
-There are three pillars: ${Object.keys(POINTS_FOR_CATEGORIES).join(', ')}
-Pillars are a split up of a 100% perfect score, allowing for individual ratings
-to be less impactful than others. The pillars are distributed as follows:
-${Object.entries(POINTS_FOR_CATEGORIES).map(e => `* ${e[0]}: ${e[1]} points.`)}
-Within pillars, the available score can be reduced by individual ratings.
-`;
 
 const defaultAiChatPrompt = `Strictly follow the instructions here.
 - You are an expert in LLM-based code generation evaluation and quality assessments.
@@ -90,7 +69,7 @@ export async function chatWithReportAI(
 ${message}
 \`\`\`
 
-${reportLlmEvalsToolContext}
+${getContextPrompt(assessmentsToProcess)}
 
 ### How many apps are there?
 There are ${allAssessments.length} apps in this report.
@@ -192,4 +171,37 @@ function isAssessmentResultWithID(
   value: AssessmentResult | AssessmentResultFromReportServer,
 ): value is AssessmentResultFromReportServer {
   return (value as Partial<AssessmentResultFromReportServer>).id !== undefined;
+}
+
+function getContextPrompt(assessments: AssessmentResultFromReportServer[] | AssessmentResult[]) {
+  let categoryCount = 0;
+  let pointsForCategories = {} as Record<string, number>;
+
+  // Deduce the categories from the first result since they're the same for the entire run.
+  if (assessments.length) {
+    assessments[0].score.categories.forEach(category => {
+      categoryCount++;
+      pointsForCategories[category.id] = category.maxPoints;
+    });
+  }
+
+  return `## What is a report?
+A report consists of many apps that were LLM generated. You will have information
+about checks that failed for this LLM generated app.
+
+Note that there may be multiple attempts for an app. E.g. an initial build may fail and
+another attempt might have repaired the build failure. The last attempt reflects the final
+state of the app. E.g. whether it does build, or if there are runtime errors.
+
+## Scoring mechanism
+Apps are rated based on their scores in the following buckets:
+${BUCKET_CONFIG.map(b => `* ${b.name}: ${b.min}-${b.max}`).join('\n')}
+
+The overall score of an app is determined based on score reductions.
+There are ${categoryCount} pillars: ${Object.keys(pointsForCategories).join(', ')}
+Pillars are a split up of a 100% perfect score, allowing for individual ratings
+to be less impactful than others. The pillars are distributed as follows:
+${Object.entries(pointsForCategories).map(e => `* ${e[0]}: ${e[1]} points.`)}
+Within pillars, the available score can be reduced by individual ratings.
+`;
 }
