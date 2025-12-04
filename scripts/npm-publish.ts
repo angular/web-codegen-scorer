@@ -1,8 +1,8 @@
-import { join } from 'path';
-import { spawn } from 'child_process';
-import { input, select } from '@inquirer/prompts';
-import { executeCommand } from '../runner/utils/exec.js';
-import { readFile, writeFile } from 'fs/promises';
+import {join} from 'path';
+import {spawn} from 'child_process';
+import {input, select} from '@inquirer/prompts';
+import {executeCommand} from '../runner/utils/exec.js';
+import {readFile, writeFile} from 'fs/promises';
 
 const root = join(import.meta.dirname, '..');
 const distDirectory = join(root, 'dist');
@@ -22,22 +22,17 @@ const registry = 'https://wombat-dressing-room.appspot.com';
 
     const distTag = await select({
       choices: [
-        { name: 'Pre-release', value: 'next' },
-        { name: 'Stable', value: 'latest' },
+        {name: 'Stable', value: 'latest'},
+        {name: 'Pre-release', value: 'next'},
       ],
       message: 'Select a release channel',
     });
 
     // Build the project.
-    await executeCommand(
-      `pnpm release-build --version=${version}`,
-      root,
-      undefined,
-      {
-        forwardStdoutToParent: true,
-        forwardStderrToParent: true,
-      }
-    );
+    await executeCommand(`pnpm release-build --version=${version}`, root, undefined, {
+      forwardStdoutToParent: true,
+      forwardStderrToParent: true,
+    });
 
     // Log into our registry.
     await spawnInteractive('npm', ['login', '--registry', registry]);
@@ -50,15 +45,12 @@ const registry = 'https://wombat-dressing-room.appspot.com';
       {
         forwardStderrToParent: true,
         forwardStdoutToParent: true,
-      }
+      },
     );
 
     // Write the package.json back to disk so the version is in sync.
     packageJson.version = version;
-    await writeFile(
-      packageJsonPath,
-      JSON.stringify(packageJson, undefined, 2) + '\n'
-    );
+    await writeFile(packageJsonPath, JSON.stringify(packageJson, undefined, 2) + '\n');
 
     console.log('Done! 🎉');
     console.log('Remember to push the changed package.json!');
@@ -77,8 +69,6 @@ function spawnInteractive(command: string, args: string[]) {
       stdio: 'inherit',
     });
 
-    childProcess.on('close', (status) =>
-      status === 0 ? resolve() : reject(status)
-    );
+    childProcess.on('close', status => (status === 0 ? resolve() : reject(status)));
   });
 }
