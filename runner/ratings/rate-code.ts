@@ -19,9 +19,7 @@ import {
   PerFileRatingContentType,
   RatingKind,
   RatingCategory,
-  POINTS_FOR_CATEGORIES,
   Rating,
-  CATEGORY_NAMES,
   RatingsResult,
 } from './rating-types.js';
 import {extractEmbeddedCodeFromTypeScript} from './embedded-languages.js';
@@ -82,10 +80,9 @@ export async function rateGeneratedCode(
     RatingCategory.MEDIUM_IMPACT,
     RatingCategory.LOW_IMPACT,
   ].map(category => ({
+    ...environment.ratingCategories[category],
     id: category,
-    name: CATEGORY_NAMES[category],
     points: 0,
-    maxPoints: POINTS_FOR_CATEGORIES[category],
     assessments: [],
   }));
 

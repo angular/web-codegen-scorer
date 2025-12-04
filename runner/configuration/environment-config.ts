@@ -1,7 +1,7 @@
 import z from 'zod';
 import {createMessageBuilder, fromError} from 'zod-validation-error/v3';
 import {UserFacingError} from '../utils/errors.js';
-import {ratingOverrideSchema, ratingSchema} from '../ratings/rating-types.js';
+import {RatingCategory, ratingOverrideSchema, ratingSchema} from '../ratings/rating-types.js';
 import {EvalPrompt, EvalPromptWithMetadata, MultiStepPrompt} from './prompts.js';
 import {executorSchema} from '../orchestration/executors/executor.js';
 import {
@@ -77,6 +77,20 @@ export const environmentConfigSchema = z.object({
       'Executor to be used for this environment. ' +
         'If unset, a local executor is derived from the full environment configuration.',
     ),
+
+  /**
+   * Map used to override fields for specific rating categories. The key is the unique ID of
+   * the category and the value are the override fields.
+   */
+  categoryOverrides: z
+    .record(
+      z.custom<RatingCategory>(),
+      z.object({
+        name: z.string().optional(),
+        maxPoints: z.number().optional(),
+      }),
+    )
+    .optional(),
 });
 
 /**
