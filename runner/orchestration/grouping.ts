@@ -1,9 +1,8 @@
-import {createHash} from 'crypto';
-import type {LlmRunner} from '../codegen/llm-runner.js';
 import type {Environment} from '../configuration/environment.js';
 import {calculateBuildAndCheckStats} from '../ratings/stats.js';
 import type {AssessmentResult, RunGroup, RunInfo} from '../shared-interfaces.js';
 import {RunnerName} from '../codegen/runner-creation.js';
+import {getSha256Hash} from '../utils/hashing.js';
 
 /** Generates a unique grouping ID for a run. */
 export function getRunGroupId(
@@ -30,7 +29,7 @@ export function getRunGroupId(
     `${options.labels?.sort().join('/')}/${options.model}/${options.runner}`;
 
   // The group string above can get long. Hash it to something shorter and fixed length.
-  return createHash('sha256').update(group).digest('hex');
+  return getSha256Hash(group);
 }
 
 /**

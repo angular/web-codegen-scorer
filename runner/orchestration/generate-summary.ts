@@ -89,5 +89,6 @@ export async function prepareSummary(
       id: executorInfo.id,
       displayName: executorInfo.displayName,
     },
+    ratingHash: env.ratingHash,
   } satisfies RunSummary;
 }

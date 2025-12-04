@@ -15,6 +15,12 @@ import {lazy} from '../utils/lazy-creation.js';
 import {EnvironmentConfig} from './environment-config.js';
 import {EvalPromptWithMetadata, MultiStepPrompt} from './prompts.js';
 import {renderPromptTemplate} from './prompt-templating.js';
+import {getSha256Hash} from '../utils/hashing.js';
+
+interface CategoryConfig {
+  name: string;
+  maxPoints: number;
+}
 
 /** Represents a single prompt evaluation environment. */
 export class Environment {
@@ -40,10 +46,18 @@ export class Environment {
   readonly promptTimeoutMinutes: number | undefined;
   /** Configuration for the individual rating categories. */
   readonly ratingCategories: {
-    [RatingCategory.HIGH_IMPACT]: {name: string; maxPoints: number};
-    [RatingCategory.MEDIUM_IMPACT]: {name: string; maxPoints: number};
-    [RatingCategory.LOW_IMPACT]: {name: string; maxPoints: number};
+    [RatingCategory.HIGH_IMPACT]: CategoryConfig;
+    [RatingCategory.MEDIUM_IMPACT]: CategoryConfig;
+    [RatingCategory.LOW_IMPACT]: CategoryConfig;
   };
+  /**
+   * Hash of the environment-level ratings. Can be used to
+   * validate that the ratings haven't changed between runs.
+   */
+  readonly ratingHash: string;
+
+  /** Ratings configured at the environment level. */
+  private readonly ratings: Rating[];
 
   constructor(
     rootPath: string,
@@ -72,11 +86,14 @@ export class Environment {
     this.executor = config.executor;
     this.promptTimeoutMinutes = config.promptTimeoutMinutes;
     this.ratingCategories = this.getRatingCategories(config);
+    this.ratings = this.resolveRatings(config);
+    this.ratingHash = this.getRatingHash(this.ratings, this.ratingCategories);
+    this.validateRatingHash(this.ratingHash, config);
   }
 
   /** Prompts that should be executed as a part of the evaluation. */
   executablePrompts = lazy(async () => {
-    return this.resolveExecutablePrompts(this.config.executablePrompts, this.config);
+    return this.resolveExecutablePrompts(this.config.executablePrompts);
   });
 
   systemPromptGeneration = lazy(async () => {
@@ -178,27 +195,9 @@ export class Environment {
    */
   private async resolveExecutablePrompts(
     prompts: EnvironmentConfig['executablePrompts'],
-    config: EnvironmentConfig,
   ): Promise<RootPromptDefinition[]> {
     const result: Promise<RootPromptDefinition>[] = [];
-    let envRatings: Rating[];
-
-    if (config.ratingOverrides) {
-      Object.keys(config.ratingOverrides).forEach(id => {
-        if (!config.ratings.some(rating => rating.id === id)) {
-          throw new UserFacingError(
-            `Rating with an ID of "${id}" has not been configured. Cannot apply an override to it.`,
-          );
-        }
-      });
-
-      envRatings = config.ratings.map(rating => {
-        const override = config.ratingOverrides![rating.id];
-        return override ? {...rating, ...override} : rating;
-      });
-    } else {
-      envRatings = config.ratings;
-    }
+    const envRatings = this.ratings;
 
     for (const def of prompts) {
       if (def instanceof MultiStepPrompt) {
@@ -378,6 +377,25 @@ export class Environment {
     return result;
   }
 
+  private resolveRatings(config: EnvironmentConfig) {
+    if (!config.ratingOverrides) {
+      return config.ratings;
+    }
+
+    Object.keys(config.ratingOverrides).forEach(id => {
+      if (!config.ratings.some(rating => rating.id === id)) {
+        throw new UserFacingError(
+          `Rating with an ID of "${id}" has not been configured. Cannot apply an override to it.`,
+        );
+      }
+    });
+
+    return config.ratings.map(rating => {
+      const override = config.ratingOverrides![rating.id];
+      return override ? {...rating, ...override} : rating;
+    });
+  }
+
   private getRatingCategories(config: EnvironmentConfig) {
     const overrides = config.categoryOverrides;
 
@@ -398,5 +416,34 @@ export class Environment {
         ...overrides?.[RatingCategory.LOW_IMPACT],
       },
     };
+  }
+
+  private getRatingHash(
+    ratings: Rating[],
+    categories: Record<RatingCategory, CategoryConfig>,
+  ): string {
+    const parts: string[] = [];
+
+    for (const rating of ratings) {
+      parts.push(
+        `${rating.category};${categories[rating.category]?.maxPoints};` +
+          `${rating.id};${rating.scoreReduction};${rating.groupingLabels || [].sort().join(',')}`,
+      );
+    }
+
+    return getSha256Hash(parts.sort().join('|'));
+  }
+
+  private validateRatingHash(currentHash: string, config: EnvironmentConfig) {
+    if (config.expectedRatingHash && config.expectedRatingHash !== currentHash) {
+      throw new UserFacingError(
+        [
+          `Rating hash for environment "${this.displayName}" does not match the expectation.`,
+          `Expected: ${config.expectedRatingHash}`,
+          `Actual: ${this.ratingHash}`,
+          `Either update the \`expectedRatingHash\` field in the config or revert the ratings back to their previous configuration`,
+        ].join('\n'),
+      );
+    }
   }
 }

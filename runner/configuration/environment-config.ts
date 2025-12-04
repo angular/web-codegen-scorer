@@ -91,6 +91,13 @@ export const environmentConfigSchema = z.object({
       }),
     )
     .optional(),
+
+  /**
+   * When an environment is created, it generates a hash based on the configured ratings.
+   * This field is used to validate that the generated hash matches a pre-defined one.
+   * It's useful to ensure that the set of ratings hasn't changed between two runs.
+   */
+  expectedRatingHash: z.string().optional(),
 });
 
 /**
