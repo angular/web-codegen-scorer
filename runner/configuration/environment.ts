@@ -69,7 +69,7 @@ export class Environment {
 
   /** Prompts that should be executed as a part of the evaluation. */
   executablePrompts = lazy(async () => {
-    return this.resolveExecutablePrompts(this.config.executablePrompts, this.config.ratings);
+    return this.resolveExecutablePrompts(this.config.executablePrompts, this.config);
   });
 
   systemPromptGeneration = lazy(async () => {
@@ -166,15 +166,32 @@ export class Environment {
 
   /**
    * Resolves the prompt configuration into prompt definitions.
-   * @param rootPath Root path of the project.
    * @param prompts Prompts to be resolved.
-   * @param envRatings Environment-level ratings.
+   * @param config Configuration for the environment.
    */
   private async resolveExecutablePrompts(
     prompts: EnvironmentConfig['executablePrompts'],
-    envRatings: Rating[],
+    config: EnvironmentConfig,
   ): Promise<RootPromptDefinition[]> {
     const result: Promise<RootPromptDefinition>[] = [];
+    let envRatings: Rating[];
+
+    if (config.ratingOverrides) {
+      Object.keys(config.ratingOverrides).forEach(id => {
+        if (!config.ratings.some(rating => rating.id === id)) {
+          throw new UserFacingError(
+            `Rating with an ID of "${id}" has not been configured. Cannot apply an override to it.`,
+          );
+        }
+      });
+
+      envRatings = config.ratings.map(rating => {
+        const override = config.ratingOverrides![rating.id];
+        return override ? {...rating, ...override} : rating;
+      });
+    } else {
+      envRatings = config.ratings;
+    }
 
     for (const def of prompts) {
       if (def instanceof MultiStepPrompt) {

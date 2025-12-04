@@ -126,6 +126,12 @@ export const ratingSchema = z.union([
   llmBasedRatingSchema,
 ]);
 
+export const ratingOverrideSchema = z.object({
+  category: z.custom<RatingCategory>().optional(),
+  scoreReduction: z.custom<`${number}%`>().optional(),
+  groupingLabels: z.array(z.string()).optional().optional(),
+});
+
 /** Result of a per-build rating. */
 export type PerBuildRatingResult =
   | {

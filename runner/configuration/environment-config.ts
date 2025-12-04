@@ -1,7 +1,7 @@
 import z from 'zod';
 import {createMessageBuilder, fromError} from 'zod-validation-error/v3';
 import {UserFacingError} from '../utils/errors.js';
-import {ratingSchema} from '../ratings/rating-types.js';
+import {ratingOverrideSchema, ratingSchema} from '../ratings/rating-types.js';
 import {EvalPrompt, EvalPromptWithMetadata, MultiStepPrompt} from './prompts.js';
 import {executorSchema} from '../orchestration/executors/executor.js';
 import {
@@ -21,6 +21,11 @@ export const environmentConfigSchema = z.object({
   clientSideFramework: z.string(),
   /** Ratings to run when evaluating the environment. */
   ratings: z.array(ratingSchema),
+  /**
+   * Map used to override fields for specific ratings. The key is the unique ID of
+   * the rating and the value are the override fields.
+   */
+  ratingOverrides: z.record(z.string(), ratingOverrideSchema).optional(),
   /** Path to the prompt used by the LLM for generating files. */
   generationSystemPrompt: z.string(),
   /**
