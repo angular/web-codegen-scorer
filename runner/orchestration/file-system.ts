@@ -8,7 +8,7 @@ import {
   safeWriteFile,
 } from '../file-system-utils.js';
 import {LlmContextFile, LlmResponseFile, RootPromptDefinition} from '../shared-interfaces.js';
-import {join} from 'path';
+import {join, resolve} from 'path';
 import {existsSync} from 'fs';
 import {mkdir, mkdtemp, readFile} from 'fs/promises';
 import {globSync} from 'tinyglobby';
@@ -60,7 +60,7 @@ export async function setupProjectStructure(
   const directoriesToCopy: string[] = [];
 
   if (env.executor instanceof LocalExecutor && env.executor.config.projectTemplate) {
-    const projectTemplatePath = join(env.rootPath, env.executor.config.projectTemplate);
+    const projectTemplatePath = resolve(env.rootPath, env.executor.config.projectTemplate);
 
     // Copy the template files first.
     directoriesToCopy.push(projectTemplatePath);
