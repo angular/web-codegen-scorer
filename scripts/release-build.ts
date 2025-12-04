@@ -1,9 +1,9 @@
-import { join } from 'path';
-import { rm, cp, readFile, writeFile } from 'fs/promises';
+import {join} from 'path';
+import {rm, cp, readFile, writeFile} from 'fs/promises';
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-import { globSync as glob } from 'tinyglobby';
-import { executeCommand } from '../runner/utils/exec.js';
+import {hideBin} from 'yargs/helpers';
+import {globSync as glob} from 'tinyglobby';
+import {executeCommand} from '../runner/utils/exec.js';
 
 const root = join(import.meta.dirname, '..');
 const runnerSource = join(root, 'runner');
@@ -28,7 +28,7 @@ const args = yargs(hideBin(process.argv))
   console.log('Building release output...');
 
   // Clear out the target directory.
-  await rm(targetDirectory, { recursive: true, force: true });
+  await rm(targetDirectory, {recursive: true, force: true});
 
   // Build the runner. This also creates `dist`.
   await executeCommand('pnpm build-runner', runnerSource, undefined, {
@@ -38,7 +38,7 @@ const args = yargs(hideBin(process.argv))
   // Generate the package.json.
   await writeFile(
     join(targetDirectory, 'package.json'),
-    await getPackageJson(join(root, 'package.json'), args.version)
+    await getPackageJson(join(root, 'package.json'), args.version),
   );
 
   // Copy the readme and license.
@@ -50,18 +50,10 @@ const args = yargs(hideBin(process.argv))
     glob('**/*', {
       cwd: join(root, 'examples'),
       dot: true,
-      ignore: [
-        '**/node_modules/**',
-        '**/dist/**',
-        '**/.vinxi/**',
-        '**/.output/**',
-      ],
-    }).map((agentFile) =>
-      cp(
-        join(root, 'examples', agentFile),
-        join(targetDirectory, 'examples', agentFile)
-      )
-    )
+      ignore: ['**/node_modules/**', '**/dist/**', '**/.vinxi/**', '**/.output/**'],
+    }).map(agentFile =>
+      cp(join(root, 'examples', agentFile), join(targetDirectory, 'examples', agentFile)),
+    ),
   );
 
   // The user journey testing requires various files to work.
@@ -71,12 +63,12 @@ const args = yargs(hideBin(process.argv))
       cwd: join(root, browserAgentRelativePath),
       dot: true,
       ignore: ['*.ts', 'README.md'],
-    }).map((agentFile) =>
+    }).map(agentFile =>
       cp(
         join(root, browserAgentRelativePath, agentFile),
-        join(targetDirectory, browserAgentRelativePath, agentFile)
-      )
-    )
+        join(targetDirectory, browserAgentRelativePath, agentFile),
+      ),
+    ),
   );
 
   if (!args.runnerOnly) {
@@ -86,16 +78,13 @@ const args = yargs(hideBin(process.argv))
     });
 
     // Copy the report artifacts into the `dist`.
-    await cp(reportAppDist, targetDirectory, { recursive: true });
+    await cp(reportAppDist, targetDirectory, {recursive: true});
   }
 
   console.log(`Release output has been built in ${targetDirectory}`);
 })();
 
-async function getPackageJson(
-  path: string,
-  version: string | null
-): Promise<string> {
+async function getPackageJson(path: string, version: string | null): Promise<string> {
   const content = await readFile(path, 'utf8');
   const parsed = JSON.parse(content) as {
     version: string;
@@ -106,9 +95,7 @@ async function getPackageJson(
 
   if (version) {
     if (version === parsed.version) {
-      throw new Error(
-        `Specified version is the same version as the current one.`
-      );
+      throw new Error(`Specified version is the same version as the current one.`);
     } else {
       parsed.version = version;
     }
