@@ -174,14 +174,7 @@ export async function resolveContextFiles(
 
   const paths = globSync(patterns, {
     cwd: directory,
-    ignore: [
-      '**/node_modules/**',
-      '**/README.md',
-      '**/package-lock.json',
-      '**/package.json',
-      '**/angular.json',
-      '**/.vinxi/**',
-    ],
+    ignore: ['**/node_modules/**', '**/README.md', '**/package-lock.json', '**/.vinxi/**'],
   });
 
   return Promise.all(
