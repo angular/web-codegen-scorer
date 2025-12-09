@@ -365,7 +365,7 @@
           <div class="app-details">
             <div class="app-details-section">
               <h4>Prompt</h4>
-              <pre class="callout neutral">{{ result.promptDef.prompt }}</pre>
+              <pre class="callout neutral code">{{ result.promptDef.prompt }}</pre>
             </div>
 
             <div class="app-details-section">
@@ -422,7 +422,8 @@
                   [class.warn]="totalPercent < 90 && totalPercent >= 80"
                   [class.error]="totalPercent < 80"
                 >
-                  {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{totalPercent}}%)
+                  {{ result.score.totalPoints }} / {{ result.score.maxOverallPoints }} points ({{totalPercent
+                  }}%)
                 </span>
               </div>
             </div>
