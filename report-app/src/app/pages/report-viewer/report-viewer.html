@@ -535,19 +535,7 @@
                     }
 
                     <h4>Generated Code</h4>
-
-                    @for (file of attempt.outputFiles; track file) {
-                      <strong>{{ file.filePath }}</strong>
-                      <div class="util-buttons button-group">
-                        <button class="text-button" (click)="copy(file.code)">
-                          Copy source code
-                        </button>
-                        <button class="text-button" (click)="format(file)">
-                          Format source code
-                        </button>
-                      </div>
-                      <app-code-viewer [code]="formatted().get(file) ?? file.code" />
-                    }
+                    <app-file-code-viewer [files]="attempt.outputFiles" />
                   }
                 </expansion-panel>
               }

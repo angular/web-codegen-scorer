@@ -1,0 +1,52 @@
+<div class="editor-container">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span>Explorer</span>
+    </div>
+    <ul class="file-list">
+      @for (node of flatTree(); track node.path) {
+        @let isExpanded = node.isDirectory && node.isExpanded();
+        @let iconOptions = { isDirectory: node.isDirectory, isExpanded: isExpanded };
+
+        @if (isNodeVisible(node)) {
+          <li
+            class="file-item"
+            [class.selected]="!node.isDirectory && node === selectedFile()"
+            [class.expanded]="isExpanded"
+            (click)="toggleNode(node)"
+            [style.padding-left]="'calc(' + (node.depth * 0.5) + 'rem + var(--padding-base))'"
+            [title]="node.path"
+          >
+            @if (node.isDirectory) {
+              <span class="material-symbols-outlined collapse-indicator">chevron_right</span>
+            } @else {
+              <span class="material-symbols-outlined collapse-indicator" style="visibility: hidden;"
+                >chevron_right</span
+              >
+            }
+            <span class="material-symbols-outlined">{{ getFileIcon(node.path, iconOptions) }}</span>
+            <span class="file-name">{{ node.name }}</span>
+          </li>
+        }
+      }
+    </ul>
+  </div>
+  <div class="content">
+    @if (selectedFile(); as file) {
+      @let iconOptions = { isDirectory: false };
+      <div class="tabs">
+        <div class="tab" [title]="file.path">
+          <span class="material-symbols-outlined">{{ getFileIcon(file.path, iconOptions) }}</span>
+          <span>{{ file.name }}</span>
+        </div>
+        <button class="copy-button" (click)="copyCode()">
+          <span class="material-symbols-outlined">content_copy</span>
+          <span>Copy</span>
+        </button>
+      </div>
+      <div class="code-container">
+        <app-code-viewer [code]="file.file!.code" />
+      </div>
+    }
+  </div>
+</div>
