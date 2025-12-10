@@ -32,7 +32,7 @@ import {AppColorMode} from '../services/app-color-mode';
       content: counter(step);
       counter-increment: step;
       width: 1rem;
-      margin-right: 1.5rem;
+      margin-right: 0.5rem;
       display: inline-block;
       text-align: right;
       color: rgba(115, 138, 148, 0.4);

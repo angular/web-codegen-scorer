@@ -1,0 +1,139 @@
+:host {
+  --bg-color: #1e1e1e;
+  --sidebar-bg: #252526;
+  --border-color: #333;
+  --text-color: #cccccc;
+  --accent-color: #37373d;
+  --hover-bg: #2a2d2e;
+  --padding-base: 1rem;
+
+  display: block;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.editor-container {
+  display: flex;
+  height: 40rem;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.sidebar {
+  width: 15rem;
+  max-width: 25rem;
+  background-color: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: calc(var(--padding-base) / 2) var(--padding-base);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background-color: var(--sidebar-bg);
+  z-index: 1;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: var(--text-color);
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem var(--padding-base);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    background-color: var(--hover-bg);
+  }
+
+  &.selected {
+    background-color: var(--accent-color);
+    color: white;
+  }
+}
+
+.collapse-indicator {
+  transition: transform 0.2s;
+}
+
+.file-item.expanded .collapse-indicator {
+  transform: rotate(90deg);
+}
+
+.content {
+  flex-grow: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--sidebar-bg);
+  flex-shrink: 0;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: calc(var(--padding-base) / 2) var(--padding-base);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border-right: 1px solid var(--sidebar-bg);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.copy-button {
+  background-color: var(--border-color);
+  color: var(--text-color);
+  border: 1px solid #444;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  &:hover {
+    background-color: #444;
+  }
+}
+
+.material-symbols-outlined {
+  font-size: 1rem;
+}
+
+.code-container {
+  flex-grow: 1;
+  overflow: auto;
+}

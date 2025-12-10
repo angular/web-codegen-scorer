@@ -45,6 +45,7 @@ import {ProviderLabel} from '../../shared/provider-label';
 import {AiAssistant} from '../../shared/ai-assistant/ai-assistant';
 import {LighthouseCategory} from './lighthouse-category';
 import {MultiSelect} from '../../shared/multi-select/multi-select';
+import {FileCodeViewer} from '../../shared/file-code-viewer/file-code-viewer';
 
 const localReportRegex = /-l\d+$/;
 
@@ -63,6 +64,7 @@ const localReportRegex = /-l\d+$/;
     AiAssistant,
     LighthouseCategory,
     MultiSelect,
+    FileCodeViewer,
   ],
   templateUrl: './report-viewer.html',
   styleUrls: ['./report-viewer.scss'],
