@@ -190,6 +190,17 @@ lighthouse-category + lighthouse-category {
   align-items: center;
 }
 
+.chart-title-tooltip-icon {
+  font-size: 18px;
+  cursor: help;
+}
+
+.chart-title-right-label {
+  margin-left: auto;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 .axe-violations ul {
   padding: 0px 20px;
 }

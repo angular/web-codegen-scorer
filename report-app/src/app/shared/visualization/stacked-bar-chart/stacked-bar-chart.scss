@@ -56,8 +56,9 @@
 
 .legend {
   display: flex;
-  justify-content: center;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: 1.5rem;
 }
 
 .legend-item {
@@ -66,6 +67,7 @@
   font-size: 14px;
   color: var(--text-secondary);
   white-space: nowrap;
+  margin-top: 0.5rem;
 }
 
 .legend-color {

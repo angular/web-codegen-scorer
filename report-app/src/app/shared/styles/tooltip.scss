@@ -28,6 +28,7 @@
 
     &.multiline-tooltip::before {
       white-space: normal;
+      width: max-content;
       max-width: 400px;
     }
 
