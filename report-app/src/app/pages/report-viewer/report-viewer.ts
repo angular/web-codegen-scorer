@@ -13,7 +13,10 @@ import {
   viewChild,
 } from '@angular/core';
 import {NgxJsonViewerModule} from 'ngx-json-viewer';
-import {BuildErrorType} from '../../../../../runner/workers/builder/builder-types';
+import {
+  BuildErrorType,
+  BuildResultStatus,
+} from '../../../../../runner/workers/builder/builder-types';
 import {
   AssessmentResult,
   AssessmentResultFromReportServer,
@@ -282,6 +285,116 @@ export class ReportViewer {
       },
     ];
   }
+
+  protected hasSuccessfulResultWithMoreThanOneBuildAttempt = computed(() => {
+    if (!this.selectedReport.hasValue()) {
+      return false;
+    }
+    for (const result of this.selectedReport.value().results) {
+      if (
+        result.finalAttempt.buildResult.status === BuildResultStatus.SUCCESS &&
+        result.repairAttempts > 1
+      ) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  protected averageRepairAttempts = computed<number | null>(() => {
+    const report = this.selectedReportWithSortedResults();
+    if (!report) {
+      return null;
+    }
+
+    let totalRepairs = 0;
+    let count = 0;
+
+    for (const result of report.results) {
+      // Only consider successful builds that required repairs.
+      if (
+        result.finalAttempt.buildResult.status === BuildResultStatus.SUCCESS &&
+        result.repairAttempts > 0
+      ) {
+        totalRepairs += result.repairAttempts;
+        count++;
+      }
+    }
+
+    return count > 0 ? totalRepairs / count : null;
+  });
+
+  protected repairAttemptsAsGraphData = computed<StackedBarChartData>(() => {
+    const report = this.selectedReportWithSortedResults();
+    if (!report) {
+      return [];
+    }
+
+    const repairsToAppCount = new Map<number | 'failed', number>();
+
+    // Map repair count to how many applications shared that count.
+    let maxRepairCount = 0;
+    for (const result of report.results) {
+      if (result.finalAttempt.buildResult.status === BuildResultStatus.ERROR) {
+        repairsToAppCount.set('failed', (repairsToAppCount.get('failed') || 0) + 1);
+      } else {
+        const repairs = result.repairAttempts;
+        // For this graph, we ignore applications that required no repair.
+        if (repairs > 0) {
+          repairsToAppCount.set(repairs, (repairsToAppCount.get(repairs) || 0) + 1);
+          maxRepairCount = Math.max(maxRepairCount, repairs);
+        }
+      }
+    }
+
+    const data: StackedBarChartData = [];
+
+    // All the numeric keys, sorted by value.
+    const intermediateRepairKeys = Array.from(repairsToAppCount.keys())
+      .filter((k): k is number => typeof k === 'number')
+      .sort((a, b) => a - b);
+
+    // This graph might involve a bunch of sections. We want to scale them among all the possible color "grades".
+
+    const minGrade = 1;
+    const maxGrade = 8;
+    const failureGrade = 9;
+
+    for (let repairCount = 1; repairCount <= maxRepairCount; repairCount++) {
+      const applicationCount = repairsToAppCount.get(repairCount);
+      if (!applicationCount) continue;
+      const label = `${repairCount} repair${repairCount > 1 ? 's' : ''}`;
+
+      // Normalize the repair count to the range [0, 1].
+      const normalizedRepairCount = (repairCount - 1) / (maxRepairCount - 1);
+
+      let gradeIndex: number;
+      if (intermediateRepairKeys.length === 1) {
+        // If there's only one intermediate repair count, map it to a middle grade (e.g., --chart-grade-5)
+        gradeIndex = Math.floor(maxGrade / 2) + minGrade;
+      } else {
+        // Distribute multiple intermediate repair counts evenly across available grades
+        gradeIndex = minGrade + Math.round(normalizedRepairCount * (maxGrade - minGrade));
+      }
+
+      data.push({
+        label,
+        color: `var(--chart-grade-${gradeIndex})`,
+        value: applicationCount,
+      });
+    }
+
+    // Handle 'Build failed even after all retries' - always maps to the "failure" grade.
+    const failedCount = repairsToAppCount.get('failed') || 0;
+    if (failedCount > 0) {
+      data.push({
+        label: 'Build failed even after all retries',
+        color: `var(--chart-grade-${failureGrade})`,
+        value: failedCount,
+      });
+    }
+    return data;
+  });
 
   protected testsAsGraphData(tests: RunSummaryTests): StackedBarChartData {
     return [

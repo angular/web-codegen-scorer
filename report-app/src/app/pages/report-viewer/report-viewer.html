@@ -73,6 +73,32 @@
             <stacked-bar-chart [data]="buildsAsGraphData(overview.stats.builds)" [compact]="true" />
           </div>
         </div>
+        @if (hasSuccessfulResultWithMoreThanOneBuildAttempt()) {
+          <div class="chart-container repair-attempts">
+            <h3>
+              <span class="material-symbols-outlined">build_circle</span>
+              <span>Repair attempts</span>
+              <span
+                class="material-symbols-outlined has-tooltip multiline-tooltip chart-title-tooltip-icon"
+                data-tooltip="For applications that required repairs to be built, this displays the distribution of how many repair attempts were required."
+                >info</span
+              >
+              @if (averageRepairAttempts() !== null) {
+                <span class="chart-title-right-label"
+                  >Avg: {{ averageRepairAttempts() | number: '1.2-2' }}</span
+                >
+                <span
+                  class="material-symbols-outlined has-tooltip multiline-tooltip chart-title-tooltip-icon"
+                  data-tooltip="Average repair count among applications that were successfully built after repairs."
+                  >info</span
+                >
+              }
+            </h3>
+            <div class="summary-card-item">
+              <stacked-bar-chart [data]="repairAttemptsAsGraphData()" [compact]="true" />
+            </div>
+          </div>
+        }
         @if (overview.stats.tests) {
           <div class="chart-container test-results-details">
             <h3 class="chart-title">
