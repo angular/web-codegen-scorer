@@ -38,6 +38,17 @@
   --status-text-poor: #eb1515;
   --status-text-neutral: #64748b;
 
+  /* 10-step Green-to-Red Quality Gradient */
+  --chart-grade-1: #10b981; /* Emerald 500 (Excellent) */
+  --chart-grade-2: #22c55e; /* Green 500 */
+  --chart-grade-3: #4ade80; /* Green 400 */
+  --chart-grade-4: #84cc16; /* Lime 500 (Great) */
+  --chart-grade-5: #a3e635; /* Lime 400 */
+  --chart-grade-6: #facc15; /* Yellow 400 */
+  --chart-grade-7: #f59e0b; /* Amber 500 (Good) */
+  --chart-grade-8: #f97316; /* Orange 500 */
+  --chart-grade-9: #ef4444; /* Red 500 (Poor) */
+
   --tooltip-background-color: light-dark(#111827, #f1f4f9);
   --tooltip-text-color: light-dark(#f9fafb, #1e293b);
 
