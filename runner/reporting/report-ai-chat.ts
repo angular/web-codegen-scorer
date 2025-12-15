@@ -87,7 +87,7 @@ ${serializeReportForPrompt(assessmentsToProcess, contextFilters)}
       includeThoughts: false,
     },
     timeout: {
-      description: `Generating summary for report`,
+      description: `Chatting with AI`,
       durationInMins: 3,
     },
     abortSignal,

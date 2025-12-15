@@ -251,6 +251,18 @@
       </expansion-panel>
     }
 
+    @if (report.details.summary.additionalAiAnalysis !== undefined) {
+      @for (item of report.details.summary.additionalAiAnalysis; track item) {
+        <expansion-panel size="large" class="root-section">
+          <expansion-panel-header>
+            <img src="gemini.webp" alt="Gemini Logo" height="30" width="30" />
+            {{item.name}}
+          </expansion-panel-header>
+          <div [innerHTML]="item.summary"></div>
+        </expansion-panel>
+      }
+    }
+
     @if (missingDeps().length > 0) {
       <expansion-panel size="large" class="root-section">
         <expansion-panel-header>
