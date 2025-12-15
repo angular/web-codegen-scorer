@@ -1,6 +1,7 @@
 import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 import {Environment} from '../configuration/environment.js';
 import {redX} from '../reporting/format.js';
+import {chatWithReportAI} from '../reporting/report-ai-chat.js';
 import {summarizeReportWithAI} from '../reporting/report-ai-summary.js';
 import {AssessmentResult, CompletionStats, RunSummary} from '../shared-interfaces.js';
 
@@ -43,7 +44,7 @@ export async function prepareSummary(
 
   let aiSummary: string | undefined = undefined;
   if (generateAiSummaryLlm) {
-    console.log(`✨ Generating AI summary for evaluation run..`);
+    console.log(`✨ Generating AI summary for evaluation run...`);
     try {
       const result = await summarizeReportWithAI(generateAiSummaryLlm, abortSignal, assessments);
       inputTokens += result.usage.inputTokens;
@@ -59,6 +60,42 @@ export async function prepareSummary(
         console.error((e as Error).stack);
       }
     }
+  }
+
+  const additionalAiAnalysis: {name: string; summary: string}[] = [];
+  if (generateAiSummaryLlm && env.analysisPrompts.length > 0) {
+    console.log(`✨ Generating additional AI analysis...`);
+
+    await Promise.all(
+      env.analysisPrompts.map(async config => {
+        try {
+          const result = await chatWithReportAI(
+            generateAiSummaryLlm,
+            config.prompt,
+            abortSignal,
+            assessments,
+            [],
+            model,
+            {
+              reportContextFilter: config.reportsFilter,
+              ratingContextFilter: config.ratingsFilter,
+            },
+            undefined,
+          );
+          inputTokens += result.usage.inputTokens;
+          outputTokens += result.usage.outputTokens;
+          thinkingTokens += result.usage.thinkingTokens;
+          totalTokens += result.usage.totalTokens;
+          additionalAiAnalysis.push({name: config.name, summary: result.responseHtml});
+        } catch (e) {
+          console.log(`${redX()} Failed custom analysis called "${config.name}".`);
+
+          if (process.env.DEBUG === '1' && (e as Partial<Error>).stack) {
+            console.error((e as Error).stack);
+          }
+        }
+      }),
+    );
   }
 
   const executorInfo = await env.executor.getExecutorInfo?.();
@@ -78,6 +115,7 @@ export async function prepareSummary(
       },
     },
     aiSummary,
+    additionalAiAnalysis,
     completionStats: completionStats,
     usage: {
       inputTokens,

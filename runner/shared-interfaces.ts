@@ -437,6 +437,8 @@ export interface RunSummary {
   completionStats?: CompletionStats;
   /** AI summary (as HTML code) of all assessments in this run/report. */
   aiSummary?: string;
+  /** Additional user-defined AI analysis. */
+  additionalAiAnalysis?: {name: string; summary: string}[];
   /**
    * Information about the runner that was used for the eval.
    * Optional since some older reports might not have it.

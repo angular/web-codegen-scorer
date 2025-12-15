@@ -7,6 +7,8 @@ import {
   FrameworkInfo,
   MultiStepPromptDefinition,
   PromptDefinition,
+  RatingContextFilter,
+  ReportContextFilter,
   RootPromptDefinition,
 } from '../shared-interfaces.js';
 import {UserFacingError} from '../utils/errors.js';
@@ -20,6 +22,13 @@ import {getSha256Hash} from '../utils/hashing.js';
 interface CategoryConfig {
   name: string;
   maxPoints: number;
+}
+
+interface AnalysisPrompt {
+  name: string;
+  prompt: string;
+  reportsFilter: ReportContextFilter;
+  ratingsFilter: RatingContextFilter;
 }
 
 /** Represents a single prompt evaluation environment. */
@@ -56,6 +65,9 @@ export class Environment {
    */
   readonly ratingHash: string;
 
+  /** Additional analysis prompts defined by the user. */
+  readonly analysisPrompts: AnalysisPrompt[];
+
   /** Ratings configured at the environment level. */
   private readonly ratings: Rating[];
 
@@ -88,6 +100,7 @@ export class Environment {
     this.ratingCategories = this.getRatingCategories(config);
     this.ratings = this.resolveRatings(config);
     this.ratingHash = this.getRatingHash(this.ratings, this.ratingCategories);
+    this.analysisPrompts = this.resolveAnalysisPrompts(config);
     this.validateRatingHash(this.ratingHash, config);
   }
 
@@ -262,7 +275,7 @@ export class Environment {
     isEditing: boolean,
     metadata: Metadata,
   ): Promise<PromptDefinition<Metadata>> {
-    const {result, contextFiles} = await this.renderEnvironmentPrompt(relativePath);
+    const {result, contextFiles} = this.renderEnvironmentPrompt(relativePath);
 
     return {
       name: name,
@@ -360,13 +373,13 @@ export class Environment {
   }
 
   /** Renders a prompt from a path relative to the environment config. */
-  private async renderEnvironmentPrompt(relativePath: string) {
+  private renderEnvironmentPrompt(relativePath: string) {
     const path = resolve(this.rootPath, relativePath);
     return this.renderPrompt(readFileSync(path, 'utf8'), path);
   }
 
   private async renderSystemPrompt(relativePath: string) {
-    const result = await this.renderEnvironmentPrompt(relativePath);
+    const result = this.renderEnvironmentPrompt(relativePath);
 
     // Optional hooks for post processing environment system prompts. Useful for e.g.
     // supporting `@` references from Gemini CLI or inside g3.
@@ -445,5 +458,22 @@ export class Environment {
         ].join('\n'),
       );
     }
+  }
+
+  private resolveAnalysisPrompts(config: EnvironmentConfig): AnalysisPrompt[] {
+    const result: AnalysisPrompt[] = [];
+
+    config.analysisPrompts?.forEach(({name, path, reportsFilter, ratingsFilter}) => {
+      const prompt = this.renderEnvironmentPrompt(path).result;
+
+      result.push({
+        name,
+        prompt,
+        reportsFilter: reportsFilter ?? ReportContextFilter.NonPerfectReports,
+        ratingsFilter: ratingsFilter ?? RatingContextFilter.NonPerfectRatings,
+      });
+    });
+
+    return result;
   }
 }

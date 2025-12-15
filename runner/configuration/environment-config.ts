@@ -8,6 +8,7 @@ import {
   LocalExecutorConfig,
   localExecutorConfigSchema,
 } from '../orchestration/executors/local-executor-config.js';
+import {RatingContextFilter, ReportContextFilter} from '../shared-interfaces.js';
 
 export const environmentConfigSchema = z.object({
   /** Display name for the environment. */
@@ -98,6 +99,24 @@ export const environmentConfigSchema = z.object({
    * It's useful to ensure that the set of ratings hasn't changed between two runs.
    */
   expectedRatingHash: z.string().optional(),
+
+  /**
+   * Prompts to use when for additional analysis of the eval results.
+   */
+  analysisPrompts: z
+    .array(
+      z.object({
+        name: z.string(),
+        path: z.string(),
+        reportsFilter: z
+          .enum([ReportContextFilter.AllReports, ReportContextFilter.NonPerfectReports])
+          .optional(),
+        ratingsFilter: z
+          .enum([RatingContextFilter.AllRatings, RatingContextFilter.NonPerfectRatings])
+          .optional(),
+      }),
+    )
+    .optional(),
 });
 
 /**
