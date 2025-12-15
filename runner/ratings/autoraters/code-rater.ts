@@ -2,13 +2,14 @@ import {readFileSync} from 'node:fs';
 import {z} from 'zod';
 import {prepareContextFilesMessage} from '../../orchestration/codegen.js';
 import {Environment} from '../../configuration/environment.js';
+import {IndividualAssessmentState, LlmResponseFile, Usage} from '../../shared-interfaces.js';
 import {
-  IndividualAssessment,
-  IndividualAssessmentState,
-  LlmResponseFile,
-  SkippedIndividualAssessment,
-} from '../../shared-interfaces.js';
-import {AutoRateResult, getCoefficient, MAX_RATING} from './auto-rate-shared.js';
+  AutoRateResult,
+  ExecutorAutoRateResponse,
+  getCoefficient,
+  MAX_RATING,
+  MIN_RATING,
+} from './auto-rate-shared.js';
 import {GenkitRunner} from '../../codegen/genkit/genkit-runner.js';
 import defaultCodeRaterPrompt from './code-rating-prompt.js';
 import {RatingsResult} from '../rating-types.js';
@@ -46,13 +47,7 @@ export async function autoRateCode(
   appPrompt: string,
   ratingsResult: RatingsResult,
 ): Promise<AutoRateResult> {
-  const contextMessage = prepareContextFilesMessage(
-    files.map(o => ({
-      relativePath: o.filePath,
-      content: o.code,
-    })),
-  );
-
+  const contextFiles = files.map(o => ({relativePath: o.filePath, content: o.code}));
   let promptText: string;
 
   if (environment.codeRatingPromptPath) {
@@ -80,32 +75,56 @@ export async function autoRateCode(
     SAFETY_WEB_RESULTS_JSON: safetyWebResultsJson,
   }).result;
 
-  const result = await llm.generateConstrained({
-    abortSignal,
-    messages: contextMessage ? [contextMessage] : [],
-    model,
-    prompt,
-    skipMcp: true,
-    schema: z.object({
-      rating: z.number().describe(`Rating from 1-${MAX_RATING}. Best is ${MAX_RATING}.`),
-      summary: z.string().describe('Summary of the overall code quality.'),
-      categories: z.array(
-        z.object({
-          name: z.string().describe('Category name'),
-          message: z.string().describe('Short description of the problem.'),
-        }),
-      ),
-    }),
-  });
+  let output: ExecutorAutoRateResponse;
+  let usage: Usage | null;
+
+  if (environment.executor.autoRateCode) {
+    output = await environment.executor.autoRateCode(
+      {
+        ratingPrompt: prompt,
+        files: contextFiles,
+        minRating: MIN_RATING,
+        maxRating: MAX_RATING,
+      },
+      abortSignal,
+    );
+    usage = output.usage || null;
+  } else {
+    // TODO(crisbeto): move this into the local executor once
+    // `Executor.autoRateVisuals` becomes a required method.
+    const contextMessage = prepareContextFilesMessage(contextFiles);
+    const result = await llm.generateConstrained({
+      abortSignal,
+      messages: contextMessage ? [contextMessage] : [],
+      model,
+      prompt,
+      skipMcp: true,
+      schema: z.object({
+        rating: z
+          .number()
+          .describe(`Rating from ${MIN_RATING}-${MAX_RATING}. Best is ${MAX_RATING}.`),
+        summary: z.string().describe('Summary of the overall code quality.'),
+        categories: z.array(
+          z.object({
+            name: z.string().describe('Category name'),
+            message: z.string().describe('Short description of the problem.'),
+          }),
+        ),
+      }),
+    });
+
+    output = result.output!;
+    usage = result.usage || null;
+  }
 
   return {
-    coefficient: getCoefficient(result.output!.rating),
+    coefficient: getCoefficient(output.rating, MAX_RATING),
     usage: {
-      inputTokens: result.usage?.inputTokens ?? 0,
-      outputTokens: result.usage?.outputTokens ?? 0,
-      totalTokens: result.usage?.totalTokens ?? 0,
-      thinkingTokens: result.usage?.thinkingTokens ?? 0,
+      inputTokens: usage?.inputTokens ?? 0,
+      outputTokens: usage?.outputTokens ?? 0,
+      totalTokens: usage?.totalTokens ?? 0,
+      thinkingTokens: usage?.thinkingTokens ?? 0,
     },
-    details: result.output!,
+    details: output,
   };
 }

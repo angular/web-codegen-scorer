@@ -1,6 +1,7 @@
 import PQueue from 'p-queue';
-import {ProgressLogger} from '../../progress/progress-logger.js';
-import {
+import z from 'zod';
+import type {ProgressLogger} from '../../progress/progress-logger.js';
+import type {
   LlmContextFile,
   LlmGenerateFilesRequest,
   LlmResponse,
@@ -8,9 +9,13 @@ import {
   RootPromptDefinition,
   TestExecutionResult,
 } from '../../shared-interfaces.js';
-import {BuildResult} from '../../workers/builder/builder-types.js';
-import z from 'zod';
-import {ServeTestingResult} from '../../workers/serve-testing/worker-types.js';
+import type {BuildResult} from '../../workers/builder/builder-types.js';
+import type {ServeTestingResult} from '../../workers/serve-testing/worker-types.js';
+import type {
+  ExecutorAutoRateResponse,
+  ExecutorCodeAutoRateRequest,
+  ExecutorVisualAutoRateRequest,
+} from '../../ratings/autoraters/auto-rate-shared.js';
 
 export type EvalID = string & {__evalID: true};
 
@@ -124,6 +129,28 @@ export const executorSchema = z.object({
       }),
     ),
   ),
+  autoRateCode: z
+    .function(
+      z.tuple([
+        z.custom<ExecutorCodeAutoRateRequest>().describe('Context for the automated code rating'),
+        z
+          .custom<AbortSignal>()
+          .describe('Abort Signal to fire when the request should be canceled.'),
+      ]),
+      z.promise(z.custom<ExecutorAutoRateResponse>()),
+    )
+    .optional(),
+  autoRateVisuals: z
+    .function(
+      z.tuple([
+        z.custom<ExecutorVisualAutoRateRequest>().describe('Context for the automated code rating'),
+        z
+          .custom<AbortSignal>()
+          .describe('Abort Signal to fire when the request should be canceled.'),
+      ]),
+      z.promise(z.custom<ExecutorAutoRateResponse>()),
+    )
+    .optional(),
 });
 
 export type Executor = z.infer<typeof executorSchema>;
