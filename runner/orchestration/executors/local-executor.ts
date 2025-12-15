@@ -1,5 +1,5 @@
 import {ChildProcess, fork} from 'node:child_process';
-import path, {join} from 'node:path';
+import path from 'node:path';
 import PQueue from 'p-queue';
 import {LlmRunner, McpServerDetails} from '../../codegen/llm-runner.js';
 import {getRunnerByName, RunnerName} from '../../codegen/runner-creation.js';
