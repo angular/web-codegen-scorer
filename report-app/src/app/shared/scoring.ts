@@ -8,6 +8,12 @@ export enum ScoreCssVariable {
   good = 'var(--status-fill-good)',
   poor = 'var(--status-fill-poor)',
   neutral = 'var(--status-fill-neutral)',
+  // When we need more refined gradiant between "good" and "poor".
+  mediocre1 = 'var(--status-fill-mediocre-1)',
+  mediocre2 = 'var(--status-fill-mediocre-2)',
+  mediocre3 = 'var(--status-fill-mediocre-3)',
+  mediocre4 = 'var(--status-fill-mediocre-4)',
+  mediocre5 = 'var(--status-fill-mediocre-5)',
 }
 
 const CACHED_COLORS = {
