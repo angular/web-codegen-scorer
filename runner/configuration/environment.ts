@@ -18,6 +18,7 @@ import {EnvironmentConfig} from './environment-config.js';
 import {EvalPromptWithMetadata, MultiStepPrompt} from './prompts.js';
 import {renderPromptTemplate} from './prompt-templating.js';
 import {getSha256Hash} from '../utils/hashing.js';
+import {DEFAULT_SUMMARY_MODEL} from './constants.js';
 
 interface CategoryConfig {
   name: string;
@@ -27,6 +28,7 @@ interface CategoryConfig {
 interface AnalysisPrompt {
   name: string;
   prompt: string;
+  model: string;
   reportsFilter: ReportContextFilter;
   ratingsFilter: RatingContextFilter;
 }
@@ -463,12 +465,13 @@ export class Environment {
   private resolveAnalysisPrompts(config: EnvironmentConfig): AnalysisPrompt[] {
     const result: AnalysisPrompt[] = [];
 
-    config.analysisPrompts?.forEach(({name, path, reportsFilter, ratingsFilter}) => {
+    config.analysisPrompts?.forEach(({name, path, model, reportsFilter, ratingsFilter}) => {
       const prompt = this.renderEnvironmentPrompt(path).result;
 
       result.push({
         name,
         prompt,
+        model: model || DEFAULT_SUMMARY_MODEL,
         reportsFilter: reportsFilter ?? ReportContextFilter.NonPerfectReports,
         ratingsFilter: ratingsFilter ?? RatingContextFilter.NonPerfectRatings,
       });

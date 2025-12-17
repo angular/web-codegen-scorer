@@ -12,7 +12,7 @@ import {AssessmentResult, CompletionStats, RunSummary} from '../shared-interface
 export async function prepareSummary(
   generateAiSummaryLlm: GenkitRunner | null,
   abortSignal: AbortSignal,
-  model: string,
+  evalRunModel: string,
   env: Environment,
   assessments: AssessmentResult[],
   completionStats: CompletionStats,
@@ -75,7 +75,7 @@ export async function prepareSummary(
             abortSignal,
             assessments,
             [],
-            model,
+            config.model,
             {
               reportContextFilter: config.reportsFilter,
               ratingContextFilter: config.ratingsFilter,
@@ -101,7 +101,7 @@ export async function prepareSummary(
   const executorInfo = await env.executor.getExecutorInfo?.();
 
   return {
-    model,
+    model: evalRunModel,
     environmentId: env.id,
     displayName: env.displayName,
     framework: {

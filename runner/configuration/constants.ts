@@ -17,6 +17,9 @@ export const DEFAULT_MODEL_NAME = 'gemini-2.5-pro'; // slower than `flash`, but 
  */
 export const DEFAULT_AUTORATER_MODEL_NAME = 'gemini-2.5-flash'; // use less expensive model
 
+/** Model used for AI summarization by default. */
+export const DEFAULT_SUMMARY_MODEL = 'gemini-2.5-flash-lite';
+
 /** Name of the root folder where we store LLM-generated code for debugging */
 export const LLM_OUTPUT_DIR = join(rootDir, 'llm-output');
 
