@@ -1,4 +1,5 @@
 import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
+import {DEFAULT_SUMMARY_MODEL} from '../configuration/constants.js';
 import {AssessmentResult, ReportContextFilter, RatingContextFilter} from '../shared-interfaces.js';
 import {chatWithReportAI} from './report-ai-chat.js';
 
@@ -7,7 +8,7 @@ export async function summarizeReportWithAI(
   abortSignal: AbortSignal,
   assessments: AssessmentResult[],
 ) {
-  const model = 'gemini-2.5-flash-lite';
+  const model = DEFAULT_SUMMARY_MODEL;
 
   if (!llm.getSupportedModels().includes(model)) {
     throw new Error(`Unable to generate AI summary due to unsupported model: ${model}`);

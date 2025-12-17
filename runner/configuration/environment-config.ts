@@ -108,6 +108,7 @@ export const environmentConfigSchema = z.object({
       z.object({
         name: z.string(),
         path: z.string(),
+        model: z.string().optional(),
         reportsFilter: z
           .enum([ReportContextFilter.AllReports, ReportContextFilter.NonPerfectReports])
           .optional(),
