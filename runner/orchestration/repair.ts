@@ -126,7 +126,7 @@ async function handleRepairResponse(
   const newAttemptFiles = previousAttemptFiles.map(f => ({...f}));
 
   mergeRepairFiles(repairResponse.outputFiles, newAttemptFiles);
-  writeResponseFiles(directory, newAttemptFiles, env, rootPromptDef.name);
+  await writeResponseFiles(directory, newAttemptFiles, env, rootPromptDef.name);
 
   const buildResult = await runBuild(
     evalID,

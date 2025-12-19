@@ -5,6 +5,7 @@ import {Executor} from '../orchestration/executors/executor.js';
 import {Rating, RatingCategory} from '../ratings/rating-types.js';
 import {
   FrameworkInfo,
+  LlmResponseFile,
   MultiStepPromptDefinition,
   PromptDefinition,
   RatingContextFilter,
@@ -83,6 +84,9 @@ export class Environment {
   /** Runner that user can use to access an LLM to augment prompts. */
   private augmentationRunner: GenkitRunner | null = null;
 
+  /** User-provided callback for augmenting the LLM-generated files. */
+  private readonly augmentFileCallback: ((file: LlmResponseFile) => string) | null;
+
   constructor(
     rootPath: string,
     private readonly config: EnvironmentConfig & Required<Pick<EnvironmentConfig, 'executor'>>,
@@ -114,6 +118,7 @@ export class Environment {
     this.ratingHash = this.getRatingHash(this.ratings, this.ratingCategories);
     this.analysisPrompts = this.resolveAnalysisPrompts(config);
     this.augmentExecutablePrompt = config.augmentExecutablePrompt || null;
+    this.augmentFileCallback = config.augmentGeneratedFile || null;
     this.validateRatingHash(this.ratingHash, config);
   }
 
@@ -189,6 +194,13 @@ export class Environment {
       CLIENT_SIDE_FRAMEWORK_NAME: this.clientSideFramework.displayName,
       ...additionalContext,
     });
+  }
+
+  /** Augments response files based on the user's configuration. */
+  augmentResponseFiles(files: LlmResponseFile[]): void {
+    if (this.augmentFileCallback) {
+      files.forEach(file => (file.code = this.augmentFileCallback!(file)));
+    }
   }
 
   async destroy(): Promise<void> {
