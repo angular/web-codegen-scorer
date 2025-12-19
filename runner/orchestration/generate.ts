@@ -48,14 +48,22 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
   const cleanup = async () => {
     // Clean-up should never interrupt a potentially passing completion.
     try {
-      await env.executor.destroy();
-      for (const cleanupFn of extraCleanupFns) {
-        await cleanupFn();
-      }
+      await env.destroy();
     } catch (e) {
-      console.error(`Failed to destroy executor: ${e}`);
+      console.error(`Failed to destroy environment: ${e}`);
       if (e instanceof Error) {
         console.error(e.stack);
+      }
+    }
+
+    for (const cleanupFn of extraCleanupFns) {
+      try {
+        await cleanupFn();
+      } catch (e) {
+        console.error(`Failed cleanup: ${e}`);
+        if (e instanceof Error) {
+          console.error(e.stack);
+        }
       }
     }
   };

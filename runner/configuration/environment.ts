@@ -14,11 +14,13 @@ import {
 import {UserFacingError} from '../utils/errors.js';
 import {generateId} from '../utils/id-generation.js';
 import {lazy} from '../utils/lazy-creation.js';
-import {EnvironmentConfig} from './environment-config.js';
+import {EnvironmentConfig, PromptAugmentationContext} from './environment-config.js';
 import {EvalPromptWithMetadata, MultiStepPrompt} from './prompts.js';
 import {renderPromptTemplate} from './prompt-templating.js';
 import {getSha256Hash} from '../utils/hashing.js';
 import {DEFAULT_SUMMARY_MODEL} from './constants.js';
+import type {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
+import {getRunnerByName} from '../codegen/runner-creation.js';
 
 interface CategoryConfig {
   name: string;
@@ -73,6 +75,14 @@ export class Environment {
   /** Ratings configured at the environment level. */
   private readonly ratings: Rating[];
 
+  /** User-configured function used to augment prompts. */
+  private readonly augmentExecutablePrompt:
+    | ((context: PromptAugmentationContext) => Promise<string>)
+    | null;
+
+  /** Runner that user can use to access an LLM to augment prompts. */
+  private augmentationRunner: GenkitRunner | null = null;
+
   constructor(
     rootPath: string,
     private readonly config: EnvironmentConfig & Required<Pick<EnvironmentConfig, 'executor'>>,
@@ -103,26 +113,27 @@ export class Environment {
     this.ratings = this.resolveRatings(config);
     this.ratingHash = this.getRatingHash(this.ratings, this.ratingCategories);
     this.analysisPrompts = this.resolveAnalysisPrompts(config);
+    this.augmentExecutablePrompt = config.augmentExecutablePrompt || null;
     this.validateRatingHash(this.ratingHash, config);
   }
 
   /** Prompts that should be executed as a part of the evaluation. */
-  executablePrompts = lazy(async () => {
+  readonly executablePrompts = lazy(async () => {
     return this.resolveExecutablePrompts(this.config.executablePrompts);
   });
 
-  systemPromptGeneration = lazy(async () => {
+  readonly systemPromptGeneration = lazy(async () => {
     return (await this.renderSystemPrompt(this.config.generationSystemPrompt)).result;
   });
 
-  systemPromptRepair = lazy(async () => {
+  readonly systemPromptRepair = lazy(async () => {
     if (!this.config.repairSystemPrompt) {
       return 'Please fix the given errors and return the corrected code.';
     }
     return (await this.renderSystemPrompt(this.config.repairSystemPrompt)).result;
   });
 
-  systemPromptEditing = lazy(async () => {
+  readonly systemPromptEditing = lazy(async () => {
     if (!this.config.editingSystemPrompt) {
       return this.systemPromptGeneration();
     }
@@ -180,6 +191,14 @@ export class Environment {
     });
   }
 
+  async destroy(): Promise<void> {
+    await this.executor.destroy();
+
+    if (this.augmentationRunner) {
+      await this.augmentationRunner.dispose();
+    }
+  }
+
   /**
    * Gets the readable display name of a framework, based on its ID.
    * @param id ID to be resolved.
@@ -209,16 +228,16 @@ export class Environment {
    * @param config Configuration for the environment.
    */
   private async resolveExecutablePrompts(
-    prompts: EnvironmentConfig['executablePrompts'],
+    definitions: EnvironmentConfig['executablePrompts'],
   ): Promise<RootPromptDefinition[]> {
-    const result: Promise<RootPromptDefinition>[] = [];
+    const promptPromises: Promise<RootPromptDefinition>[] = [];
     const envRatings = this.ratings;
 
-    for (const def of prompts) {
+    for (const def of definitions) {
       if (def instanceof MultiStepPrompt) {
-        result.push(this.getMultiStepPrompt(def, envRatings));
+        promptPromises.push(this.getMultiStepPrompt(def, envRatings));
       } else if (def instanceof EvalPromptWithMetadata) {
-        result.push(
+        promptPromises.push(
           Promise.resolve({
             name: def.name,
             kind: 'single',
@@ -243,10 +262,10 @@ export class Environment {
           name = def.name;
         }
 
-        result.push(
+        promptPromises.push(
           ...globSync(path, {cwd: this.rootPath}).map(
             async relativePath =>
-              await this.getStepPromptDefinition(
+              await this.getSinglePromptDefinition(
                 name ?? basename(relativePath, extname(relativePath)),
                 relativePath,
                 ratings,
@@ -258,11 +277,39 @@ export class Environment {
       }
     }
 
-    return Promise.all(result);
+    const prompts = await Promise.all(promptPromises);
+
+    if (this.augmentExecutablePrompt) {
+      const augmentationPromises: Promise<unknown>[] = [];
+      const updatePrompt = (promptDef: PromptDefinition) => {
+        augmentationPromises.push(
+          this.augmentExecutablePrompt!({
+            promptDef,
+            environment: this,
+            runner: this.augmentationRunner!,
+          }).then(text => (promptDef.prompt = text)),
+        );
+      };
+      this.augmentationRunner ??= await getRunnerByName('genkit');
+
+      for (const rootPrompt of prompts) {
+        if (rootPrompt.kind === 'multi-step') {
+          for (const promptDef of rootPrompt.steps) {
+            updatePrompt(promptDef);
+          }
+        } else {
+          updatePrompt(rootPrompt);
+        }
+      }
+
+      await Promise.all(augmentationPromises);
+    }
+
+    return prompts;
   }
 
   /**
-   * Creates a prompt definition for a given step.
+   * Creates a prompt definition for a single prompt.
    *
    * @param name Name of the prompt.
    * @param rootPath Root path of the project.
@@ -270,7 +317,7 @@ export class Environment {
    * @param ratings Ratings to run against the definition.
    * @param isEditing Whether this is an editing or generation step.
    */
-  private async getStepPromptDefinition<Metadata>(
+  private async getSinglePromptDefinition<Metadata>(
     name: string,
     relativePath: string,
     ratings: Rating[],
@@ -345,11 +392,11 @@ export class Environment {
       if (stepNum === 0) {
         throw new UserFacingError('Multi-step prompts start with `step-1`.');
       }
-      const step = await this.getStepPromptDefinition(
+      const step = await this.getSinglePromptDefinition(
         `${name}-step-${stepNum}`,
         join(def.directoryPath, current.name),
         ratings,
-        /*isEditing */ stepNum !== 1,
+        /* isEditing */ stepNum !== 1,
         stepMetadata,
       );
 
