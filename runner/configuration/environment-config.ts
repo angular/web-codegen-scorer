@@ -8,7 +8,12 @@ import {
   LocalExecutorConfig,
   localExecutorConfigSchema,
 } from '../orchestration/executors/local-executor-config.js';
-import {PromptDefinition, RatingContextFilter, ReportContextFilter} from '../shared-interfaces.js';
+import {
+  LlmResponseFile,
+  PromptDefinition,
+  RatingContextFilter,
+  ReportContextFilter,
+} from '../shared-interfaces.js';
 import type {Environment} from './environment.js';
 import type {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 
@@ -126,6 +131,13 @@ export const environmentConfigSchema = z.object({
    */
   augmentExecutablePrompt: z
     .function(z.tuple([z.custom<PromptAugmentationContext>()]), z.promise(z.string()))
+    .optional(),
+
+  /**
+   * Function that can be used to augment generated files before they're evaluated.
+   */
+  augmentGeneratedFile: z
+    .function(z.tuple([z.custom<Readonly<LlmResponseFile>>()]), z.string())
     .optional(),
 });
 

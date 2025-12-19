@@ -129,6 +129,7 @@ export async function repairCodeWithAI(
   );
 
   if (response.success) {
+    env.augmentResponseFiles(response.outputFiles);
     progress.log(
       promptDef,
       'codegen',

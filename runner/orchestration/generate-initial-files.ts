@@ -75,6 +75,7 @@ export async function generateInitialFiles(
   );
 
   if (response.success) {
+    env.augmentResponseFiles(response.outputFiles);
     progress.log(
       promptDef,
       'codegen',
@@ -90,7 +91,7 @@ export async function generateInitialFiles(
   }
 
   return {
-    files: response.outputFiles!,
+    files: response.outputFiles,
     usage: response.usage,
     reasoning: response.reasoning,
     toolLogs: response.toolLogs,
