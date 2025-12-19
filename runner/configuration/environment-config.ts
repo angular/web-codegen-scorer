@@ -8,7 +8,9 @@ import {
   LocalExecutorConfig,
   localExecutorConfigSchema,
 } from '../orchestration/executors/local-executor-config.js';
-import {RatingContextFilter, ReportContextFilter} from '../shared-interfaces.js';
+import {PromptDefinition, RatingContextFilter, ReportContextFilter} from '../shared-interfaces.js';
+import type {Environment} from './environment.js';
+import type {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 
 export const environmentConfigSchema = z.object({
   /** Display name for the environment. */
@@ -118,6 +120,13 @@ export const environmentConfigSchema = z.object({
       }),
     )
     .optional(),
+
+  /**
+   * Function that can be used to augment prompts before they're evaluated.
+   */
+  augmentExecutablePrompt: z
+    .function(z.tuple([z.custom<PromptAugmentationContext>()]), z.promise(z.string()))
+    .optional(),
 });
 
 /**
@@ -126,6 +135,16 @@ export const environmentConfigSchema = z.object({
  */
 export type EnvironmentConfig = z.infer<typeof environmentConfigSchema> &
   Partial<LocalExecutorConfig>;
+
+/** Context passed to the `augmentExecutablePrompt` function. */
+export interface PromptAugmentationContext {
+  /** Definition being augmented. */
+  promptDef: PromptDefinition;
+  /** Environment running the evaluation. */
+  environment: Environment;
+  /** Runner that the user can use for augmentation. */
+  runner: GenkitRunner;
+}
 
 /** Asserts that the specified data is a valid environment config. */
 export function assertIsEnvironmentConfig(value: unknown): asserts value is EnvironmentConfig {
