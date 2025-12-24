@@ -54,7 +54,7 @@
     "@ai-sdk/anthropic": "^2.0.50",
     "@ai-sdk/google": "^2.0.39",
     "@ai-sdk/openai": "^2.0.71",
-    "@ai-sdk/provider": "^2.0.0",
+    "@ai-sdk/provider": "^3.0.0",
     "@anthropic-ai/sdk": "^0.68.0",
     "@axe-core/puppeteer": "^4.10.2",
     "@genkit-ai/compat-oai": "1.23.0",
