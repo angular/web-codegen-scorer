@@ -187,15 +187,17 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
               } catch (e) {
                 progress.log(rootPromptDef, 'error', 'Failed to finalize eval', `${e}`);
               }
-              progress.evalFinished(rootPromptDef, results || []);
             }
           };
 
           // Retries + initial attempt.
           const maxAttempts = (options.promptTimeoutRetries ?? 0) + 1;
+          let promptResults: AssessmentResult[] | null = null;
+
           for (let attemptIdx = 0; attemptIdx < maxAttempts; attemptIdx++) {
             try {
-              return await evaluate();
+              promptResults = await evaluate();
+              break;
             } catch (e: unknown) {
               if (e instanceof TimeoutError && attemptIdx < maxAttempts - 1) {
                 continue;
@@ -213,14 +215,20 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
               }
 
               progress.log(rootPromptDef, 'error', 'Failed to evaluate code', details);
-              return [] satisfies AssessmentResult[];
+              promptResults = [];
+              break;
             }
           }
 
-          throw new Error(
-            `Unexpected code path. ` +
-              `There were ${maxAttempts} attempts for evaluating: ${rootPromptDef.name}`,
-          );
+          if (promptResults === null) {
+            throw new Error(
+              `Unexpected code path. ` +
+                `There were ${maxAttempts} attempts for evaluating: ${rootPromptDef.name}`,
+            );
+          }
+
+          progress.evalFinished(rootPromptDef, promptResults);
+          return promptResults;
         }),
       );
     }
