@@ -21,23 +21,23 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       '@anthropic-ai/sdk':
-        specifier: ^0.68.0
-        version: 0.68.0(zod@3.25.76)
+        specifier: ^0.71.0
+        version: 0.71.2(zod@3.25.76)
       '@axe-core/puppeteer':
         specifier: ^4.10.2
         version: 4.10.2(puppeteer@24.25.0(typescript@5.9.3))
       '@genkit-ai/compat-oai':
-        specifier: 1.23.0
-        version: 1.23.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))(ws@8.18.3)(zod@3.25.76)
+        specifier: 1.27.0
+        version: 1.27.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))(ws@8.18.3)(zod@3.25.76)
       '@genkit-ai/googleai':
-        specifier: 1.22.0
-        version: 1.22.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
+        specifier: 1.27.0
+        version: 1.27.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
       '@genkit-ai/mcp':
-        specifier: 1.22.0
-        version: 1.22.0(@modelcontextprotocol/sdk@1.20.1)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
+        specifier: 1.27.0
+        version: 1.27.0(@modelcontextprotocol/sdk@1.25.2(hono@4.11.3)(zod@3.25.76))(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
       '@google/genai':
-        specifier: 1.29.1
-        version: 1.29.1(@modelcontextprotocol/sdk@1.20.1)
+        specifier: 1.35.0
+        version: 1.35.0(@modelcontextprotocol/sdk@1.25.2(hono@4.11.3)(zod@3.25.76))
       '@inquirer/prompts':
         specifier: ^8.0.0
         version: 8.0.1(@types/node@24.8.1)
@@ -78,8 +78,8 @@ importers:
         specifier: ^1.23.0
         version: 1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))
       genkitx-anthropic:
-        specifier: 0.25.0
-        version: 0.25.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
+        specifier: 0.29.0
+        version: 0.29.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))
       handlebars:
         specifier: ^4.7.8
         version: 4.7.8
@@ -142,11 +142,11 @@ importers:
         specifier: ^2.0.0
         version: 2.0.22
       '@google/gemini-cli':
-        specifier: ^0.13.0
-        version: 0.13.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
+        specifier: ^0.23.0
+        version: 0.23.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(hono@4.11.3)
       '@openai/codex':
-        specifier: ^0.56.0
-        version: 0.56.0
+        specifier: ^0.80.0
+        version: 0.80.0
       prettier:
         specifier: ^3.5.3
         version: 3.6.2
@@ -155,37 +155,37 @@ importers:
     dependencies:
       '@angular/cdk':
         specifier: 21.0.0-next.5
-        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
+        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
       '@angular/common':
         specifier: 21.0.0-next.5
-        version: 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
+        version: 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
       '@angular/compiler':
         specifier: 21.0.0-next.5
         version: 21.0.0-next.5
       '@angular/core':
         specifier: 21.0.0-next.5
-        version: 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)
+        version: 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)
       '@angular/forms':
         specifier: 21.0.0-next.5
-        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)))(@standard-schema/spec@1.0.0)(rxjs@7.8.2)
+        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)))(@standard-schema/spec@1.0.0)(rxjs@7.8.2)
       '@angular/platform-browser':
         specifier: 21.0.0-next.5
-        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))
+        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))
       '@angular/platform-server':
         specifier: 21.0.0-next.5
-        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@21.0.0-next.5)(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
+        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/compiler@21.0.0-next.5)(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
       '@angular/router':
         specifier: 21.0.0-next.5
-        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
+        version: 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
       '@angular/ssr':
         specifier: 21.0.0-next.5
-        version: 21.0.0-next.5(1aac7f9e92aa38fb20a39f46e038b9d3)
+        version: 21.0.0-next.5(105826b3ff40641661a58bb889821856)
       '@shikijs/langs':
-        specifier: 3.15.0
-        version: 3.15.0
+        specifier: 3.21.0
+        version: 3.21.0
       '@shikijs/themes':
-        specifier: 3.15.0
-        version: 3.15.0
+        specifier: 3.21.0
+        version: 3.21.0
       express:
         specifier: ^4.18.2
         version: 4.21.2
@@ -208,12 +208,12 @@ importers:
         specifier: ^2.3.0
         version: 2.8.1
       zone.js:
-        specifier: ~0.15.0
-        version: 0.15.1
+        specifier: ~0.16.0
+        version: 0.16.0
     devDependencies:
       '@angular/build':
         specifier: 21.0.0-next.5
-        version: 21.0.0-next.5(72f1c3879a0ed429fdfc29f509433636)
+        version: 21.0.0-next.5(8cd95beab50bb971ee05fdef84ee5708)
       '@angular/cli':
         specifier: 21.0.0-next.5
         version: 21.0.0-next.5(@types/node@24.8.1)(chokidar@4.0.3)
@@ -230,8 +230,8 @@ importers:
         specifier: ~5.1.0
         version: 5.1.12
       jasmine-core:
-        specifier: ~5.12.0
-        version: 5.12.0
+        specifier: ~5.13.0
+        version: 5.13.0
       karma:
         specifier: ~6.4.0
         version: 6.4.4
@@ -246,7 +246,7 @@ importers:
         version: 5.1.0(karma@6.4.4)
       karma-jasmine-html-reporter:
         specifier: ~2.1.0
-        version: 2.1.0(jasmine-core@5.12.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4)
+        version: 2.1.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4)
       prettier:
         specifier: ^3.5.3
         version: 3.6.2
@@ -255,6 +255,11 @@ importers:
         version: 5.9.3
 
 packages:
+
+  '@agentclientprotocol/sdk@0.11.0':
+    resolution: {integrity: sha512-hngnMwQ13DCC7oEr0BUnrx+vTDFf/ToCLhF0YcCMWRs+v4X60rKQyAENsx0PdbQF21jC1VjMFkh2+vwNBLh6fQ==}
+    peerDependencies:
+      zod: ^3.25.0 || ^4.0.0
 
   '@ai-sdk/anthropic@2.0.50':
     resolution: {integrity: sha512-21PaHfoLmouOXXNINTsZJsMw+wE5oLR2He/1kq/sKokTVKyq7ObGT1LDk6ahwxaz/GoaNaGankMh+EgVcdv2Cw==}
@@ -529,8 +534,8 @@ packages:
   '@anthropic-ai/sdk@0.39.0':
     resolution: {integrity: sha512-eMyDIPRZbt1CCLErRCi3exlAvNkBtRe+kW5vvJyef93PmNr/clstYgHhtvmkxN82nlKgzyGPCyGxrm0JQ1ZIdg==}
 
-  '@anthropic-ai/sdk@0.68.0':
-    resolution: {integrity: sha512-SMYAmbbiprG8k1EjEPMTwaTqssDT7Ae+jxcR5kWXiqTlbwMR2AthXtscEVWOHkRfyAV5+y3PFYTJRNa3OJWIEw==}
+  '@anthropic-ai/sdk@0.71.2':
+    resolution: {integrity: sha512-TGNDEUuEstk/DKu0/TflXAEt+p+p/WhTlFzEnoosvbaDU2LTjm42igSdlL0VijrKpWejtOKxX0b8A7uc+XiSAQ==}
     hasBin: true
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
@@ -1090,10 +1095,10 @@ packages:
   '@genkit-ai/ai@1.23.0':
     resolution: {integrity: sha512-9CuZJYZnnmAtqVcOEDU/bSCJYPELu2oveEoOSECVA6St3bmebID9mL0F51AKGi6YyB1Xz+GLny35PTbqxrhAWw==}
 
-  '@genkit-ai/compat-oai@1.23.0':
-    resolution: {integrity: sha512-zD4472v3p4K228SpxDkuJPdkzs9u+JETVoxFDGj3dxGA9ffvQV3JIq7db6ImSqb0U+pXJniohqJCyJKTndmTvw==}
+  '@genkit-ai/compat-oai@1.27.0':
+    resolution: {integrity: sha512-vZAC/+lgnhSLf5/WqOC1+rm4ajz1N7DDIrnYN5us8ZPTfV/ZKnJQS5qli5851SpFSwRRi7CKgCe9y+7A9mYmHw==}
     peerDependencies:
-      genkit: ^1.23.0
+      genkit: ^1.27.0
 
   '@genkit-ai/core@1.23.0':
     resolution: {integrity: sha512-JG5QPwM49HZmH69ky2DZUevJLEkeIkAo1EdIbYC0E32cH4VZp0Mn1ooA73oTLZm0/D/LrJ2zc5487Eu3gIhs9Q==}
@@ -1114,16 +1119,16 @@ packages:
     peerDependencies:
       genkit: ^1.21.0
 
-  '@genkit-ai/googleai@1.22.0':
-    resolution: {integrity: sha512-6GTfrsv2acRWlXcvi8jqH044tG/eslMQCH1wxpA//wzTnsnht5f4SJ3isKU3gcmyQtoYWiaUN8/F7OYqkIYHcw==}
+  '@genkit-ai/googleai@1.27.0':
+    resolution: {integrity: sha512-oX9QYLGteFZT5Ug3IHZC/TOWlZgJ8LoUuRC4J486iPhs9yPGSrRiIlW4nfrTWhe/nqmzmCyF8JTvHXKhfSkIag==}
     peerDependencies:
-      genkit: ^1.22.0
+      genkit: ^1.27.0
 
-  '@genkit-ai/mcp@1.22.0':
-    resolution: {integrity: sha512-SMq3Ct/pqZvHH+n0W9F7tJXVJwdcivn9RTfTX4gt8h1oTMxrhwEtYt+gnpFHlQ9Hm5FlfPSImIMsBx4sObFp7A==}
+  '@genkit-ai/mcp@1.27.0':
+    resolution: {integrity: sha512-M2UI2z3pC2KTHlA3ZS5HqTSN+YicWw+xXjC3t4t3jA69CGxW6MCpCe2OLl0bM6DqkXhFJdT6zen0ThHadIe8GA==}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.13.0
-      genkit: ^1.22.0
+      genkit: ^1.27.0
 
   '@google-cloud/common@5.0.2':
     resolution: {integrity: sha512-V7bmBKYQyu0eVG2BFejuUjlBt+zrya6vtsKdY+JxMM/dNntPF41vZ9+LhOshEUH01zOHEqBSvI7Dad7ZS6aUeA==}
@@ -1212,29 +1217,29 @@ packages:
     resolution: {integrity: sha512-6xN0KNO8L/LIA5zu3CJwHkJiB6n65eykBLOb0E+RooiHYgX8CSao6lvQiKT9TBk2gL5g33LL3fmhDodZnt56rw==}
     engines: {node: '>=14'}
 
-  '@google/gemini-cli-core@0.13.0':
-    resolution: {integrity: sha512-uBEnrMlNZV0yzUizwEGYmeb2zI1/2DcDxgZYKWtlMDb00cGKjLrSDj0YTr9Upi9LScN50wYcI2XjEFHjSaA64g==}
+  '@google/gemini-cli-core@0.23.0':
+    resolution: {integrity: sha512-46ZOF1LzQqs7e41MKts+P45GgquJfap3c82yqpB6X6XM+/S+QmiYzp0gm8zxtm8Ri7FP6lLFMPH0AmdU7anyww==}
     engines: {node: '>=20'}
 
-  '@google/gemini-cli@0.13.0':
-    resolution: {integrity: sha512-8EA20oJDGIoOAx5aD5iqK8oCEQdd992MIP5MQxfBrNXl25/QTRmEfilpg3sF8eakCvUuyDi55OP/nA5lRKb21w==}
+  '@google/gemini-cli@0.23.0':
+    resolution: {integrity: sha512-2gCo9kTYVEZXhEi0uepBsjLyaq74N28L2c2gHL/VRt9pdpsjp6KGuq+ZjN7IUu7877txCNJpXwGZ5Fs0YLFFpw==}
     engines: {node: '>=20'}
     hasBin: true
 
-  '@google/genai@1.16.0':
-    resolution: {integrity: sha512-hdTYu39QgDFxv+FB6BK2zi4UIJGWhx2iPc0pHQ0C5Q/RCi+m+4gsryIzTGO+riqWcUA8/WGYp6hpqckdOBNysw==}
+  '@google/genai@1.30.0':
+    resolution: {integrity: sha512-3MRcgczBFbUat1wIlZoLJ0vCCfXgm7Qxjh59cZi2X08RgWLtm9hKOspzp7TOg1TV2e26/MLxR2GR5yD5GmBV2w==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@modelcontextprotocol/sdk': ^1.11.4
+      '@modelcontextprotocol/sdk': ^1.20.1
     peerDependenciesMeta:
       '@modelcontextprotocol/sdk':
         optional: true
 
-  '@google/genai@1.29.1':
-    resolution: {integrity: sha512-Buywpq0A6xf9cOdhiWCi5KUiDBbZkjCH5xbl+xxNQRItoYQgd31p0OKyn5cUnT0YNzC/pAmszqXoOc7kncqfFQ==}
+  '@google/genai@1.35.0':
+    resolution: {integrity: sha512-ZC1d0PSM5eS73BpbVIgL3ZsmXeMKLVJurxzww1Z9axy3B2eUB3ioEytbQt4Qu0Od6qPluKrTDew9pSi9kEuPaw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@modelcontextprotocol/sdk': ^1.20.1
+      '@modelcontextprotocol/sdk': ^1.24.0
     peerDependenciesMeta:
       '@modelcontextprotocol/sdk':
         optional: true
@@ -1256,6 +1261,12 @@ packages:
     resolution: {integrity: sha512-rc1hOQtjIWGxcxpb9aHAfLpIctjEnsDehj0DAiVfBlmT84uvR0uUtN2hEi/ecvWVjXUGf5qPF4qEgiLOx1YIMQ==}
     engines: {node: '>=6'}
     hasBin: true
+
+  '@hono/node-server@1.19.8':
+    resolution: {integrity: sha512-0/g2lIOPzX8f3vzW1ggQgvG5mjtFBDBHFAzI5SFAi2DzSqS9luJwqg9T6O/gKYLi+inS7eNxBeIFkkghIPvrMA==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: ^4
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1643,8 +1654,8 @@ packages:
   '@joshua.litt/get-ripgrep@0.0.3':
     resolution: {integrity: sha512-rycdieAKKqXi2bsM7G2ayDiNk5CAX8ZOzsTQsirfOqUKPef04Xw40BWGGyimaOOuvPgLWYt3tPnLLG3TvPXi5Q==}
 
-  '@jrichman/ink@6.4.0':
-    resolution: {integrity: sha512-RXr0+h414DfVRCOo7hLnGS8E83MV8AJ9qGUMR4/uGoqYID865O0p8NJ1+5QcAKzpP6ZotdIll5l9hvzalFYuDQ==}
+  '@jrichman/ink@6.4.6':
+    resolution: {integrity: sha512-QHl6l1cl3zPCaRMzt9TUbTX6Q5SzvkGEZDDad0DmSf5SPmT1/90k6pGPejEvDCJprkitwObXpPaTWGHItqsy4g==}
     engines: {node: '>=20'}
     peerDependencies:
       '@types/react': '>=19.0.0'
@@ -1772,9 +1783,15 @@ packages:
     resolution: {integrity: sha512-d//GE8/Yh7aC3e7p+kZG8JqqEAwwDUmAfvH1quogtbk+ksS6E0RR6toKKESPYYZVre0meqkJb27zb+dhqE9Sgw==}
     engines: {node: '>=18'}
 
-  '@modelcontextprotocol/sdk@1.20.1':
-    resolution: {integrity: sha512-j/P+yuxXfgxb+mW7OEoRCM3G47zCTDqUPivJo/VzpjbG8I9csTXtOprCf5FfOfHK4whOJny0aHuBEON+kS7CCA==}
+  '@modelcontextprotocol/sdk@1.25.2':
+    resolution: {integrity: sha512-LZFeo4F9M5qOhC/Uc1aQSrBHxMrvxett+9KLHt7OhcExtoiRN9DKgbZffMP/nxjutWDQpfMDfP3nkHI4X9ijww==}
     engines: {node: '>=18'}
+    peerDependencies:
+      '@cfworker/json-schema': ^4.1.1
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      '@cfworker/json-schema':
+        optional: true
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
@@ -1975,8 +1992,8 @@ packages:
     resolution: {integrity: sha512-vaQj4nccJbAslopIvd49pQH2NhUp7G9pY4byUtmwhe37ZZuubGrx0eB9hW2F37uVNRuDDK6byFGXF+7JCuMSZg==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  '@openai/codex@0.56.0':
-    resolution: {integrity: sha512-Sm8zBZHzOetnDXELmydZxNzq2bWwLiHGPP2jpnw/Om/Usyk80Zt2+89sf5aWpayu0OtcxBGfjO8MgnvwpJovXg==}
+  '@openai/codex@0.80.0':
+    resolution: {integrity: sha512-U1DWDy7eTjx+SF32Wx9oO6cyX1dd9WiRvIW4XCP3FVcv7Xq7CSCvDrFAdzpFxPNPg6CLz9a4qtO42yntpcJpDw==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -3200,20 +3217,20 @@ packages:
   '@shikijs/langs@3.13.0':
     resolution: {integrity: sha512-672c3WAETDYHwrRP0yLy3W1QYB89Hbpj+pO4KhxK6FzIrDI2FoEXNiNCut6BQmEApYLfuYfpgOZaqbY+E9b8wQ==}
 
-  '@shikijs/langs@3.15.0':
-    resolution: {integrity: sha512-WpRvEFvkVvO65uKYW4Rzxs+IG0gToyM8SARQMtGGsH4GDMNZrr60qdggXrFOsdfOVssG/QQGEl3FnJ3EZ+8w8A==}
+  '@shikijs/langs@3.21.0':
+    resolution: {integrity: sha512-g6mn5m+Y6GBJ4wxmBYqalK9Sp0CFkUqfNzUy2pJglUginz6ZpWbaWjDB4fbQ/8SHzFjYbtU6Ddlp1pc+PPNDVA==}
 
   '@shikijs/themes@3.13.0':
     resolution: {integrity: sha512-Vxw1Nm1/Od8jyA7QuAenaV78BG2nSr3/gCGdBkLpfLscddCkzkL36Q5b67SrLLfvAJTOUzW39x4FHVCFriPVgg==}
 
-  '@shikijs/themes@3.15.0':
-    resolution: {integrity: sha512-8ow2zWb1IDvCKjYb0KiLNrK4offFdkfNVPXb1OZykpLCzRU6j+efkY+Y7VQjNlNFXonSw+4AOdGYtmqykDbRiQ==}
+  '@shikijs/themes@3.21.0':
+    resolution: {integrity: sha512-BAE4cr9EDiZyYzwIHEk7JTBJ9CzlPuM4PchfcA5ao1dWXb25nv6hYsoDiBq2aZK9E3dlt3WB78uI96UESD+8Mw==}
 
   '@shikijs/types@3.13.0':
     resolution: {integrity: sha512-oM9P+NCFri/mmQ8LoFGVfVyemm5Hi27330zuOBp0annwJdKH1kOLndw3zCtAVDehPLg9fKqoEx3Ht/wNZxolfw==}
 
-  '@shikijs/types@3.15.0':
-    resolution: {integrity: sha512-BnP+y/EQnhihgHy4oIAN+6FFtmfTekwOLsQbRw9hOKwqgNy8Bdsjq8B05oAt/ZgvIWWFrshV71ytOrlPfYjIJw==}
+  '@shikijs/types@3.21.0':
+    resolution: {integrity: sha512-zGrWOxZ0/+0ovPY7PvBU2gIS9tmhSUUt30jAcNV0Bq0gb2S98gwfjIs1vxlmH5zM7/4YxLamT6ChlqqAJmPPjA==}
 
   '@shikijs/vscode-textmate@10.0.2':
     resolution: {integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==}
@@ -3888,9 +3905,6 @@ packages:
   character-entities-legacy@3.0.0:
     resolution: {integrity: sha512-RpPp0asT/6ufRm//AJVwpViZbGM/MkjQFxJccQRHmISF/22NBtsHqAWmL+/pmkPWoIUJdWyeVleTl1wydHATVQ==}
 
-  chardet@2.1.0:
-    resolution: {integrity: sha512-bNFETTG/pM5ryzQ9Ad0lJOTa6HWD/YsScAR3EnCPZRPlQh77JocYktSHOUHelyhm8IARL+o4c4F1bP5KVOjiRA==}
-
   chardet@2.1.1:
     resolution: {integrity: sha512-PsezH1rqdV9VvyNhxxOW32/d75r01NY7TQCmOqomRo15ZSOKbpTFVsfjghxo6JloQUCGnH4k1LGu0R4yCLlWQQ==}
 
@@ -3961,6 +3975,10 @@ packages:
   cli-width@4.1.0:
     resolution: {integrity: sha512-ouuZd4/dm2Sw5Gmqy6bGyNNNe1qt9RpmxveLSO7KcgsTnU7RXfsw+/bukWGo1abgBiMAic068rclZsO4IWmmxQ==}
     engines: {node: '>= 12'}
+
+  clipboardy@5.0.2:
+    resolution: {integrity: sha512-3IG8i8Yfb410yqDlCx9Ve3lYLFN3bD1IkrWcowT1kyTo6y4bwYf2guK9Q8a6zck5vWm7afm6Y61i7BG/Ir3FMA==}
+    engines: {node: '>=20'}
 
   cliui@7.0.4:
     resolution: {integrity: sha512-OcRE68cOsVMXp1Yvonl/fzkQOyjLSu/8bhPDfQt0e0/Eb283TKP20Fs2MqoPsr9SwA595rRCA+QMzYc9nBP+JQ==}
@@ -4738,10 +4756,10 @@ packages:
   genkit@1.23.0:
     resolution: {integrity: sha512-8BOpwt40Yqadc6shvfcKk4fTzrtlIV8ntv9Mqx3Yul9BbM4kRXW+h6nYMaPMKT4ZdErzZgnfxU7e6t1lXFFP4A==}
 
-  genkitx-anthropic@0.25.0:
-    resolution: {integrity: sha512-TiI5fA5iXpD2RYqV0+RsS3Y927niL7gSjcNVflNScK74i0mTDMhaHUXaPGEnLTGK5OtS5lWfXnj/Mkqo6n6J3g==}
+  genkitx-anthropic@0.29.0:
+    resolution: {integrity: sha512-Z09P3Wyo4qqpmQ94+y+oklN4TIn3HTkCSsgZK9+fxRrwEgoGHLZgJWprjr7uicGAuuTnOtOSv6tc3+XhjbX7PA==}
     peerDependencies:
-      genkit: ^1.15.0
+      genkit: ^1.19.3
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -4799,6 +4817,11 @@ packages:
 
   glob@11.0.3:
     resolution: {integrity: sha512-2Nim7dha1KVkaiF4q6Dj+ngPPMdfvLJEOpZk/jKiUAkqKebpGAWQXAq9z1xu9HKu5lWfqw/FASuccEjyznjPaA==}
+    engines: {node: 20 || >=22}
+    hasBin: true
+
+  glob@12.0.0:
+    resolution: {integrity: sha512-5Qcll1z7IKgHr5g485ePDdHcNQY0k2dtv/bjYy0iuyGxQw2qSOiiXUXJ+AYQpg3HNoUMHqAruX478Jeev7UULw==}
     engines: {node: 20 || >=22}
     hasBin: true
 
@@ -4917,6 +4940,10 @@ packages:
   highlight.js@11.11.1:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
+
+  hono@4.11.3:
+    resolution: {integrity: sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w==}
+    engines: {node: '>=16.9.0'}
 
   hookified@1.12.2:
     resolution: {integrity: sha512-aokUX1VdTpI0DUsndvW+OiwmBpKCu/NgRsSSkuSY0zq8PY6Q6a+lmOfAFDXAAOtBqJELvcWY9L1EVtzjbQcMdg==}
@@ -5180,6 +5207,10 @@ packages:
     resolution: {integrity: sha512-mE00Gnza5EEB3Ds0HfMyllZzbBrmLOX3vfWoj9A9PEnTfratQ/BcaJOuMhnkhjXvb2+FkY3VuHqtAGpTPmglFQ==}
     engines: {node: '>=18'}
 
+  is-wayland@0.1.0:
+    resolution: {integrity: sha512-QkbMsWkIfkrzOPxenwye0h56iAXirZYHG9eHVPb22fO9y+wPbaX/CHacOWBa/I++4ohTcByimhM1/nyCsH8KNA==}
+    engines: {node: '>=20'}
+
   is-wsl@2.2.0:
     resolution: {integrity: sha512-fKzAra0rGJUUBwGBgNkHZuToZcn+TtXHpeCgmkMJMMYx1sQDYaCSyjJBSCa2nH1DGm7s3n1oBnohoVTBaN7Lww==}
     engines: {node: '>=8'}
@@ -5187,6 +5218,10 @@ packages:
   is-wsl@3.1.0:
     resolution: {integrity: sha512-UcVfVfaK4Sc4m7X3dUSoHoozQGBEFeDC+zVo06t98xe8CzHSZZBekNXH+tu0NalHolcJ/QAGqS46Hef7QXBIMw==}
     engines: {node: '>=16'}
+
+  is64bit@2.0.0:
+    resolution: {integrity: sha512-jv+8jaWCl0g2lSBkNSVXdzfBA0npK1HGC2KtWM9FumFRoGS94g3NbCCLVnCYHLjp4GrW2KZeeSTMo5ddtznmGw==}
+    engines: {node: '>=18'}
 
   isarray@1.0.0:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
@@ -5240,11 +5275,14 @@ packages:
   jasmine-core@4.6.1:
     resolution: {integrity: sha512-VYz/BjjmC3klLJlLwA4Kw8ytk0zDSmbbDLNs794VnWmkcCB7I9aAL/D48VNQtmITyPvea2C3jdUMfc3kAoy0PQ==}
 
-  jasmine-core@5.12.0:
-    resolution: {integrity: sha512-QqO4pX33GEML5JoGQU6BM5NHKPgEsg+TXp3jCIDek9MbfEp2JUYEFBo9EF1+hegWy/bCHS1m5nP0BOp18G6rVA==}
+  jasmine-core@5.13.0:
+    resolution: {integrity: sha512-vsYjfh7lyqvZX5QgqKc4YH8phs7g96Z8bsdIFNEU3VqXhlHaq+vov/Fgn/sr6MiUczdZkyXRC3TX369Ll4Nzbw==}
 
   jose@4.15.9:
     resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
+
+  jose@6.1.3:
+    resolution: {integrity: sha512-0TpaTfihd4QMNwrz/ob2Bp7X04yuxJkjRGi4aKmOqwhov54i6u79oCv7T+C7lo70MKH6BesI3vscD1yb/yzKXQ==}
 
   jpeg-js@0.4.4:
     resolution: {integrity: sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg==}
@@ -5287,6 +5325,9 @@ packages:
 
   json-schema-traverse@1.0.0:
     resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
+
+  json-schema-typed@8.0.2:
+    resolution: {integrity: sha512-fQhoXdcvc3V28x7C7BMs4P5+kNlgUURe2jmUT1T//oBRMDrqy1QPelJimwZGo7Hg9VPV3EQV5Bnq4hbFy2vetA==}
 
   json-schema@0.4.0:
     resolution: {integrity: sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==}
@@ -5676,6 +5717,10 @@ packages:
 
   minimatch@10.0.3:
     resolution: {integrity: sha512-IPZ167aShDZZUMdRk66cyQAW3qr0WzbHkPdMYa8bzZhlHhO3jALbKdxcaak7W9FfT2rZNpQuUu4Od7ILEpXSaw==}
+    engines: {node: 20 || >=22}
+
+  minimatch@10.1.1:
+    resolution: {integrity: sha512-enIvLvRAFZYXJzkCYG5RKmPfrFArdLv+R+lbQ53BmIMLIry74bjKzX6iHAm8WYamJkhSSEabrWN5D97XnKObjQ==}
     engines: {node: 20 || >=22}
 
   minimatch@3.1.2:
@@ -6810,6 +6855,10 @@ packages:
   svg-tags@1.0.0:
     resolution: {integrity: sha512-ovssysQTa+luh7A5Weu3Rta6FJlFBBbInjOh722LIt6klpU2/HtdUbszju/G4devcvk8PGt7FCLv5wftu3THUA==}
 
+  system-architecture@0.1.0:
+    resolution: {integrity: sha512-ulAk51I9UVUyJgxlv9M6lFot2WP3e7t8Kz9+IS6D4rVba1tR9kON+Ey69f+1R4Q8cd45Lod6a4IcJIxnzGc/zA==}
+    engines: {node: '>=18'}
+
   table@6.9.0:
     resolution: {integrity: sha512-9kY+CygyYM6j02t5YFHbNz2FN5QmYGv9zAjVp4lCDjlCw7amdckXlEt/bjMhUIfj4ThGRE4gCUH5+yGnNuPo5A==}
     engines: {node: '>=10.0.0'}
@@ -6819,10 +6868,6 @@ packages:
 
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
-
-  tar@7.5.1:
-    resolution: {integrity: sha512-nlGpxf+hv0v7GkWBK2V9spgactGOp0qvfWRxUMjqHyzrt3SgwE48DIv/FhqPHJYLHpgW1opq3nERbz5Anq7n1g==}
-    engines: {node: '>=18'}
 
   tar@7.5.2:
     resolution: {integrity: sha512-7NyxrTE4Anh8km8iEy7o0QYPs+0JKBTj5ZaqHg6B39erLg0qYXN3BijtShwbsNSvQ+LN75+KV+C4QR/f6Gwnpg==}
@@ -7189,6 +7234,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
@@ -7381,6 +7427,11 @@ packages:
     peerDependencies:
       zod: ^3.24.1
 
+  zod-to-json-schema@3.25.1:
+    resolution: {integrity: sha512-pM/SU9d3YAggzi6MtR4h7ruuQlqKtad8e9S0fmxcMi+ueAK5Korys/aWcV9LIIHTVbj01NdzxcnXSN+O74ZIVA==}
+    peerDependencies:
+      zod: ^3.25 || ^4
+
   zod-validation-error@5.0.0:
     resolution: {integrity: sha512-hmk+pkyKq7Q71PiWVSDUc3VfpzpvcRHZ3QPw9yEMVvmtCekaMeOHnbr3WbxfrgEnQTv6haGP4cmv0Ojmihzsxw==}
     engines: {node: '>=18.0.0'}
@@ -7390,8 +7441,8 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zone.js@0.15.1:
-    resolution: {integrity: sha512-XE96n56IQpJM7NAoXswY3XRLcWFW83xe0BiAOeMD7K5k5xecOeul3Qcpx6GqEeeHNkW5DWL5zOyTbEfB4eti8w==}
+  zone.js@0.16.0:
+    resolution: {integrity: sha512-LqLPpIQANebrlxY6jKcYKdgN5DTXyyHAKnnWWjE5pPfEQ4n7j5zn7mOEEpwNZVKGqx3kKKmvplEmoBrvpgROTA==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -7402,6 +7453,10 @@ packages:
     hasBin: true
 
 snapshots:
+
+  '@agentclientprotocol/sdk@0.11.0(zod@3.25.76)':
+    dependencies:
+      zod: 3.25.76
 
   '@ai-sdk/anthropic@2.0.50(zod@3.25.76)':
     dependencies:
@@ -7568,7 +7623,7 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@angular/build@21.0.0-next.5(72f1c3879a0ed429fdfc29f509433636)':
+  '@angular/build@21.0.0-next.5(8cd95beab50bb971ee05fdef84ee5708)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.2100.0-next.5(chokidar@4.0.3)
@@ -7601,10 +7656,10 @@ snapshots:
       vite: 7.1.7(@types/node@24.8.1)(sass@1.93.1)(tsx@4.20.6)(yaml@2.8.1)
       watchpack: 2.4.4
     optionalDependencies:
-      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)
-      '@angular/platform-browser': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))
-      '@angular/platform-server': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@21.0.0-next.5)(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
-      '@angular/ssr': 21.0.0-next.5(1aac7f9e92aa38fb20a39f46e038b9d3)
+      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)
+      '@angular/platform-browser': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))
+      '@angular/platform-server': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/compiler@21.0.0-next.5)(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
+      '@angular/ssr': 21.0.0-next.5(105826b3ff40641661a58bb889821856)
       karma: 6.4.4
       lmdb: 3.4.2
       postcss: 8.5.6
@@ -7621,10 +7676,10 @@ snapshots:
       - tsx
       - yaml
 
-  '@angular/cdk@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)':
+  '@angular/cdk@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)':
     dependencies:
-      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
-      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)
+      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
+      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)
       parse5: 8.0.0
       rxjs: 7.8.2
       tslib: 2.8.1
@@ -7654,9 +7709,9 @@ snapshots:
       - chokidar
       - supports-color
 
-  '@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)':
+  '@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)':
     dependencies:
-      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)
+      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)
       rxjs: 7.8.2
       tslib: 2.8.1
 
@@ -7680,55 +7735,55 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)':
+  '@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)':
     dependencies:
       rxjs: 7.8.2
       tslib: 2.8.1
     optionalDependencies:
       '@angular/compiler': 21.0.0-next.5
-      zone.js: 0.15.1
+      zone.js: 0.16.0
 
-  '@angular/forms@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)))(@standard-schema/spec@1.0.0)(rxjs@7.8.2)':
+  '@angular/forms@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)))(@standard-schema/spec@1.0.0)(rxjs@7.8.2)':
     dependencies:
-      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
-      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)
-      '@angular/platform-browser': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))
+      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
+      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)
+      '@angular/platform-browser': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))
       '@standard-schema/spec': 1.0.0
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))':
+  '@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))':
     dependencies:
-      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
-      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)
+      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
+      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)
       tslib: 2.8.1
 
-  '@angular/platform-server@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@21.0.0-next.5)(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)':
+  '@angular/platform-server@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/compiler@21.0.0-next.5)(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)':
     dependencies:
-      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
+      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
       '@angular/compiler': 21.0.0-next.5
-      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)
-      '@angular/platform-browser': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))
+      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)
+      '@angular/platform-browser': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))
       rxjs: 7.8.2
       tslib: 2.8.1
       xhr2: 0.2.1
 
-  '@angular/router@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)':
+  '@angular/router@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)':
     dependencies:
-      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
-      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)
-      '@angular/platform-browser': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))
+      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
+      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)
+      '@angular/platform-browser': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ssr@21.0.0-next.5(1aac7f9e92aa38fb20a39f46e038b9d3)':
+  '@angular/ssr@21.0.0-next.5(105826b3ff40641661a58bb889821856)':
     dependencies:
-      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
-      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)
-      '@angular/router': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
+      '@angular/common': 21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
+      '@angular/core': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)
+      '@angular/router': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
       tslib: 2.8.1
     optionalDependencies:
-      '@angular/platform-server': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@21.0.0-next.5)(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
+      '@angular/platform-server': 21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/compiler@21.0.0-next.5)(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.0.0-next.5(@angular/common@21.0.0-next.5(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
 
   '@anthropic-ai/claude-code@2.0.22':
     optionalDependencies:
@@ -7751,7 +7806,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@anthropic-ai/sdk@0.68.0(zod@3.25.76)':
+  '@anthropic-ai/sdk@0.71.2(zod@3.25.76)':
     dependencies:
       json-schema-to-ts: 3.1.1
     optionalDependencies:
@@ -8246,7 +8301,7 @@ snapshots:
       - genkit
       - supports-color
 
-  '@genkit-ai/compat-oai@1.23.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))(ws@8.18.3)(zod@3.25.76)':
+  '@genkit-ai/compat-oai@1.27.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))(ws@8.18.3)(zod@3.25.76)':
     dependencies:
       genkit: 1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))
       openai: 4.104.0(encoding@0.1.13)(ws@8.18.3)(zod@3.25.76)
@@ -8322,7 +8377,7 @@ snapshots:
       - supports-color
     optional: true
 
-  '@genkit-ai/googleai@1.22.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
+  '@genkit-ai/googleai@1.27.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
     dependencies:
       '@google/generative-ai': 0.24.1
       genkit: 1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))
@@ -8332,9 +8387,9 @@ snapshots:
       - encoding
       - supports-color
 
-  '@genkit-ai/mcp@1.22.0(@modelcontextprotocol/sdk@1.20.1)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
+  '@genkit-ai/mcp@1.27.0(@modelcontextprotocol/sdk@1.25.2(hono@4.11.3)(zod@3.25.76))(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13)))':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.20.1
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.3)(zod@3.25.76)
       genkit: 1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))
 
   '@google-cloud/common@5.0.2(encoding@0.1.13)':
@@ -8509,15 +8564,15 @@ snapshots:
       - supports-color
     optional: true
 
-  '@google/gemini-cli-core@0.13.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)':
+  '@google/gemini-cli-core@0.23.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(hono@4.11.3)':
     dependencies:
       '@google-cloud/logging': 11.2.1(encoding@0.1.13)
       '@google-cloud/opentelemetry-cloud-monitoring-exporter': 0.21.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
       '@google-cloud/opentelemetry-cloud-trace-exporter': 3.0.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
-      '@google/genai': 1.16.0(@modelcontextprotocol/sdk@1.20.1)(encoding@0.1.13)
+      '@google/genai': 1.30.0(@modelcontextprotocol/sdk@1.25.2(hono@4.11.3)(zod@3.25.76))
       '@iarna/toml': 2.2.5
       '@joshua.litt/get-ripgrep': 0.0.3
-      '@modelcontextprotocol/sdk': 1.20.1
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.3)(zod@3.25.76)
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/exporter-logs-otlp-grpc': 0.203.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/exporter-logs-otlp-http': 0.203.0(@opentelemetry/api@1.9.0)
@@ -8533,14 +8588,12 @@ snapshots:
       '@xterm/headless': 5.5.0
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
-      chardet: 2.1.0
+      chardet: 2.1.1
       diff: 7.0.0
-      dotenv: 17.2.3
       fast-levenshtein: 2.0.6
-      fast-uri: 3.1.0
       fdir: 6.5.0(picomatch@4.0.3)
       fzf: 0.5.2
-      glob: 10.4.5
+      glob: 12.0.0
       google-auth-library: 9.15.1(encoding@0.1.13)
       html-to-text: 9.0.5
       https-proxy-agent: 7.0.6
@@ -8557,7 +8610,6 @@ snapshots:
       tree-sitter-bash: 0.25.0
       undici: 7.16.0
       web-tree-sitter: 0.25.10
-      ws: 8.18.3
       zod: 3.25.76
     optionalDependencies:
       '@lydell/node-pty': 1.1.0
@@ -8568,6 +8620,7 @@ snapshots:
       '@lydell/node-pty-win32-x64': 1.1.0
       node-pty: 1.0.0
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - '@opentelemetry/core'
       - '@opentelemetry/resources'
       - '@opentelemetry/sdk-metrics'
@@ -8575,29 +8628,32 @@ snapshots:
       - '@types/emscripten'
       - bufferutil
       - encoding
+      - hono
       - supports-color
       - tree-sitter
       - utf-8-validate
 
-  '@google/gemini-cli@0.13.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)':
+  '@google/gemini-cli@0.23.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(hono@4.11.3)':
     dependencies:
-      '@google/gemini-cli-core': 0.13.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
-      '@google/genai': 1.16.0(@modelcontextprotocol/sdk@1.20.1)(encoding@0.1.13)
+      '@agentclientprotocol/sdk': 0.11.0(zod@3.25.76)
+      '@google/gemini-cli-core': 0.23.0(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(hono@4.11.3)
+      '@google/genai': 1.30.0(@modelcontextprotocol/sdk@1.25.2(hono@4.11.3)(zod@3.25.76))
       '@iarna/toml': 2.2.5
-      '@modelcontextprotocol/sdk': 1.20.1
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.3)(zod@3.25.76)
       '@types/update-notifier': 6.0.8
       ansi-regex: 6.2.2
+      clipboardy: 5.0.2
       command-exists: 1.2.9
       comment-json: 4.4.1
       diff: 7.0.0
       dotenv: 17.2.3
       extract-zip: 2.0.1
       fzf: 0.5.2
-      glob: 10.4.5
+      glob: 12.0.0
       highlight.js: 11.11.1
-      ink: '@jrichman/ink@6.4.0(react@19.2.0)'
-      ink-gradient: 3.0.0(@jrichman/ink@6.4.0(react@19.2.0))
-      ink-spinner: 5.0.0(@jrichman/ink@6.4.0(react@19.2.0))(react@19.2.0)
+      ink: '@jrichman/ink@6.4.6(react@19.2.0)'
+      ink-gradient: 3.0.0(@jrichman/ink@6.4.6(react@19.2.0))
+      ink-spinner: 5.0.0(@jrichman/ink@6.4.6(react@19.2.0))(react@19.2.0)
       latest-version: 9.0.0
       lowlight: 3.3.0
       mnemonist: 0.40.3
@@ -8617,6 +8673,7 @@ snapshots:
       yargs: 17.7.2
       zod: 3.25.76
     transitivePeerDependencies:
+      - '@cfworker/json-schema'
       - '@opentelemetry/core'
       - '@opentelemetry/resources'
       - '@opentelemetry/sdk-metrics'
@@ -8625,29 +8682,29 @@ snapshots:
       - '@types/react'
       - bufferutil
       - encoding
+      - hono
       - react-devtools-core
       - supports-color
       - tree-sitter
       - utf-8-validate
 
-  '@google/genai@1.16.0(@modelcontextprotocol/sdk@1.20.1)(encoding@0.1.13)':
-    dependencies:
-      google-auth-library: 9.15.1(encoding@0.1.13)
-      ws: 8.18.3
-    optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.20.1
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - supports-color
-      - utf-8-validate
-
-  '@google/genai@1.29.1(@modelcontextprotocol/sdk@1.20.1)':
+  '@google/genai@1.30.0(@modelcontextprotocol/sdk@1.25.2(hono@4.11.3)(zod@3.25.76))':
     dependencies:
       google-auth-library: 10.4.2
       ws: 8.18.3
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.20.1
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.3)(zod@3.25.76)
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
+  '@google/genai@1.35.0(@modelcontextprotocol/sdk@1.25.2(hono@4.11.3)(zod@3.25.76))':
+    dependencies:
+      google-auth-library: 10.4.2
+      ws: 8.18.3
+    optionalDependencies:
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.3)(zod@3.25.76)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -8673,6 +8730,10 @@ snapshots:
       long: 5.3.2
       protobufjs: 7.5.4
       yargs: 17.7.2
+
+  '@hono/node-server@1.19.8(hono@4.11.3)':
+    dependencies:
+      hono: 4.11.3
 
   '@humanfs/core@0.19.1': {}
 
@@ -8832,7 +8893,7 @@ snapshots:
 
   '@inquirer/external-editor@1.0.2(@types/node@24.8.1)':
     dependencies:
-      chardet: 2.1.0
+      chardet: 2.1.1
       iconv-lite: 0.7.0
     optionalDependencies:
       '@types/node': 24.8.1
@@ -9014,7 +9075,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@jrichman/ink@6.4.0(react@19.2.0)':
+  '@jrichman/ink@6.4.6(react@19.2.0)':
     dependencies:
       '@alcalzone/ansi-tokenize': 0.2.2
       ansi-escapes: 7.1.1
@@ -9028,6 +9089,7 @@ snapshots:
       es-toolkit: 1.40.0
       indent-string: 5.0.0
       is-in-ci: 2.0.0
+      mnemonist: 0.40.3
       patch-console: 2.0.0
       react: 19.2.0
       react-reconciler: 0.32.0(react@19.2.0)
@@ -9155,9 +9217,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@modelcontextprotocol/sdk@1.20.1':
+  '@modelcontextprotocol/sdk@1.25.2(hono@4.11.3)(zod@3.25.76)':
     dependencies:
-      ajv: 6.12.6
+      '@hono/node-server': 1.19.8(hono@4.11.3)
+      ajv: 8.17.1
+      ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
       cors: 2.8.5
       cross-spawn: 7.0.6
@@ -9165,11 +9229,14 @@ snapshots:
       eventsource-parser: 3.0.6
       express: 5.1.0
       express-rate-limit: 7.5.1(express@5.1.0)
+      jose: 6.1.3
+      json-schema-typed: 8.0.2
       pkce-challenge: 5.0.0
       raw-body: 3.0.1
       zod: 3.25.76
-      zod-to-json-schema: 3.24.6(zod@3.25.76)
+      zod-to-json-schema: 3.25.1(zod@3.25.76)
     transitivePeerDependencies:
+      - hono
       - supports-color
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
@@ -9350,7 +9417,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@openai/codex@0.56.0': {}
+  '@openai/codex@0.80.0': {}
 
   '@opentelemetry/api-logs@0.203.0':
     dependencies:
@@ -10903,24 +10970,24 @@ snapshots:
     dependencies:
       '@shikijs/types': 3.13.0
 
-  '@shikijs/langs@3.15.0':
+  '@shikijs/langs@3.21.0':
     dependencies:
-      '@shikijs/types': 3.15.0
+      '@shikijs/types': 3.21.0
 
   '@shikijs/themes@3.13.0':
     dependencies:
       '@shikijs/types': 3.13.0
 
-  '@shikijs/themes@3.15.0':
+  '@shikijs/themes@3.21.0':
     dependencies:
-      '@shikijs/types': 3.15.0
+      '@shikijs/types': 3.21.0
 
   '@shikijs/types@3.13.0':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.4
 
-  '@shikijs/types@3.15.0':
+  '@shikijs/types@3.21.0':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.4
@@ -11644,7 +11711,7 @@ snapshots:
       minipass-pipeline: 1.2.4
       p-map: 7.0.3
       ssri: 12.0.0
-      tar: 7.5.1
+      tar: 7.5.2
       unique-filename: 4.0.0
 
   cacache@20.0.1:
@@ -11712,8 +11779,6 @@ snapshots:
   character-entities-html4@2.1.0: {}
 
   character-entities-legacy@3.0.0: {}
-
-  chardet@2.1.0: {}
 
   chardet@2.1.1: {}
 
@@ -11804,6 +11869,13 @@ snapshots:
       string-width: 8.1.0
 
   cli-width@4.1.0: {}
+
+  clipboardy@5.0.2:
+    dependencies:
+      execa: 9.6.0
+      is-wayland: 0.1.0
+      is-wsl: 3.1.0
+      is64bit: 2.0.0
 
   cliui@7.0.4:
     dependencies:
@@ -12747,7 +12819,7 @@ snapshots:
       - firebase-admin
       - supports-color
 
-  genkitx-anthropic@0.25.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))):
+  genkitx-anthropic@0.29.0(encoding@0.1.13)(genkit@1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))):
     dependencies:
       '@anthropic-ai/sdk': 0.39.0(encoding@0.1.13)
       genkit: 1.23.0(@google-cloud/firestore@7.11.6(encoding@0.1.13))(encoding@0.1.13)(firebase-admin@13.5.0(encoding@0.1.13))
@@ -12825,6 +12897,15 @@ snapshots:
       foreground-child: 3.3.1
       jackspeak: 4.1.1
       minimatch: 10.0.3
+      minipass: 7.1.2
+      package-json-from-dist: 1.0.1
+      path-scurry: 2.0.0
+
+  glob@12.0.0:
+    dependencies:
+      foreground-child: 3.3.1
+      jackspeak: 4.1.1
+      minimatch: 10.1.1
       minipass: 7.1.2
       package-json-from-dist: 1.0.1
       path-scurry: 2.0.0
@@ -13018,6 +13099,8 @@ snapshots:
 
   highlight.js@11.11.1: {}
 
+  hono@4.11.3: {}
+
   hookified@1.12.2: {}
 
   hosted-git-info@7.0.2:
@@ -13178,18 +13261,18 @@ snapshots:
 
   ini@5.0.0: {}
 
-  ink-gradient@3.0.0(@jrichman/ink@6.4.0(react@19.2.0)):
+  ink-gradient@3.0.0(@jrichman/ink@6.4.6(react@19.2.0)):
     dependencies:
       '@types/gradient-string': 1.1.6
       gradient-string: 2.0.2
-      ink: '@jrichman/ink@6.4.0(react@19.2.0)'
+      ink: '@jrichman/ink@6.4.6(react@19.2.0)'
       prop-types: 15.8.1
       strip-ansi: 7.1.2
 
-  ink-spinner@5.0.0(@jrichman/ink@6.4.0(react@19.2.0))(react@19.2.0):
+  ink-spinner@5.0.0(@jrichman/ink@6.4.6(react@19.2.0))(react@19.2.0):
     dependencies:
       cli-spinners: 2.9.2
-      ink: '@jrichman/ink@6.4.0(react@19.2.0)'
+      ink: '@jrichman/ink@6.4.6(react@19.2.0)'
       react: 19.2.0
 
   intl-messageformat@10.7.18:
@@ -13262,6 +13345,8 @@ snapshots:
 
   is-unicode-supported@2.1.0: {}
 
+  is-wayland@0.1.0: {}
+
   is-wsl@2.2.0:
     dependencies:
       is-docker: 2.2.1
@@ -13269,6 +13354,10 @@ snapshots:
   is-wsl@3.1.0:
     dependencies:
       is-inside-container: 1.0.0
+
+  is64bit@2.0.0:
+    dependencies:
+      system-architecture: 0.1.0
 
   isarray@1.0.0: {}
 
@@ -13339,10 +13428,12 @@ snapshots:
 
   jasmine-core@4.6.1: {}
 
-  jasmine-core@5.12.0: {}
+  jasmine-core@5.13.0: {}
 
   jose@4.15.9:
     optional: true
+
+  jose@6.1.3: {}
 
   jpeg-js@0.4.4: {}
 
@@ -13374,6 +13465,8 @@ snapshots:
   json-schema-traverse@0.4.1: {}
 
   json-schema-traverse@1.0.0: {}
+
+  json-schema-typed@8.0.2: {}
 
   json-schema@0.4.0: {}
 
@@ -13467,9 +13560,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  karma-jasmine-html-reporter@2.1.0(jasmine-core@5.12.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4):
+  karma-jasmine-html-reporter@2.1.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4):
     dependencies:
-      jasmine-core: 5.12.0
+      jasmine-core: 5.13.0
       karma: 6.4.4
       karma-jasmine: 5.1.0(karma@6.4.4)
 
@@ -13869,6 +13962,10 @@ snapshots:
     dependencies:
       '@isaacs/brace-expansion': 5.0.0
 
+  minimatch@10.1.1:
+    dependencies:
+      '@isaacs/brace-expansion': 5.0.0
+
   minimatch@3.1.2:
     dependencies:
       brace-expansion: 1.1.12
@@ -14012,7 +14109,7 @@ snapshots:
       nopt: 8.1.0
       proc-log: 5.0.0
       semver: 7.7.3
-      tar: 7.5.1
+      tar: 7.5.2
       tinyglobby: 0.2.15
       which: 5.0.0
     transitivePeerDependencies:
@@ -14250,7 +14347,7 @@ snapshots:
       promise-retry: 2.0.1
       sigstore: 4.0.0
       ssri: 12.0.0
-      tar: 7.5.1
+      tar: 7.5.2
     transitivePeerDependencies:
       - supports-color
 
@@ -15232,6 +15329,8 @@ snapshots:
 
   svg-tags@1.0.0: {}
 
+  system-architecture@0.1.0: {}
+
   table@6.9.0:
     dependencies:
       ajv: 8.17.1
@@ -15260,14 +15359,6 @@ snapshots:
     transitivePeerDependencies:
       - bare-abort-controller
       - react-native-b4a
-
-  tar@7.5.1:
-    dependencies:
-      '@isaacs/fs-minipass': 4.0.1
-      chownr: 3.0.0
-      minipass: 7.1.2
-      minizlib: 3.1.0
-      yallist: 5.0.0
 
   tar@7.5.2:
     dependencies:
@@ -15736,13 +15827,17 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
+  zod-to-json-schema@3.25.1(zod@3.25.76):
+    dependencies:
+      zod: 3.25.76
+
   zod-validation-error@5.0.0(zod@3.25.76):
     dependencies:
       zod: 3.25.76
 
   zod@3.25.76: {}
 
-  zone.js@0.15.1: {}
+  zone.js@0.16.0: {}
 
   zwitch@2.0.4: {}
 
