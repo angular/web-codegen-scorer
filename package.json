@@ -1,6 +1,6 @@
 {
   "name": "web-codegen-scorer",
-  "version": "0.0.58",
+  "version": "0.0.59",
   "scripts": {
     "build-runner": "tsc",
     "release-build": "tsx ./scripts/release-build.ts",
