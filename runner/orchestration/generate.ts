@@ -158,7 +158,7 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
       allTasks.push(
         appConcurrencyQueue.add(async () => {
           const evaluate = async () => {
-            const evalID = await env.executor.initializeEval();
+            const evalID = await env.executor.initializeEval(rootPromptDef);
             let results: AssessmentResult[] | undefined;
 
             try {
