@@ -5,12 +5,13 @@ import type {AutoRateResult} from './ratings/autoraters/auto-rate-shared.js';
 import type {Rating, RatingCategory} from './ratings/rating-types.js';
 import type {ServeTestingResult} from './workers/serve-testing/worker-types.js';
 import type {RunnerName} from './codegen/runner-creation.js';
+import {Environment} from './configuration/environment.js';
 
 /** Configuration options necessary for kicking off an assessment run. */
 export interface AssessmentConfig {
   model: string;
   runner: RunnerName;
-  environmentConfigPath: string;
+  environment: Environment | {configPath: string};
   localMode: boolean;
   limit: number;
   concurrency: number | 'auto';

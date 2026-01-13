@@ -209,7 +209,9 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
     const runInfo = await generateCodeAndAssess({
       runner: cliArgs.runner,
       model: cliArgs.model,
-      environmentConfigPath: BUILT_IN_ENVIRONMENTS.get(cliArgs.environment) || cliArgs.environment,
+      environment: {
+        configPath: BUILT_IN_ENVIRONMENTS.get(cliArgs.environment) || cliArgs.environment,
+      },
       localMode: cliArgs.local,
       limit: cliArgs.limit,
       concurrency: cliArgs.concurrency as number,

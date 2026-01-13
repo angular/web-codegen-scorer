@@ -43,7 +43,11 @@ import {RatingKind} from '../ratings/rating-types.js';
  *          each containing the prompt, generated code, and final validation status.
  */
 export async function generateCodeAndAssess(options: AssessmentConfig): Promise<RunInfo> {
-  const env = await getEnvironmentByPath(options.environmentConfigPath, options.runner);
+  const env =
+    options.environment instanceof Environment
+      ? options.environment
+      : await getEnvironmentByPath(options.environment.configPath, options.runner);
+
   const extraCleanupFns: (() => Promise<void>)[] = [];
   const cleanup = async () => {
     // Clean-up should never interrupt a potentially passing completion.
