@@ -23,7 +23,10 @@ export type EvalID = string & {__evalID: true};
 export type WorkerQueueType = PQueue;
 
 export const executorSchema = z.object({
-  initializeEval: z.function(z.tuple([]), z.promise(z.custom<EvalID>())),
+  initializeEval: z.function(
+    z.tuple([z.custom<RootPromptDefinition>()]),
+    z.promise(z.custom<EvalID>()),
+  ),
   generateInitialFiles: z.function(
     z.tuple([
       z.custom<EvalID>().describe('ID of the eval'),
