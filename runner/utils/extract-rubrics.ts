@@ -1,10 +1,6 @@
 import {AssessmentResult, IndividualAssessmentState} from '../shared-interfaces.js';
 
-export interface RubricInfo {
-  score: number;
-}
-
-export function extractRubrics(results: AssessmentResult[]): Record<string, RubricInfo> {
+export function extractRubrics(results: AssessmentResult[]): Record<string, number> {
   const rubricsBreakdown: Record<string, number[]> = {};
 
   for (const app of results) {
@@ -47,6 +43,6 @@ export function extractRubrics(results: AssessmentResult[]): Record<string, Rubr
       ...rubricsResult,
       [label]: scores.reduce((prev, cur) => prev + cur, 0) / scores.length,
     }),
-    {},
+    {} as Record<string, number>,
   );
 }

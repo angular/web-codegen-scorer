@@ -49,5 +49,5 @@ export {NoopProgressLogger} from './progress/noop-progress-logger.js';
 export {TextProgressLogger} from './progress/text-progress-logger.js';
 export {type ServeTestingResult} from './workers/serve-testing/worker-types.js';
 export {replaceAtReferencesInPrompt} from './utils/prompt-at-references.js';
-export {extractRubrics, type RubricInfo} from './utils/extract-rubrics.js';
+export {extractRubrics} from './utils/extract-rubrics.js';
 export {combineReports} from './utils/combine-reports.mjs';
