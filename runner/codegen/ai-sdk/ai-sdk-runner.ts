@@ -3,10 +3,10 @@ import {GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
 import {OpenAIResponsesProviderOptions} from '@ai-sdk/openai';
 import {
   FilePart,
-  generateObject,
   generateText,
   LanguageModel,
   ModelMessage,
+  Output,
   SystemModelMessage,
   TextPart,
 } from 'ai';
@@ -68,18 +68,18 @@ export class AiSDKRunner implements LlmRunner {
     options: LocalLlmConstrainedOutputGenerateRequestOptions<T>,
   ): Promise<LocalLlmConstrainedOutputGenerateResponse<T>> {
     const response = await this._wrapRequestWithTimeoutAndRateLimiting(options, async abortSignal =>
-      generateObject({
+      generateText({
         ...(await this._getAiSdkModelOptions(options)),
         messages: this._convertRequestToMessagesList(options),
-        schema: options.schema,
+        output: Output.object<z.infer<T>>({schema: options.schema}),
         abortSignal: abortSignal,
         maxRetries: DEFAULT_MAX_RETRIES,
       }),
     );
 
     return {
-      reasoning: response.reasoning ?? '',
-      output: response.object,
+      reasoning: response.reasoning.map(r => r.text).join('\n') ?? '',
+      output: response.output,
       usage: {
         inputTokens: response.usage.inputTokens ?? 0,
         outputTokens: response.usage.outputTokens ?? 0,

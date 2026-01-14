@@ -51,10 +51,10 @@
     "wcs": "./runner/bin/cli.js"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^2.0.50",
-    "@ai-sdk/google": "^2.0.39",
-    "@ai-sdk/openai": "^2.0.71",
-    "@ai-sdk/provider": "^2.0.0",
+    "@ai-sdk/anthropic": "3.0.12",
+    "@ai-sdk/google": "3.0.7",
+    "@ai-sdk/openai": "3.0.9",
+    "@ai-sdk/provider": "3.0.2",
     "@anthropic-ai/sdk": "^0.68.0",
     "@axe-core/puppeteer": "^4.10.2",
     "@genkit-ai/compat-oai": "1.23.0",
@@ -67,7 +67,7 @@
     "@types/cli-progress": "^3.11.6",
     "@types/node": "^24.2.0",
     "@types/yargs": "^17.0.33",
-    "ai": "^5.0.95",
+    "ai": "6.0.31",
     "axe-core": "^4.10.3",
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",

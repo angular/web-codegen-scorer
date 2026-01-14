@@ -1,14 +1,15 @@
-import type {LanguageModelV2Middleware} from '@ai-sdk/provider';
+import type {LanguageModelV3Middleware} from '@ai-sdk/provider';
 
 /**
  * Middleware for Anthropic AI SDK models that is necessary for enabling
  * thinking mode + structured responses.
  *
  * This is necessary because Anthropic would be used with enforced tool usage
- * by default with `generateObject()`. This is a workaround that makes the tool
- * optional: https://github.com/vercel/ai/issues/9351.
+ * by default with `generateText()`. This is a workaround that makes the tool
+ * optional: https://github.com/vercel/ai/issues/9351, https://github.com/vercel/ai/issues/11227.
  */
-export const anthropicThinkingWithStructuredResponseMiddleware: LanguageModelV2Middleware = {
+export const anthropicThinkingWithStructuredResponseMiddleware: LanguageModelV3Middleware = {
+  specificationVersion: 'v3',
   transformParams: ({params}) => {
     if (params.responseFormat?.type === 'json' && params.responseFormat.schema) {
       params.tools = [
