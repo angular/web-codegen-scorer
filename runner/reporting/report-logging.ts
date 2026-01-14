@@ -2,7 +2,7 @@ import {join} from 'path';
 import chalk from 'chalk';
 import boxen from 'boxen';
 import {IndividualAssessmentState, RunInfo, ScoreBucket} from '../shared-interfaces.js';
-import {DEFAULT_AUTORATER_MODEL_NAME, REPORTS_ROOT_DIR} from '../configuration/constants.js';
+import {DEFAULT_AUTORATER_MODEL_NAME} from '../configuration/constants.js';
 import {calculateBuildAndCheckStats} from '../ratings/stats.js';
 import {safeWriteFile} from '../file-system-utils.js';
 import {BuildResultStatus} from '../workers/builder/builder-types.js';
@@ -17,7 +17,6 @@ import {
 } from './format.js';
 import {Environment} from '../configuration/environment.js';
 import {groupSimilarReports} from '../orchestration/grouping.js';
-import {LocalExecutor} from '../orchestration/executors/local-executor.js';
 
 /**
  * Generates a structured report on fs, based on the assessment run information.
@@ -38,14 +37,19 @@ import {LocalExecutor} from '../orchestration/executors/local-executor.js';
  *
  * @param runInfo An object containing all details and results of the assessment run.
  * @param id ID of the environment that was used for the eval.
+ * @param reportsRootDir Root directory where the reports are written to.
  * @returns The original `runInfo` object, allowing for chaining.
  */
-export async function writeReportToDisk(runInfo: RunInfo, id: string): Promise<void> {
+export async function writeReportToDisk(
+  runInfo: RunInfo,
+  id: string,
+  reportsRootDir: string,
+): Promise<void> {
   // Sanitize report name: allow only a-z, A-Z, 0-9, and hyphens. Replace others with a hyphen.
   const sanitizedReportName = runInfo.details.reportName.replace(/[^a-zA-Z0-9-]/g, '-');
 
   const {results} = runInfo;
-  const reportBaseDir = join(REPORTS_ROOT_DIR, id, sanitizedReportName);
+  const reportBaseDir = join(reportsRootDir, id, sanitizedReportName);
 
   // Write `summary.json` file, which contains **all** available info.
   const summaryJsonPath = join(reportBaseDir, 'summary.json');
