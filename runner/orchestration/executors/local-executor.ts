@@ -41,7 +41,7 @@ export class LocalExecutor implements Executor {
     this.llm = getRunnerByName(runnerName);
   }
 
-  async initializeEval(): Promise<EvalID> {
+  async initializeEval(_prompt: RootPromptDefinition): Promise<EvalID> {
     return `${uniqueIDs++}` as EvalID;
   }
 
