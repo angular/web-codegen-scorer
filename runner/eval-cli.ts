@@ -7,6 +7,7 @@ import {
   DEFAULT_MAX_TEST_REPAIR_ATTEMPTS,
   DEFAULT_MODEL_NAME,
   DEFAULT_PROMPT_TIMEOUT_RETRIES,
+  REPORTS_ROOT_DIR,
 } from './configuration/constants.js';
 import {generateCodeAndAssess} from './orchestration/generate.js';
 import {logReportToConsole, writeReportToDisk} from './reporting/report-logging.js';
@@ -236,7 +237,7 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
     });
 
     logReportToConsole(runInfo);
-    await writeReportToDisk(runInfo, runInfo.details.summary.environmentId);
+    await writeReportToDisk(runInfo, runInfo.details.summary.environmentId, REPORTS_ROOT_DIR);
   } catch (error: unknown) {
     if (error instanceof UserFacingError) {
       console.error(chalk.red(error.message));

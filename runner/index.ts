@@ -51,3 +51,4 @@ export {type ServeTestingResult} from './workers/serve-testing/worker-types.js';
 export {replaceAtReferencesInPrompt} from './utils/prompt-at-references.js';
 export {extractRubrics} from './utils/extract-rubrics.js';
 export {combineReports} from './utils/combine-reports.mjs';
+export {writeReportToDisk} from './reporting/report-logging.js';
