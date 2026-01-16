@@ -74,7 +74,7 @@
     "cli-progress": "^3.12.0",
     "file-type": "^21.0.0",
     "genkit": "^1.23.0",
-    "genkitx-anthropic": "0.25.0",
+    "genkitx-anthropic": "0.29.0",
     "handlebars": "^4.7.8",
     "lighthouse": "^13.0.0",
     "limiter": "^3.0.0",
