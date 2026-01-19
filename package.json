@@ -85,7 +85,7 @@
     "sass": "^1.89.2",
     "strict-csp": "^1.1.1",
     "stylelint": "^17.0.0",
-    "stylelint-config-recommended-scss": "^16.0.0",
+    "stylelint-config-recommended-scss": "^17.0.0",
     "tiktoken": "1.0.22",
     "tinyglobby": "^0.2.14",
     "tree-kill": "^1.2.2",
