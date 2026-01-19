@@ -1,7 +1,7 @@
 import {anthropic, AnthropicProviderOptions} from '@ai-sdk/anthropic';
 import {wrapLanguageModel} from 'ai';
 import {anthropicThinkingWithStructuredResponseMiddleware} from './anthropic_thinking_patch.js';
-import {ModelOptions} from './ai-sdk-model-options.js';
+import {AiSdkModelOptions} from './ai-sdk-model-options.js';
 
 export const ANTHROPIC_MODELS = [
   'claude-opus-4.1-no-thinking',
@@ -17,7 +17,7 @@ export const ANTHROPIC_MODELS = [
 
 export async function getAiSdkModelOptionsForAnthropic(
   rawModelName: string,
-): Promise<ModelOptions | null> {
+): Promise<AiSdkModelOptions | null> {
   const modelName = rawModelName as (typeof ANTHROPIC_MODELS)[number];
 
   switch (modelName) {
