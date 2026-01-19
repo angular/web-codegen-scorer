@@ -1,5 +1,5 @@
 import {openai, OpenAIResponsesProviderOptions} from '@ai-sdk/openai';
-import {ModelOptions} from './ai-sdk-model-options.js';
+import {AiSdkModelOptions} from './ai-sdk-model-options.js';
 
 export const OPENAI_MODELS = [
   'gpt-5.1-no-thinking',
@@ -10,7 +10,7 @@ export const OPENAI_MODELS = [
 
 export async function getAiSdkModelOptionsForOpenAI(
   rawModelName: string,
-): Promise<ModelOptions | null> {
+): Promise<AiSdkModelOptions | null> {
   const modelName = rawModelName as (typeof OPENAI_MODELS)[number];
 
   switch (modelName) {

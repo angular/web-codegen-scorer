@@ -26,6 +26,7 @@ import {
 import {ANTHROPIC_MODELS, getAiSdkModelOptionsForAnthropic} from './anthropic.js';
 import {getAiSdkModelOptionsForGoogle, GOOGLE_MODELS} from './google.js';
 import {getAiSdkModelOptionsForOpenAI, OPENAI_MODELS} from './openai.js';
+import {AiSdkModelOptions} from './ai-sdk-model-options.js';
 
 const SUPPORTED_MODELS = [...GOOGLE_MODELS, ...ANTHROPIC_MODELS, ...OPENAI_MODELS] as const;
 
@@ -34,7 +35,7 @@ const SUPPORTED_MODELS = [...GOOGLE_MODELS, ...ANTHROPIC_MODELS, ...OPENAI_MODEL
 // even if it involves many exponential backoff-waiting.
 const DEFAULT_MAX_RETRIES = 100000;
 
-export class AiSDKRunner implements LlmRunner {
+export class AiSdkRunner implements LlmRunner {
   displayName = 'AI SDK';
   id = 'ai-sdk';
   hasBuiltInRepairLoop = true;
@@ -44,9 +45,9 @@ export class AiSDKRunner implements LlmRunner {
   ): Promise<LocalLlmGenerateTextResponse> {
     const response = await this._wrapRequestWithTimeoutAndRateLimiting(options, async abortSignal =>
       generateText({
-        ...(await this._getAiSdkModelOptions(options)),
+        ...(await this.getAiSdkModelOptions(options)),
         abortSignal: abortSignal,
-        messages: this._convertRequestToMessagesList(options),
+        messages: this.convertRequestToMessagesList(options),
         maxRetries: DEFAULT_MAX_RETRIES,
       }),
     );
@@ -69,8 +70,8 @@ export class AiSDKRunner implements LlmRunner {
   ): Promise<LocalLlmConstrainedOutputGenerateResponse<T>> {
     const response = await this._wrapRequestWithTimeoutAndRateLimiting(options, async abortSignal =>
       generateText({
-        ...(await this._getAiSdkModelOptions(options)),
-        messages: this._convertRequestToMessagesList(options),
+        ...(await this.getAiSdkModelOptions(options)),
+        messages: this.convertRequestToMessagesList(options),
         output: Output.object<z.infer<T>>({schema: options.schema}),
         abortSignal: abortSignal,
         maxRetries: DEFAULT_MAX_RETRIES,
@@ -138,13 +139,9 @@ export class AiSDKRunner implements LlmRunner {
     );
   }
 
-  private async _getAiSdkModelOptions(request: LocalLlmGenerateTextRequestOptions): Promise<{
-    model: LanguageModel;
-    providerOptions:
-      | {anthropic: AnthropicProviderOptions}
-      | {google: GoogleGenerativeAIProviderOptions}
-      | {openai: OpenAIResponsesProviderOptions};
-  }> {
+  protected async getAiSdkModelOptions(
+    request: LocalLlmGenerateTextRequestOptions,
+  ): Promise<AiSdkModelOptions> {
     const result =
       (await getAiSdkModelOptionsForGoogle(request.model)) ??
       (await getAiSdkModelOptionsForAnthropic(request.model)) ??
@@ -155,7 +152,7 @@ export class AiSDKRunner implements LlmRunner {
     return result;
   }
 
-  private _convertRequestToMessagesList(
+  protected convertRequestToMessagesList(
     request: LocalLlmConstrainedOutputGenerateRequestOptions | LocalLlmGenerateTextRequestOptions,
   ): ModelMessage[] {
     return [
@@ -169,13 +166,13 @@ export class AiSDKRunner implements LlmRunner {
           ]
         : []),
       // Optional additional messages
-      ...this._toAiSDKMessage(request.messages ?? []),
+      ...this.toAiSDKMessage(request.messages ?? []),
       // The main message.
       {role: 'user', content: [{type: 'text', text: request.prompt}]},
     ];
   }
 
-  private _toAiSDKMessage(messages: PromptDataMessage[]): ModelMessage[] {
+  protected toAiSDKMessage(messages: PromptDataMessage[]): ModelMessage[] {
     const result: ModelMessage[] = [];
 
     for (const message of messages) {

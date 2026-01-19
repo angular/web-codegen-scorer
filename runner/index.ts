@@ -52,3 +52,5 @@ export {replaceAtReferencesInPrompt} from './utils/prompt-at-references.js';
 export {extractRubrics} from './utils/extract-rubrics.js';
 export {combineReports} from './utils/combine-reports.mjs';
 export {writeReportToDisk} from './reporting/report-logging.js';
+export {AiSdkRunner} from './codegen/ai-sdk/ai-sdk-runner.js';
+export {type AiSdkModelOptions as AiSDKModelOptions} from './codegen/ai-sdk/ai-sdk-model-options.js';

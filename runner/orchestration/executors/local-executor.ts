@@ -36,9 +36,12 @@ export class LocalExecutor implements Executor {
 
   constructor(
     public config: LocalExecutorConfig,
-    runnerName: RunnerName = 'noop-unimplemented',
+    runnerOrName: RunnerName | LlmRunner = 'noop-unimplemented',
   ) {
-    this.llm = getRunnerByName(runnerName);
+    this.llm =
+      typeof runnerOrName === 'string'
+        ? getRunnerByName(runnerOrName)
+        : Promise.resolve(runnerOrName);
   }
 
   async initializeEval(_prompt: RootPromptDefinition): Promise<EvalID> {

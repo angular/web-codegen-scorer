@@ -1,5 +1,5 @@
 import {google, GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
-import {ModelOptions} from './ai-sdk-model-options.js';
+import {AiSdkModelOptions} from './ai-sdk-model-options.js';
 
 export const GOOGLE_MODELS = [
   'gemini-2.5-flash-lite',
@@ -13,7 +13,7 @@ export const GOOGLE_MODELS = [
 
 export async function getAiSdkModelOptionsForGoogle(
   rawModelName: string,
-): Promise<ModelOptions | null> {
+): Promise<AiSdkModelOptions | null> {
   const modelName = rawModelName as (typeof GOOGLE_MODELS)[number];
 
   switch (modelName) {
