@@ -6,7 +6,7 @@ import {BUILT_IN_ENVIRONMENTS, LLM_OUTPUT_DIR} from './configuration/constants.j
 import {UserFacingError} from './utils/errors.js';
 import {existsSync, rmSync} from 'fs';
 import {readFile, readdir} from 'fs/promises';
-import {join} from 'path';
+import {join, resolve} from 'path';
 import {glob} from 'tinyglobby';
 import {LlmResponseFile} from './shared-interfaces.js';
 import {setupProjectStructure, writeResponseFiles} from './orchestration/file-system.js';
@@ -26,6 +26,7 @@ export const RunModule = {
 interface Options {
   environment: string;
   prompt: string;
+  reportsDirectory?: string;
 }
 
 function builder(argv: Argv): Argv<Options> {
@@ -40,6 +41,11 @@ function builder(argv: Argv): Argv<Options> {
       type: 'string',
       default: '',
       description: 'ID of the prompt within the environment that should be run',
+    })
+    .option('reports-directory', {
+      type: 'string',
+      description: 'Path from which to read local reports',
+      demandOption: false,
     })
     .version(false)
     .help();
@@ -129,7 +135,7 @@ async function resolveConfig(options: Options) {
     BUILT_IN_ENVIRONMENTS.get(options.environment) || options.environment,
     'genkit',
   );
-  const environmentDir = join(LLM_OUTPUT_DIR, environment.id);
+  const environmentDir = resolve(options.reportsDirectory ?? LLM_OUTPUT_DIR, environment.id);
 
   if (!existsSync(environmentDir)) {
     throw new UserFacingError(
