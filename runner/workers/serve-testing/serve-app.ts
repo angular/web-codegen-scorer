@@ -24,7 +24,9 @@ export async function serveApp<T>(
     );
 
     const actualPort = await new Promise<number>((resolvePort, rejectPort) => {
-      const serveStartTimeout = 45000; // 45s for serve to start
+      // Timeout for server to start. CPU queueing might cause this to take longer.
+      // It's a upper safety boundary. The overall eval timeout is the main control.
+      const serveStartTimeout = 1000 * 60 * 5;
       const timeoutId = setTimeout(() => {
         rejectPort(
           new Error(
