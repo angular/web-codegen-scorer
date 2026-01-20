@@ -11,6 +11,10 @@ import {BaseCliAgentRunner} from './base-cli-agent-runner.js';
 const MODEL_MAPPING: Record<string, string> = {
   'claude-4.0-sonnet': 'claude-sonnet-4-20250514',
   'claude-3.5-haiku': 'claude-3-5-haiku-latest',
+  'claude-4.5-sonnet': 'claude-sonnet-4-5-20250929',
+  'claude-4.0-opus': 'claude-opus-4-20250514',
+  'claude-4.5-opus': 'claude-opus-4-5-20251101',
+  'claude-4.5-haiku': 'claude-haiku-4-5-20251001',
 };
 
 /** Runner that generates code using the Claude Code. */

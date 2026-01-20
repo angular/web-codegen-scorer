@@ -1,8 +1,8 @@
 import {Anthropic} from '@anthropic-ai/sdk';
-import {GenkitPlugin} from 'genkit/plugin';
+import {GenkitPluginV2} from 'genkit/plugin';
 import {GenkitModelProvider, PromptDataForCounting, RateLimitConfig} from '../model-provider.js';
 import {anthropic} from 'genkitx-anthropic';
-import {claude35Haiku, claude4Sonnet} from 'genkitx-anthropic';
+import {claude35Haiku, claude4Sonnet, claude4Opus, claude45Sonnet, claude45Haiku, claude45Opus } from 'genkitx-anthropic';
 import {lazy} from '../../../utils/lazy-creation.js';
 import {RateLimiter} from 'limiter';
 
@@ -12,6 +12,10 @@ export class ClaudeModelProvider extends GenkitModelProvider {
   protected readonly models = {
     'claude-4.0-sonnet': () => claude4Sonnet,
     'claude-3.5-haiku': () => claude35Haiku,
+    'claude-4.5-sonnet': () => claude45Sonnet,
+    'claude-4.0-opus': () => claude4Opus,
+    'claude-4.5-opus': () => claude45Opus,
+    'claude-4.5-haiku': () => claude45Haiku,
   };
 
   protected rateLimitConfig: Record<string, RateLimitConfig> = {
@@ -42,7 +46,7 @@ export class ClaudeModelProvider extends GenkitModelProvider {
     return new Anthropic({apiKey: this.getApiKey() || undefined});
   });
 
-  protected pluginFactory(apiKey: string): GenkitPlugin {
+  protected pluginFactory(apiKey: string):  GenkitPluginV2 {
     return anthropic({apiKey});
   }
 
