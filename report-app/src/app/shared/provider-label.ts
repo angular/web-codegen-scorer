@@ -9,6 +9,7 @@ const exactMatches: Record<string, string> = {
   'gemini-cli': 'gemini.webp',
   genkit: 'genkit.png',
   codex: 'open-ai.png',
+  'ai-sdk': 'ai-sdk.png',
 };
 
 @Component({

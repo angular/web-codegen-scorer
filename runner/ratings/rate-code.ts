@@ -24,11 +24,11 @@ import {
 } from './rating-types.js';
 import {extractEmbeddedCodeFromTypeScript} from './embedded-languages.js';
 import {Environment} from '../configuration/environment.js';
-import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {UserFacingError} from '../utils/errors.js';
 import {ServeTestingResult} from '../workers/serve-testing/worker-types.js';
 import assert from 'assert';
+import {AiSdkRunner} from '../codegen/ai-sdk/ai-sdk-runner.js';
 
 interface FileOrEmbeddedSyntheticFile {
   /**
@@ -45,7 +45,7 @@ interface FileOrEmbeddedSyntheticFile {
 type CategorizedFiles = Record<PerFileRatingContentType, FileOrEmbeddedSyntheticFile[]>;
 
 export async function rateGeneratedCode(
-  autoraterLlm: GenkitRunner | null,
+  autoraterLlm: AiSdkRunner | null,
   environment: Environment,
   currentPromptDef: PromptDefinition,
   fullPromptText: string,
@@ -280,7 +280,7 @@ async function runLlmBasedRating(
   rating: LLMBasedRating,
   fullPromptText: string,
   currentPromptDef: PromptDefinition,
-  llm: GenkitRunner,
+  llm: AiSdkRunner,
   outputFiles: LlmResponseFile[],
   buildResult: BuildResult,
   serveTestingResult: ServeTestingResult | null,

@@ -133,7 +133,7 @@ async function resolveConfig(options: Options) {
 
   const environment = await getEnvironmentByPath(
     BUILT_IN_ENVIRONMENTS.get(options.environment) || options.environment,
-    'genkit',
+    'ai-sdk',
   );
   const environmentDir = resolve(options.reportsDirectory ?? LLM_OUTPUT_DIR, environment.id);
 

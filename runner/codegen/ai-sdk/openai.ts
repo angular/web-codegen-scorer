@@ -1,4 +1,4 @@
-import {openai, OpenAIResponsesProviderOptions} from '@ai-sdk/openai';
+import {createOpenAI, OpenAIResponsesProviderOptions} from '@ai-sdk/openai';
 import {AiSdkModelOptions} from './ai-sdk-model-options.js';
 
 export const OPENAI_MODELS = [
@@ -11,6 +11,7 @@ export const OPENAI_MODELS = [
 export async function getAiSdkModelOptionsForOpenAI(
   rawModelName: string,
 ): Promise<AiSdkModelOptions | null> {
+  const provideModel = createOpenAI({apiKey: process.env['OPENAI_API_KEY']});
   const modelName = rawModelName as (typeof OPENAI_MODELS)[number];
 
   switch (modelName) {
@@ -27,7 +28,7 @@ export async function getAiSdkModelOptionsForOpenAI(
         reasoningEffort = 'low';
       }
       return {
-        model: openai('gpt-5.1'),
+        model: provideModel('gpt-5.1'),
         providerOptions: {
           openai: {
             reasoningEffort,

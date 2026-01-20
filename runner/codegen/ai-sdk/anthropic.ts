@@ -1,4 +1,4 @@
-import {anthropic, AnthropicProviderOptions} from '@ai-sdk/anthropic';
+import {createAnthropic, AnthropicProviderOptions} from '@ai-sdk/anthropic';
 import {wrapLanguageModel} from 'ai';
 import {anthropicThinkingWithStructuredResponseMiddleware} from './anthropic_thinking_patch.js';
 import {AiSdkModelOptions} from './ai-sdk-model-options.js';
@@ -19,6 +19,7 @@ export async function getAiSdkModelOptionsForAnthropic(
   rawModelName: string,
 ): Promise<AiSdkModelOptions | null> {
   const modelName = rawModelName as (typeof ANTHROPIC_MODELS)[number];
+  const provideModel = createAnthropic({apiKey: process.env['ANTHROPIC_API_KEY']});
 
   switch (modelName) {
     case 'claude-opus-4.1-no-thinking':
@@ -36,13 +37,13 @@ export async function getAiSdkModelOptionsForAnthropic(
         : modelName.endsWith('-32k')
           ? 32_000
           : 16_000;
-      let apiModelName: Parameters<typeof anthropic>[0] = 'claude-sonnet-4-5';
+      let apiModelName = 'claude-sonnet-4-5';
       if (modelName.includes('opus-4.1')) {
         apiModelName = 'claude-opus-4-1';
       } else if (modelName.includes('opus-4.5')) {
         apiModelName = 'claude-opus-4-5';
       }
-      const model = anthropic(apiModelName);
+      const model = provideModel(apiModelName);
       return {
         model: thinkingEnabled
           ? wrapLanguageModel({

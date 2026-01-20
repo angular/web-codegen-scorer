@@ -94,12 +94,12 @@ export async function generateCodeAndAssess(options: AssessmentConfig): Promise<
 
     // Only construct LLMs when necessary. This is helpful in cases where WCS is invoked
     // as a auto-rater that doesn't have access to other LLMs.
-    const autoraterLlm = hasLlmBasedRatings ? await getRunnerByName('genkit') : null;
+    const autoraterLlm = hasLlmBasedRatings ? await getRunnerByName('ai-sdk') : null;
     const cujGenerationLlm = options.enableUserJourneyTesting
-      ? (autoraterLlm ?? (await getRunnerByName('genkit')))
+      ? (autoraterLlm ?? (await getRunnerByName('ai-sdk')))
       : null;
     const generateAiSummaryLlm = !options.skipAiSummary
-      ? (autoraterLlm ?? cujGenerationLlm ?? (await getRunnerByName('genkit')))
+      ? (autoraterLlm ?? cujGenerationLlm ?? (await getRunnerByName('ai-sdk')))
       : null;
 
     extraCleanupFns.push(async () => {

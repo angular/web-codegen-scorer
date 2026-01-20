@@ -10,9 +10,9 @@ import {
   MAX_RATING,
   MIN_RATING,
 } from './auto-rate-shared.js';
-import {GenkitRunner} from '../../codegen/genkit/genkit-runner.js';
 import defaultCodeRaterPrompt from './code-rating-prompt.js';
 import {RatingsResult} from '../rating-types.js';
+import {AiSdkRunner} from '../../codegen/ai-sdk/ai-sdk-runner.js';
 
 /** Framework-specific hints for the rating prompt. */
 const FW_HINTS: Record<string, string | undefined> = {
@@ -39,7 +39,7 @@ const CACHED_RATING_PROMPTS: Record<string, string> = {};
  * @param ratingsResult Context containing results from previous ratings.
  */
 export async function autoRateCode(
-  llm: GenkitRunner,
+  llm: AiSdkRunner,
   abortSignal: AbortSignal,
   model: string,
   environment: Environment,

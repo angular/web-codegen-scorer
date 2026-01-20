@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {LlmResponseFile, Usage} from '../shared-interfaces.js';
-import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 import {UserFacingError} from '../utils/errors.js';
+import {AiSdkRunner} from '../codegen/ai-sdk/ai-sdk-runner.js';
 
 // NOTE: When changing this, also change `browser-agent`'s prompt!
 const USER_JOURNEY_SCHEMA = z.object({
@@ -25,7 +25,7 @@ export interface UserJourneysResult {
 }
 
 export async function generateUserJourneysForApp(
-  llm: GenkitRunner,
+  llm: AiSdkRunner,
   appName: string,
   appPrompt: string,
   appFiles: LlmResponseFile[],

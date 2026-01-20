@@ -1,5 +1,4 @@
 import {marked} from 'marked';
-import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 import {
   AiChatMessage,
   AssessmentResult,
@@ -12,6 +11,7 @@ import {
 } from '../shared-interfaces.js';
 import {BuildResultStatus} from '../workers/builder/builder-types.js';
 import {BUCKET_CONFIG} from '../ratings/stats.js';
+import {AiSdkRunner} from '../codegen/ai-sdk/ai-sdk-runner.js';
 
 const defaultAiChatPrompt = `Strictly follow the instructions here.
 - You are an expert in LLM-based code generation evaluation and quality assessments.
@@ -27,7 +27,7 @@ const defaultAiChatPrompt = `Strictly follow the instructions here.
   * Decide based on the question, whether you need to generate a larger response, or just a chat reply.`;
 
 export async function chatWithReportAI(
-  llm: GenkitRunner,
+  llm: AiSdkRunner,
   message: string,
   abortSignal: AbortSignal,
   allAssessments: AssessmentResultFromReportServer[] | AssessmentResult[],
