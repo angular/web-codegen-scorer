@@ -1,4 +1,4 @@
-import {google, GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
+import {createGoogleGenerativeAI, GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
 import {AiSdkModelOptions} from './ai-sdk-model-options.js';
 
 export const GOOGLE_MODELS = [
@@ -15,6 +15,7 @@ export async function getAiSdkModelOptionsForGoogle(
   rawModelName: string,
 ): Promise<AiSdkModelOptions | null> {
   const modelName = rawModelName as (typeof GOOGLE_MODELS)[number];
+  const provideModel = createGoogleGenerativeAI({apiKey: process.env['GEMINI_API_KEY']});
 
   switch (modelName) {
     case 'gemini-2.5-flash-lite':
@@ -22,7 +23,7 @@ export async function getAiSdkModelOptionsForGoogle(
     case 'gemini-2.5-pro':
     case 'gemini-3-pro-preview':
       return {
-        model: google(modelName),
+        model: provideModel(modelName),
         providerOptions: {
           google: {
             thinkingConfig: {
@@ -33,7 +34,7 @@ export async function getAiSdkModelOptionsForGoogle(
       };
     case 'gemini-2.5-flash-no-thinking': {
       return {
-        model: google('gemini-2.5-flash'),
+        model: provideModel('gemini-2.5-flash'),
         providerOptions: {
           google: {
             thinkingConfig: {
@@ -55,7 +56,7 @@ export async function getAiSdkModelOptionsForGoogle(
       }
 
       return {
-        model: google('gemini-2.5-flash'),
+        model: provideModel('gemini-2.5-flash'),
         providerOptions: {
           google: {
             thinkingConfig: {

@@ -20,7 +20,7 @@ import {EvalPromptWithMetadata, MultiStepPrompt} from './prompts.js';
 import {renderPromptTemplate} from './prompt-templating.js';
 import {getSha256Hash} from '../utils/hashing.js';
 import {DEFAULT_SUMMARY_MODEL} from './constants.js';
-import type {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
+import type {AiSdkRunner} from '../codegen/ai-sdk/ai-sdk-runner.js';
 import {getRunnerByName} from '../codegen/runner-creation.js';
 
 interface CategoryConfig {
@@ -82,7 +82,7 @@ export class Environment {
     | null;
 
   /** Runner that user can use to access an LLM to augment prompts. */
-  private augmentationRunner: GenkitRunner | null = null;
+  private augmentationRunner: AiSdkRunner | null = null;
 
   /** User-provided callback for augmenting the LLM-generated files. */
   private readonly augmentFileCallback: ((file: LlmResponseFile) => string) | null;
@@ -302,7 +302,7 @@ export class Environment {
           }).then(text => (promptDef.prompt = text)),
         );
       };
-      this.augmentationRunner ??= await getRunnerByName('genkit');
+      this.augmentationRunner ??= await getRunnerByName('ai-sdk');
 
       for (const rootPrompt of prompts) {
         if (rootPrompt.kind === 'multi-step') {

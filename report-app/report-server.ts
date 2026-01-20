@@ -14,14 +14,13 @@ import {
   AiChatRequest,
   AIConfigState,
   AssessmentResultFromReportServer,
-  IndividualAssessmentState,
   RunInfo,
   RunInfoFromReportServer,
 } from '../runner/shared-interfaces';
 
 // This will result in a lot of loading and would slow down the serving,
 // so it's loaded lazily below.
-import {type GenkitRunner} from '../runner/codegen/genkit/genkit-runner';
+import {type AiSdkRunner} from '../runner/codegen/ai-sdk/ai-sdk-runner';
 
 const app = express();
 const reportsLoader = await getReportLoader();
@@ -89,11 +88,11 @@ app.get('/api/reports/:id', async (req, res) => {
   res.json(result ?? []);
 });
 
-let llm: Promise<GenkitRunner> | null = null;
+let llm: Promise<AiSdkRunner> | null = null;
 
-/** Lazily initializes and returns the genkit runner. */
-async function getOrCreateGenkitLlmRunner() {
-  const llm = new (await import('../runner/codegen/genkit/genkit-runner')).GenkitRunner();
+/** Lazily initializes and returns the LLM runner. */
+async function getOrCreateRunner() {
+  const llm = new (await import('../runner/codegen/ai-sdk/ai-sdk-runner')).AiSdkRunner();
   // Gracefully shut down the runner on exit.
   process.on('SIGINT', () => llm!.dispose());
   process.on('SIGTERM', () => llm!.dispose());
@@ -116,7 +115,7 @@ app.post('/api/reports/:id/chat', async (req, res) => {
 
     const abortController = new AbortController();
     const summary = await chatWithReportAI(
-      await (llm ?? getOrCreateGenkitLlmRunner()),
+      await (llm ?? getOrCreateRunner()),
       prompt,
       abortController.signal,
       allAssessments,
@@ -138,9 +137,9 @@ app.post('/api/reports/:id/chat', async (req, res) => {
 
 app.get('/api/ai-config-state', async (req, res) => {
   try {
-    const llm = await getOrCreateGenkitLlmRunner();
+    const llm = await getOrCreateRunner();
     return res.json({
-      configuredModels: llm.getSupportedModelsWithAPIKey(),
+      configuredModels: llm.getSupportedModels(),
     } satisfies AIConfigState);
   } catch (e) {
     console.error('Could not instantiate LLM instance. Error:', e);

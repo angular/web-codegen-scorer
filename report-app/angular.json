@@ -20,13 +20,8 @@
               "@firebase/app",
               "@firebase/firestore",
               "tiktoken",
-              "genkit",
-              "@genkit-ai/compat-oai",
-              "@genkit-ai/googleai",
-              "@genkit-ai/mcp",
               "@google/genai",
               "@google/generative-ai",
-              "genkitx-anthropic",
               "node-fetch"
             ],
             "allowedCommonJsDependencies": [

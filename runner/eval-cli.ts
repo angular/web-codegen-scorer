@@ -63,8 +63,8 @@ function builder(argv: Argv): Argv<Options> {
       // Option is a noop right now when using a remote environment.
       .option('runner', {
         type: 'string',
-        default: 'genkit' as const,
-        choices: ['genkit', 'ai-sdk', 'gemini-cli', 'claude-code', 'codex'] as RunnerName[],
+        default: 'ai-sdk' as const,
+        choices: ['ai-sdk', 'gemini-cli', 'claude-code', 'codex'] as RunnerName[],
         description: 'Runner to use to execute the eval',
       })
       .option('local', {

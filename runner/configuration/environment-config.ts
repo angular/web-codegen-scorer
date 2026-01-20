@@ -15,7 +15,7 @@ import {
   ReportContextFilter,
 } from '../shared-interfaces.js';
 import type {Environment} from './environment.js';
-import type {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
+import type {AiSdkRunner} from '../codegen/ai-sdk/ai-sdk-runner.js';
 
 export const environmentConfigSchema = z.object({
   /** Display name for the environment. */
@@ -155,7 +155,7 @@ export interface PromptAugmentationContext {
   /** Environment running the evaluation. */
   environment: Environment;
   /** Runner that the user can use for augmentation. */
-  runner: GenkitRunner;
+  runner: AiSdkRunner;
 }
 
 /** Asserts that the specified data is a valid environment config. */
@@ -169,8 +169,6 @@ export function assertIsEnvironmentConfig(value: unknown): asserts value is Envi
     .safeParse(value);
 
   if (!validationResult.success) {
-    // TODO: we can use `z.prettifyError` once we update to zod v4,
-    // but last time the update caused some issues with Genkit.
     const message = fromError(validationResult.error, {
       messageBuilder: createMessageBuilder({
         prefix: 'Environment parsing failed:',

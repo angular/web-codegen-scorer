@@ -1,15 +1,14 @@
-import {AnthropicProviderOptions} from '@ai-sdk/anthropic';
-import {GoogleGenerativeAIProviderOptions} from '@ai-sdk/google';
-import {OpenAIResponsesProviderOptions} from '@ai-sdk/openai';
 import {
   FilePart,
   generateText,
-  LanguageModel,
   ModelMessage,
   Output,
   SystemModelMessage,
   TextPart,
+  ToolSet,
 } from 'ai';
+import {createMCPClient, MCPClient} from '@ai-sdk/mcp';
+import {Experimental_StdioMCPTransport as StdioClientTransport} from '@ai-sdk/mcp/mcp-stdio';
 import z from 'zod';
 import {combineAbortSignals} from '../../utils/abort-signal.js';
 import {callWithTimeout} from '../../utils/timeout.js';
@@ -21,14 +20,22 @@ import {
   LocalLlmGenerateFilesResponse,
   LocalLlmGenerateTextRequestOptions,
   LocalLlmGenerateTextResponse,
+  McpServerDetails,
+  McpServerOptions,
   PromptDataMessage,
 } from '../llm-runner.js';
 import {ANTHROPIC_MODELS, getAiSdkModelOptionsForAnthropic} from './anthropic.js';
 import {getAiSdkModelOptionsForGoogle, GOOGLE_MODELS} from './google.js';
 import {getAiSdkModelOptionsForOpenAI, OPENAI_MODELS} from './openai.js';
 import {AiSdkModelOptions} from './ai-sdk-model-options.js';
+import {getAiSdkModelOptionsForXai, XAI_MODELS} from './xai.js';
 
-const SUPPORTED_MODELS = [...GOOGLE_MODELS, ...ANTHROPIC_MODELS, ...OPENAI_MODELS] as const;
+const SUPPORTED_MODELS = [
+  ...GOOGLE_MODELS,
+  ...ANTHROPIC_MODELS,
+  ...OPENAI_MODELS,
+  ...XAI_MODELS,
+] as const;
 
 // Increased to a very high value as we rely on an actual timeout
 // that aborts stuck LLM requests. WCS is targeting stability here;
@@ -36,9 +43,10 @@ const SUPPORTED_MODELS = [...GOOGLE_MODELS, ...ANTHROPIC_MODELS, ...OPENAI_MODEL
 const DEFAULT_MAX_RETRIES = 100000;
 
 export class AiSdkRunner implements LlmRunner {
-  displayName = 'AI SDK';
-  id = 'ai-sdk';
-  hasBuiltInRepairLoop = true;
+  readonly displayName = 'AI SDK';
+  readonly id = 'ai-sdk';
+  readonly hasBuiltInRepairLoop = true;
+  private mcpClients: MCPClient[] | null = null;
 
   async generateText(
     options: LocalLlmGenerateTextRequestOptions,
@@ -49,6 +57,7 @@ export class AiSdkRunner implements LlmRunner {
         abortSignal: abortSignal,
         messages: this.convertRequestToMessagesList(options),
         maxRetries: DEFAULT_MAX_RETRIES,
+        tools: await this.getTools(),
       }),
     );
 
@@ -75,6 +84,7 @@ export class AiSdkRunner implements LlmRunner {
         output: Output.object<z.infer<T>>({schema: options.schema}),
         abortSignal: abortSignal,
         maxRetries: DEFAULT_MAX_RETRIES,
+        tools: await this.getTools(),
       }),
     );
 
@@ -120,7 +130,42 @@ export class AiSdkRunner implements LlmRunner {
     return [...SUPPORTED_MODELS];
   }
 
-  async dispose(): Promise<void> {}
+  async dispose(): Promise<void> {
+    if (this.mcpClients) {
+      for (const client of this.mcpClients) {
+        try {
+          await client.close();
+        } catch (error) {
+          console.error(`Failed to close MCP client`, error);
+        }
+      }
+    }
+  }
+
+  async startMcpServerHost(
+    _hostName: string,
+    servers: McpServerOptions[],
+  ): Promise<McpServerDetails> {
+    const details: McpServerDetails = {resources: [], tools: []};
+
+    for (const server of servers) {
+      const client = await createMCPClient({
+        transport: new StdioClientTransport({
+          command: server.command,
+          args: server.args,
+          env: server.env,
+        }),
+      });
+
+      const [resources, tools] = await Promise.all([client.listResources(), client.tools()]);
+      resources.resources.forEach(r => details.resources.push(r.name));
+      details.tools.push(...Object.keys(tools));
+      this.mcpClients ??= [];
+      this.mcpClients.push(client);
+    }
+
+    return details;
+  }
 
   private async _wrapRequestWithTimeoutAndRateLimiting<T>(
     request: LocalLlmGenerateTextRequestOptions | LocalLlmConstrainedOutputGenerateRequestOptions,
@@ -145,7 +190,8 @@ export class AiSdkRunner implements LlmRunner {
     const result =
       (await getAiSdkModelOptionsForGoogle(request.model)) ??
       (await getAiSdkModelOptionsForAnthropic(request.model)) ??
-      (await getAiSdkModelOptionsForOpenAI(request.model));
+      (await getAiSdkModelOptionsForOpenAI(request.model)) ??
+      (await getAiSdkModelOptionsForXai(request.model));
     if (result === null) {
       throw new Error(`Unexpected unsupported model: ${request.model}`);
     }
@@ -197,5 +243,19 @@ export class AiSdkRunner implements LlmRunner {
       }
     }
     return result;
+  }
+
+  private async getTools(): Promise<ToolSet | undefined> {
+    let tools: ToolSet | undefined;
+
+    if (this.mcpClients) {
+      for (const client of this.mcpClients) {
+        const clientTools = (await client.tools()) as ToolSet;
+        tools ??= {};
+        Object.keys(clientTools).forEach(name => (tools![name] = clientTools[name]));
+      }
+    }
+
+    return tools;
   }
 }

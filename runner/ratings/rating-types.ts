@@ -9,8 +9,8 @@ import type {
   Usage,
 } from '../shared-interfaces.js';
 import {Environment} from '../configuration/environment.js';
-import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 import {ServeTestingResult} from '../workers/serve-testing/worker-types.js';
+import {AiSdkRunner} from '../codegen/ai-sdk/ai-sdk-runner.js';
 
 /** Possible types of ratings. */
 export enum RatingKind {
@@ -181,7 +181,7 @@ export interface LLMBasedRatingContext {
   environment: Environment;
   fullPromptText: string;
   currentPromptDef: PromptDefinition;
-  llm: GenkitRunner;
+  llm: AiSdkRunner;
   model: string;
   outputFiles: LlmResponseFile[];
   buildResult: BuildResult;

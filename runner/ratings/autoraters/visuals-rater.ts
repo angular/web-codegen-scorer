@@ -7,11 +7,11 @@ import {
   MAX_RATING,
   MIN_RATING,
 } from './auto-rate-shared.js';
-import {GenkitRunner} from '../../codegen/genkit/genkit-runner.js';
 import defaultVisualRaterPrompt from './visual-rating-prompt.js';
 import {Environment} from '../../configuration/environment.js';
 import {screenshotUrlToPngBuffer} from '../../utils/screenshots.js';
 import {Usage} from '../../shared-interfaces.js';
+import {AiSdkRunner} from '../../codegen/ai-sdk/ai-sdk-runner.js';
 
 /**
  * Automatically rate the appearance of a screenshot using an LLM.
@@ -24,7 +24,7 @@ import {Usage} from '../../shared-interfaces.js';
  * @param label Label for the rating, used for logging.
  */
 export async function autoRateAppearance(
-  llm: GenkitRunner,
+  llm: AiSdkRunner,
   abortSignal: AbortSignal,
   model: string,
   environment: Environment,

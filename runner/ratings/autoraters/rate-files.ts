@@ -1,15 +1,10 @@
 import {greenCheckmark} from '../../reporting/format.js';
-import {
-  AutoraterRunInfo,
-  IndividualAssessment,
-  LlmResponseFile,
-  SkippedIndividualAssessment,
-} from '../../shared-interfaces.js';
+import {AutoraterRunInfo, LlmResponseFile} from '../../shared-interfaces.js';
 import {autoRateCode} from './code-rater.js';
 import {autoRateAppearance} from './visuals-rater.js';
 import {Environment} from '../../configuration/environment.js';
-import {GenkitRunner} from '../../codegen/genkit/genkit-runner.js';
 import {RatingsResult} from '../rating-types.js';
+import {AiSdkRunner} from '../../codegen/ai-sdk/ai-sdk-runner.js';
 
 /**
  * Automatically rates the code inside of a file.
@@ -22,7 +17,7 @@ import {RatingsResult} from '../rating-types.js';
  * @param ratingsResult Context containing results from previous ratings.
  */
 export async function autoRateFiles(
-  llm: GenkitRunner,
+  llm: AiSdkRunner,
   abortSignal: AbortSignal,
   model: string,
   environment: Environment,

@@ -1,4 +1,4 @@
-import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
+import {AiSdkRunner} from '../codegen/ai-sdk/ai-sdk-runner.js';
 import {Environment} from '../configuration/environment.js';
 import {redX} from '../reporting/format.js';
 import {chatWithReportAI} from '../reporting/report-ai-chat.js';
@@ -10,7 +10,7 @@ import {AssessmentResult, CompletionStats, RunSummary} from '../shared-interface
  * and also some extra metadata about the run.
  */
 export async function prepareSummary(
-  generateAiSummaryLlm: GenkitRunner | null,
+  generateAiSummaryLlm: AiSdkRunner | null,
   abortSignal: AbortSignal,
   evalRunModel: string,
   env: Environment,

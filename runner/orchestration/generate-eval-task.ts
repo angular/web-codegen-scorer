@@ -1,5 +1,4 @@
 import PQueue from 'p-queue';
-import {GenkitRunner} from '../codegen/genkit/genkit-runner.js';
 import {Environment} from '../configuration/environment.js';
 import {
   AssessmentConfig,
@@ -18,6 +17,7 @@ import {attemptBuildAndTest} from './build-serve-test-loop.js';
 import {rateGeneratedCode} from '../ratings/rate-code.js';
 import {DEFAULT_AUTORATER_MODEL_NAME} from '../configuration/constants.js';
 import assert from 'node:assert';
+import {AiSdkRunner} from '../codegen/ai-sdk/ai-sdk-runner.js';
 
 /**
  * Creates and executes a task to generate or load code for a given prompt,
@@ -32,8 +32,8 @@ export async function startEvaluationTask(
   config: AssessmentConfig,
   evalID: EvalID,
   env: Environment,
-  autoraterLlm: GenkitRunner | null,
-  cujGenerationLlm: GenkitRunner | null,
+  autoraterLlm: AiSdkRunner | null,
+  cujGenerationLlm: AiSdkRunner | null,
   rootPromptDef: PromptDefinition | MultiStepPromptDefinition,
   abortSignal: AbortSignal,
   workerConcurrencyQueue: PQueue,

@@ -1,12 +1,10 @@
 import {Argv, CommandModule, Options} from 'yargs';
-import {input, confirm} from '@inquirer/prompts';
-import chalk from 'chalk';
+import {input} from '@inquirer/prompts';
 import {join, relative, dirname} from 'path';
 import {cp} from 'fs/promises';
 import {formatTitleCard} from './reporting/format.js';
 import {generateId} from './utils/id-generation.js';
 import {safeWriteFile, toProcessAbsolutePath} from './file-system-utils.js';
-import {MODEL_PROVIDERS} from './codegen/genkit/models.js';
 
 export const InitModule = {
   builder,
@@ -55,22 +53,6 @@ async function getAnswers(): Promise<InitOptions | null> {
 
   // Add some spaces at the end to align to the text of the line above.
   const newLineSeparator = '\n  ';
-  const apiKeyVariables = MODEL_PROVIDERS.map(p => p.apiKeyVariableName);
-
-  if (!apiKeyVariables.some(name => process.env[name])) {
-    const hasConfirmed = await confirm({
-      message: chalk.red(
-        `Could not detect an API key in any of the following environment variables: ${apiKeyVariables.join(', ')}` +
-          newLineSeparator +
-          'You may not be able to run the evals. Do you want to continue generating an environment anyway?',
-      ),
-    });
-
-    if (!hasConfirmed) {
-      return null;
-    }
-  }
-
   const displayName = await input({
     message: 'What will be the name of your environment?',
     required: true,
