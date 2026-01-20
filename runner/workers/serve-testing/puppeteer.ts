@@ -67,8 +67,9 @@ export async function runAppInPuppeteer(
   });
 
   page.on('pageerror', error => {
-    progressLog('error', 'Page error', error.message);
-    runtimeErrors.push(error.toString());
+    const errorMessage = error instanceof Error ? error.message : `${error}`;
+    progressLog('error', 'Page error', errorMessage);
+    runtimeErrors.push(errorMessage);
   });
 
   await page.setViewport({width: 1280, height: 720});
