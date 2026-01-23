@@ -20,7 +20,7 @@ export class AppColorMode {
       } catch {}
 
       if (!colorMode) {
-        colorMode = matchMedia('(prefers-color-scheme: dark)') ? 'dark' : 'light';
+        colorMode = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
 
       this.setColorMode(colorMode);
