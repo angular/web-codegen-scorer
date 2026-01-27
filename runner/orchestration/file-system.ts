@@ -80,7 +80,7 @@ export async function setupProjectStructure(
   }
 
   if (env.executor instanceof LocalExecutor && env.executor.config.sourceDirectory) {
-    const sourceDirectory = join(env.rootPath, env.executor.config.sourceDirectory);
+    const sourceDirectory = resolve(env.rootPath, env.executor.config.sourceDirectory);
 
     // Push this after the project so the environment's files that precedence.
     directoriesToCopy.push(sourceDirectory);
