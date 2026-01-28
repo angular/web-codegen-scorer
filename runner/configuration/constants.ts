@@ -24,6 +24,15 @@ export const DEFAULT_SUMMARY_MODEL = 'gemini-2.5-flash-lite';
 export const LLM_OUTPUT_DIR = join(rootDir, 'llm-output');
 
 /**
+ * Path for WCS temporary directories.
+ *
+ * We want temporary workspaces to be nested inside the root project to
+ * better support symlinked node modules. E.g. Turbopack will otherwise
+ * fail if symlinked node modules are not reachable via parent directories.
+ */
+export const WCS_BASE_TMP_DIR = join(rootDir, 'tmp-workspaces');
+
+/**
  * Number of times we'll try to ask LLM to repair a build failure,
  * providing the build output and the code that causes the problem.
  */

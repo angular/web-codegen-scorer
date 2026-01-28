@@ -1,5 +1,4 @@
-import {tmpdir} from 'os';
-import {LLM_OUTPUT_DIR} from '../configuration/constants.js';
+import {LLM_OUTPUT_DIR, WCS_BASE_TMP_DIR} from '../configuration/constants.js';
 import {Environment} from '../configuration/environment.js';
 import {
   copyFolderExcept,
@@ -25,6 +24,7 @@ const PENDING_INSTALLS = new Map<string, Promise<void>>();
  * @param env Environment that is currently being run.
  * @param rootPromptDef Definition of the root prompt.
  * @param progress Logger to use to log out the current progress.
+ * @param tmpdirBasePath Base path for temporary directories (like `/tmp`).
  * @param outputDirectory Custom output directory specified by the user.
  * @returns Temporary directory in which to build and a function used to clean in up.
  */
@@ -32,6 +32,7 @@ export async function setupProjectStructure(
   env: Environment,
   rootPromptDef: RootPromptDefinition,
   progress: ProgressLogger,
+  tmpdirBasePath: string = WCS_BASE_TMP_DIR,
   outputDirectory?: string,
 ) {
   let directory: string;
@@ -48,7 +49,8 @@ export async function setupProjectStructure(
     cleanup = () => Promise.resolve();
   } else {
     // When outputting to the temporary directory, make sure that the directory is unique.
-    directory = await mkdtemp(join(tmpdir(), `fw-${env.id}-build-${rootPromptDef.name}`));
+    await mkdir(tmpdirBasePath, {recursive: true});
+    directory = await mkdtemp(join(tmpdirBasePath, `fw-${env.id}-build-${rootPromptDef.name}`));
 
     cleanup = async () => {
       try {
