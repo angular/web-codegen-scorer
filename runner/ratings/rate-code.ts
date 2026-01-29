@@ -312,7 +312,11 @@ async function runLlmBasedRating(
   let message = `${getMessage(result.coefficient)}\n${result.details.summary}`;
 
   if (result.coefficient < 1) {
-    message += ':\n' + result.details.categories.map(category => category.message).join('\n  ');
+    message +=
+      ':\n' +
+      result.details.categories
+        .map(category => `${category.name}: ${category.message}`)
+        .join('\n  ');
   }
 
   return getIndividualAssessment(rating, result.coefficient, message);
