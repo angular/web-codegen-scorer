@@ -9,17 +9,17 @@ importers:
   .:
     dependencies:
       '@ai-sdk/anthropic':
-        specifier: 3.0.23
-        version: 3.0.23(zod@3.25.76)
+        specifier: 3.0.29
+        version: 3.0.29(zod@3.25.76)
       '@ai-sdk/google':
-        specifier: 3.0.13
-        version: 3.0.13(zod@3.25.76)
+        specifier: 3.0.16
+        version: 3.0.16(zod@3.25.76)
       '@ai-sdk/mcp':
-        specifier: 1.0.13
-        version: 1.0.13(zod@3.25.76)
+        specifier: 1.0.14
+        version: 1.0.14(zod@3.25.76)
       '@ai-sdk/openai':
-        specifier: 3.0.19
-        version: 3.0.19(zod@3.25.76)
+        specifier: 3.0.21
+        version: 3.0.21(zod@3.25.76)
       '@ai-sdk/provider':
         specifier: 3.0.5
         version: 3.0.5
@@ -54,8 +54,8 @@ importers:
         specifier: ^17.0.35
         version: 17.0.35
       ai:
-        specifier: 6.0.49
-        version: 6.0.49(zod@3.25.76)
+        specifier: 6.0.59
+        version: 6.0.59(zod@3.25.76)
       axe-core:
         specifier: ^4.11.1
         version: 4.11.1
@@ -133,11 +133,11 @@ importers:
         specifier: ^2.1.12
         version: 2.1.12
       '@google/gemini-cli':
-        specifier: ^0.25.0
-        version: 0.25.2(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(@opentelemetry/core@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)
+        specifier: ^0.26.0
+        version: 0.26.0(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(@opentelemetry/core@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)
       '@openai/codex':
-        specifier: ^0.91.0
-        version: 0.91.0
+        specifier: ^0.92.0
+        version: 0.92.0
       prettier:
         specifier: ^3.8.0
         version: 3.8.0
@@ -236,8 +236,8 @@ importers:
         specifier: ~5.1.0
         version: 5.1.0(karma@6.4.4)
       karma-jasmine-html-reporter:
-        specifier: ~2.1.0
-        version: 2.1.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4)
+        specifier: ~2.2.0
+        version: 2.2.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4)
       prettier:
         specifier: ^3.5.3
         version: 3.6.2
@@ -262,31 +262,31 @@ packages:
       express:
         optional: true
 
-  '@agentclientprotocol/sdk@0.11.0':
-    resolution: {integrity: sha512-hngnMwQ13DCC7oEr0BUnrx+vTDFf/ToCLhF0YcCMWRs+v4X60rKQyAENsx0PdbQF21jC1VjMFkh2+vwNBLh6fQ==}
+  '@agentclientprotocol/sdk@0.12.0':
+    resolution: {integrity: sha512-V8uH/KK1t7utqyJmTA7y7DzKu6+jKFIXM+ZVouz8E55j8Ej2RV42rEvPKn3/PpBJlliI5crcGk1qQhZ7VwaepA==}
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
-  '@ai-sdk/anthropic@3.0.23':
-    resolution: {integrity: sha512-mu9djDW2kiJS/ihH5BwGy2c/zwSlcTjx1NWPvY/Ug12SWToqzozSyd1EIXRlfXyfwzL2CWrqMNyybqi9OVDXgg==}
+  '@ai-sdk/anthropic@3.0.29':
+    resolution: {integrity: sha512-Yo+LG0WZuv2QXgpeh95zDeFBy/D02yEgWFCLYE1y72XZzuZ6M/g8tcMyTFOVyfM4yULRE7wShIq2VUYTwi1ZKw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/gateway@3.0.22':
-    resolution: {integrity: sha512-NgnlY73JNuooACHqUIz5uMOEWvqR1MMVbb2soGLMozLY1fgwEIF5iJFDAGa5/YArlzw2ATVU7zQu7HkR/FUjgA==}
+  '@ai-sdk/gateway@3.0.27':
+    resolution: {integrity: sha512-Pr+ApS9k6/jcR3kNltJNxo60OdYvnVU4DeRhzVtxUAYTXCHx4qO+qTMG9nNRn+El1acJnNRA//Su47srjXkT/w==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/google@3.0.13':
-    resolution: {integrity: sha512-HYCh8miS4FLxOIpjo/BmoFVMO5BuxNpHVVDQkoJotoH8ZSFftkJJGGayIxQT/Lwx9GGvVVCOQ+lCdBBAnkl1sA==}
+  '@ai-sdk/google@3.0.16':
+    resolution: {integrity: sha512-aflGst6QdfDFEZ+il1Fm8179BkEEXWbF0WI7CB8bzHCmJSRkrRLilacnogsN4VFup5Wg5jWKCfukThTf7S2xAg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/mcp@1.0.13':
-    resolution: {integrity: sha512-yQEa+X5/QNmWlNwURAMlobmipvg4i/3L0iTz7pJQ/Z2Imjgp/y8gRAxkIzXL1HzlOxF4Dm/4PHpHrXaSV+EAUQ==}
+  '@ai-sdk/mcp@1.0.14':
+    resolution: {integrity: sha512-Rv8dORNPHH9RddwHfxBf9IBPSgmKa9YsWxnfH24PgnocDFE26Abqq8gPGMmFtN6gjZmC7qGrfqxTww+/dTtMCg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -297,20 +297,20 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/openai@3.0.19':
-    resolution: {integrity: sha512-qpMGKV6eYfW8IzErk/OppchQwVui3GPc4BEfg/sQGRzR89vf2Sa8qvSavXeZi5w/oUF56d+VtobwSH0FRooFCQ==}
+  '@ai-sdk/openai@3.0.21':
+    resolution: {integrity: sha512-6RzVqDNoJOptlMD4Wn9D2pZytiVgzeJSpm+E3Yvb2mO51CtklqhLmNur+DW2RpP/cGKgBDCbyns3yoJUd1hIhQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/provider-utils@4.0.10':
+    resolution: {integrity: sha512-VeDAiCH+ZK8Xs4hb9Cw7pHlujWNL52RKe8TExOkrw6Ir1AmfajBZTb9XUdKOZO08RwQElIKA8+Ltm+Gqfo8djQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
   '@ai-sdk/provider-utils@4.0.8':
     resolution: {integrity: sha512-ns9gN7MmpI8vTRandzgz+KK/zNMLzhrriiKECMt4euLtQFSBgNfydtagPOX4j4pS1/3KvHF6RivhT3gNQgBZsg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
-
-  '@ai-sdk/provider-utils@4.0.9':
-    resolution: {integrity: sha512-bB4r6nfhBOpmoS9mePxjRoCy+LnzP3AfhyMGCkGL4Mn9clVNlqEeKj26zEKEtB6yoSVcT1IQ0Zh9fytwMCDnow==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -1031,12 +1031,12 @@ packages:
     resolution: {integrity: sha512-Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==}
     engines: {node: '>=14'}
 
-  '@google/gemini-cli-core@0.25.2':
-    resolution: {integrity: sha512-ah/xszZSC0Eycb4wl541pAFyfKc2CsX6kLExReqGmml2YA3ts/2NQ/oB666D+odiE7Ved6cYdwu/k3i0izDWNA==}
+  '@google/gemini-cli-core@0.26.0':
+    resolution: {integrity: sha512-tMGQSz5SrF+yYCd6XYyA+nPjCqvAgLWT5W+c6tfbU/cCorfZILcUYwxojCAz3fvYK1znW+REZekOvywhkKnp/w==}
     engines: {node: '>=20'}
 
-  '@google/gemini-cli@0.25.2':
-    resolution: {integrity: sha512-qz3krT7W1+NsQr18tl3KurFzpmXOuP3AiVWsuc8EFZvQebzGPJ5TBP+PF7t3ad4BBGygQgw/OLopnTdIeJWZLQ==}
+  '@google/gemini-cli@0.26.0':
+    resolution: {integrity: sha512-V3YueAz+7zqNLo8KWEMKQkCLvy7dp2SfYXvq11CDQIC3iPbh1NHEjR+anbU4FI/sL9ecYgcxoHAiLqbUFyCRNA==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -1819,8 +1819,8 @@ packages:
     resolution: {integrity: sha512-vaQj4nccJbAslopIvd49pQH2NhUp7G9pY4byUtmwhe37ZZuubGrx0eB9hW2F37uVNRuDDK6byFGXF+7JCuMSZg==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  '@openai/codex@0.91.0':
-    resolution: {integrity: sha512-eRLRg0+uM0g0iW+Ca5VedBk+laslLcq93Hf6rbFtv+gLb4+aMib2UPdvlDlvvCVkBMbvE8ckY/cju+iOOuKCNA==}
+  '@openai/codex@0.92.0':
+    resolution: {integrity: sha512-DR9A2QlJDtEpMwqUGMIztTCzzCYTVrM7rqG3XuMVURnQ4b7XrScmY5RnSUuUZ/ga7wDTqw0BTmVzPurm4NX3Tw==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -2974,8 +2974,8 @@ packages:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
 
-  ai@6.0.49:
-    resolution: {integrity: sha512-LABniBX/0R6Tv+iUK5keUZhZLaZUe4YjP5M2rZ4wAdZ8iKV3EfTAoJxuL1aaWTSJKIilKa9QUEkCgnp89/32bw==}
+  ai@6.0.59:
+    resolution: {integrity: sha512-9SfCvcr4kVk4t8ZzIuyHpuL1hFYKsYMQfBSbBq3dipXPa+MphARvI8wHEjNaRqYl3JOsJbWxEBIMqHL0L92mUA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -4684,10 +4684,10 @@ packages:
     resolution: {integrity: sha512-yj7hbequkQP2qOSb20GuNSIyE//PgJWHwC2IydLE6XRtsnaflv+/OSGNssPjobYUlhVVagy99TQpqUt3vAUG7A==}
     engines: {node: '>=10.0.0'}
 
-  karma-jasmine-html-reporter@2.1.0:
-    resolution: {integrity: sha512-sPQE1+nlsn6Hwb5t+HHwyy0A1FNCVKuL1192b+XNauMYWThz2kweiBVW1DqloRpVvZIJkIoHVB7XRpK78n1xbQ==}
+  karma-jasmine-html-reporter@2.2.0:
+    resolution: {integrity: sha512-J0laEC43Oy2RdR5V5R3bqmdo7yRIYySq6XHKbA+e5iSAgLjhR1oICLGeSREPlJXpeyNcdJf3J17YcdhD0mRssQ==}
     peerDependencies:
-      jasmine-core: ^4.0.0 || ^5.0.0
+      jasmine-core: ^4.0.0 || ^5.0.0 || ^6.0.0
       karma: ^6.0.0
       karma-jasmine: ^5.0.0
 
@@ -6716,33 +6716,33 @@ snapshots:
       '@grpc/grpc-js': 1.14.3
       express: 5.2.1
 
-  '@agentclientprotocol/sdk@0.11.0(zod@3.25.76)':
+  '@agentclientprotocol/sdk@0.12.0(zod@3.25.76)':
     dependencies:
       zod: 3.25.76
 
-  '@ai-sdk/anthropic@3.0.23(zod@3.25.76)':
+  '@ai-sdk/anthropic@3.0.29(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.5
-      '@ai-sdk/provider-utils': 4.0.9(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.10(zod@3.25.76)
       zod: 3.25.76
 
-  '@ai-sdk/gateway@3.0.22(zod@3.25.76)':
+  '@ai-sdk/gateway@3.0.27(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.5
-      '@ai-sdk/provider-utils': 4.0.9(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.10(zod@3.25.76)
       '@vercel/oidc': 3.1.0
       zod: 3.25.76
 
-  '@ai-sdk/google@3.0.13(zod@3.25.76)':
+  '@ai-sdk/google@3.0.16(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.5
-      '@ai-sdk/provider-utils': 4.0.9(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.10(zod@3.25.76)
       zod: 3.25.76
 
-  '@ai-sdk/mcp@1.0.13(zod@3.25.76)':
+  '@ai-sdk/mcp@1.0.14(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.5
-      '@ai-sdk/provider-utils': 4.0.9(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.10(zod@3.25.76)
       pkce-challenge: 5.0.1
       zod: 3.25.76
 
@@ -6752,22 +6752,22 @@ snapshots:
       '@ai-sdk/provider-utils': 4.0.8(zod@3.25.76)
       zod: 3.25.76
 
-  '@ai-sdk/openai@3.0.19(zod@3.25.76)':
+  '@ai-sdk/openai@3.0.21(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.5
-      '@ai-sdk/provider-utils': 4.0.9(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.10(zod@3.25.76)
+      zod: 3.25.76
+
+  '@ai-sdk/provider-utils@4.0.10(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.5
+      '@standard-schema/spec': 1.1.0
+      eventsource-parser: 3.0.6
       zod: 3.25.76
 
   '@ai-sdk/provider-utils@4.0.8(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.4
-      '@standard-schema/spec': 1.1.0
-      eventsource-parser: 3.0.6
-      zod: 3.25.76
-
-  '@ai-sdk/provider-utils@4.0.9(zod@3.25.76)':
-    dependencies:
-      '@ai-sdk/provider': 3.0.5
       '@standard-schema/spec': 1.1.0
       eventsource-parser: 3.0.6
       zod: 3.25.76
@@ -7630,7 +7630,7 @@ snapshots:
 
   '@google-cloud/promisify@4.0.0': {}
 
-  '@google/gemini-cli-core@0.25.2(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(@opentelemetry/core@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)':
+  '@google/gemini-cli-core@0.26.0(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(@opentelemetry/core@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)':
     dependencies:
       '@a2a-js/sdk': 0.3.9(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(express@5.2.1)
       '@google-cloud/logging': 11.2.1(encoding@0.1.13)
@@ -7707,16 +7707,17 @@ snapshots:
       - tree-sitter
       - utf-8-validate
 
-  '@google/gemini-cli@0.25.2(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(@opentelemetry/core@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)':
+  '@google/gemini-cli@0.26.0(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(@opentelemetry/core@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)':
     dependencies:
-      '@agentclientprotocol/sdk': 0.11.0(zod@3.25.76)
-      '@google/gemini-cli-core': 0.25.2(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(@opentelemetry/core@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)
+      '@agentclientprotocol/sdk': 0.12.0(zod@3.25.76)
+      '@google/gemini-cli-core': 0.26.0(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(@opentelemetry/core@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.4.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.0.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)
       '@google/genai': 1.30.0(@modelcontextprotocol/sdk@1.25.2(hono@4.11.4)(zod@3.25.76))
       '@iarna/toml': 2.2.5
       '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.4)(zod@3.25.76)
       '@types/update-notifier': 6.0.8
       ansi-regex: 6.2.2
       clipboardy: 5.1.0
+      color-convert: 2.0.1
       command-exists: 1.2.9
       comment-json: 4.5.1
       diff: 7.0.0
@@ -8512,7 +8513,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@openai/codex@0.91.0': {}
+  '@openai/codex@0.92.0': {}
 
   '@opentelemetry/api-logs@0.203.0':
     dependencies:
@@ -9809,11 +9810,11 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  ai@6.0.49(zod@3.25.76):
+  ai@6.0.59(zod@3.25.76):
     dependencies:
-      '@ai-sdk/gateway': 3.0.22(zod@3.25.76)
+      '@ai-sdk/gateway': 3.0.27(zod@3.25.76)
       '@ai-sdk/provider': 3.0.5
-      '@ai-sdk/provider-utils': 4.0.9(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.10(zod@3.25.76)
       '@opentelemetry/api': 1.9.0
       zod: 3.25.76
 
@@ -11786,7 +11787,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  karma-jasmine-html-reporter@2.1.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4):
+  karma-jasmine-html-reporter@2.2.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4):
     dependencies:
       jasmine-core: 5.13.0
       karma: 6.4.4
