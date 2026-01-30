@@ -50,6 +50,8 @@ export class Environment {
   readonly clientSideFramework: FrameworkInfo;
   /** Path from which to read the code rating prompt. */
   readonly codeRatingPromptPath: string | null;
+  /** Path from which to read the visual rating prompt. */
+  readonly visualRatingPromptPath: string | null;
   /** Whether the prompts should be removed from the final report. */
   readonly classifyPrompts: boolean;
   /** Whether this is one of the built-in environment that come with the runner. */
@@ -108,6 +110,9 @@ export class Environment {
       : {...this.clientSideFramework};
     this.codeRatingPromptPath = config.codeRatingPrompt
       ? join(rootPath, config.codeRatingPrompt)
+      : null;
+    this.visualRatingPromptPath = config.visualRatingPrompt
+      ? join(rootPath, config.visualRatingPrompt)
       : null;
     this.classifyPrompts = config.classifyPrompts ?? false;
     this.isBuiltIn = rootPath.includes('node_modules');

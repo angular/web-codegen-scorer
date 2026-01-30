@@ -12,6 +12,10 @@ import {Environment} from '../../configuration/environment.js';
 import {screenshotUrlToPngBuffer} from '../../utils/screenshots.js';
 import {Usage} from '../../shared-interfaces.js';
 import {AiSdkRunner} from '../../codegen/ai-sdk/ai-sdk-runner.js';
+import {readFileSync} from 'fs';
+
+/** Cache for visual rating prompts that have been read from disk. */
+const CACHED_VISUAL_RATING_PROMPTS: Record<string, string> = {};
 
 /**
  * Automatically rate the appearance of a screenshot using an LLM.
@@ -32,7 +36,18 @@ export async function autoRateAppearance(
   screenshotPngUrl: string,
   label: string,
 ): Promise<AutoRateResult> {
-  const prompt = environment.renderPrompt(defaultVisualRaterPrompt, null, {
+  let promptText: string;
+  if (environment.visualRatingPromptPath) {
+    CACHED_VISUAL_RATING_PROMPTS[environment.visualRatingPromptPath] ??= readFileSync(
+      environment.visualRatingPromptPath,
+      'utf8',
+    );
+    promptText = CACHED_VISUAL_RATING_PROMPTS[environment.visualRatingPromptPath];
+  } else {
+    promptText = defaultVisualRaterPrompt;
+  }
+
+  const prompt = environment.renderPrompt(promptText, environment.visualRatingPromptPath, {
     APP_PROMPT: appPrompt,
   }).result;
 
