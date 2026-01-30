@@ -70,6 +70,8 @@ export const environmentConfigSchema = z.object({
   fullStackFramework: z.string().optional(),
   /** Path to the prompt to use when rating code. */
   codeRatingPrompt: z.string().optional(),
+  /** Path to the prompt to use when rating screenshots. */
+  visualRatingPrompt: z.string().optional(),
   /** When enabled, the system prompts for this environment won't be included in the report. */
   classifyPrompts: z.boolean().optional(),
   /**
