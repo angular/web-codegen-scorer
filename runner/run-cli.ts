@@ -96,13 +96,13 @@ async function runApp(options: Options) {
 
   try {
     await writeResponseFiles(directory, files, environment, rootPromptDef.name);
-
+    const abortController = new AbortController();
     await serveApp(
       environment.executor.getServeCommand(),
       rootPromptDef,
       directory,
       new NoopProgressLogger(),
-      new AbortSignal(),
+      abortController.signal,
       async url => {
         console.log();
         console.log(formatTitleCard(`🎉 App is up and running at ${url}`));
