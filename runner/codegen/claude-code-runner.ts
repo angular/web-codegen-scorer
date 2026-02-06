@@ -15,6 +15,7 @@ const MODEL_MAPPING: Record<string, string> = {
   'claude-4.0-opus': 'claude-opus-4-20250514',
   'claude-4.5-opus': 'claude-opus-4-5-20251101',
   'claude-4.5-haiku': 'claude-haiku-4-5-20251001',
+  'claude-4.6-opus': 'claude-opus-4-6',
 };
 
 /** Runner that generates code using the Claude Code. */
