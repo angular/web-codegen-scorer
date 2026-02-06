@@ -1,6 +1,7 @@
 import {UserFacingError} from '../utils/errors.js';
 import type {GeminiCliRunner} from './gemini-cli-runner.js';
 import type {ClaudeCodeRunner} from './claude-code-runner.js';
+import type {CopilotCliRunner} from './copilot-cli-runner.js';
 import type {CodexRunner} from './codex-runner.js';
 import type {NoopUnimplementedRunner} from './noop-unimplemented-runner.js';
 import {AiSdkRunner} from './ai-sdk/ai-sdk-runner.js';
@@ -9,6 +10,7 @@ interface AvailableRunners {
   'ai-sdk': AiSdkRunner;
   'gemini-cli': GeminiCliRunner;
   'claude-code': ClaudeCodeRunner;
+  'copilot-cli': CopilotCliRunner;
   'codex': CodexRunner;
   'noop-unimplemented': NoopUnimplementedRunner;
 }
@@ -30,6 +32,10 @@ export async function getRunnerByName<T extends RunnerName>(name: T): Promise<Av
     case 'claude-code':
       return import('./claude-code-runner.js').then(
         m => new m.ClaudeCodeRunner() as AvailableRunners[T],
+      );
+    case 'copilot-cli':
+      return import('./copilot-cli-runner.js').then(
+        m => new m.CopilotCliRunner() as AvailableRunners[T],
       );
     case 'codex':
       return import('./codex-runner.js').then(m => new m.CodexRunner() as AvailableRunners[T]);

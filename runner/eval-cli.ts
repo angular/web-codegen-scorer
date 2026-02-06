@@ -64,7 +64,7 @@ function builder(argv: Argv): Argv<Options> {
       .option('runner', {
         type: 'string',
         default: 'ai-sdk' as const,
-        choices: ['ai-sdk', 'gemini-cli', 'claude-code', 'codex'] as RunnerName[],
+        choices: ['ai-sdk', 'gemini-cli', 'claude-code', 'copilot-cli', 'codex'] as RunnerName[],
         description: 'Runner to use to execute the eval',
       })
       .option('local', {
