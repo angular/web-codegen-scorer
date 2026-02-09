@@ -2,6 +2,7 @@ import {ChildProcess, spawn} from 'child_process';
 import {join, relative} from 'path';
 import {existsSync} from 'fs';
 import assert from 'assert';
+import chalk from 'chalk';
 import {
   LocalLlmConstrainedOutputGenerateResponse,
   LocalLlmGenerateFilesRequestOptions,
@@ -23,15 +24,10 @@ function debugLog(category: string, message: string, data?: unknown): void {
     return;
   }
   const timestamp = new Date().toISOString();
-  const cyan = '\x1b[36m';
-  const dim = '\x1b[2m';
-  const reset = '\x1b[0m';
-  console.error(
-    `${cyan}[DEBUG ${dim}${timestamp}${reset}${cyan}] [${category}] ${message}${reset}`,
-  );
+  console.error(chalk.cyan(`[DEBUG ${chalk.dim(timestamp)}] [${category}] ${message}`));
   if (data !== undefined) {
     console.error(
-      `${cyan}[DEBUG ${dim}${timestamp}${reset}${cyan}] [${category}] Data:${reset}`,
+      chalk.cyan(`[DEBUG ${chalk.dim(timestamp)}] [${category}] Data:`),
       JSON.stringify(data, null, 2),
     );
   }
