@@ -637,6 +637,8 @@ export interface RunGroup {
   };
   /** Runner used to generate code for the runs in the group. */
   runner?: CodegenRunnerInfo;
+  /** Names of prompts that were evaluated in this group. */
+  promptNames: string[];
 }
 
 /** Request information for a file generation. */

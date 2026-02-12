@@ -37,6 +37,11 @@ export async function fetchReportsFromDisk(directory: string): Promise<FetchedLo
       // were part of the same invocation. Add a unique suffix to the ID to
       // prevent further grouping.
       run.group = group.id = `${group.id}-l${index}`;
+
+      // Derive prompt names from the run data for backward compatibility
+      // with older groups.json files that don't have the field.
+      group.promptNames ??= run.results.map(r => r.promptDef.name);
+
       data.set(group.id, {group, run});
     }),
   );
