@@ -94,6 +94,7 @@
   },
   "devDependencies": {
     "@anthropic-ai/claude-code": "^2.1.12",
+    "@github/copilot": "^0.0.405",
     "@google/gemini-cli": "^0.26.0",
     "@openai/codex": "^0.92.0",
     "prettier": "^3.8.0",
