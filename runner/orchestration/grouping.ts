@@ -55,6 +55,7 @@ export function groupSimilarReports(inputRuns: RunInfo[]): RunGroup[] {
     const groupResults: AssessmentResult[] = [];
     const firstRun = groupRuns[0];
     const labels = new Set<string>();
+    const promptNames = new Set<string>();
     let totalForGroup = 0;
     let maxForGroup = 0;
     let appsCount = 0;
@@ -70,6 +71,7 @@ export function groupSimilarReports(inputRuns: RunInfo[]): RunGroup[] {
         totalForRun += result.score.totalPoints;
         maxForRun += result.score.maxOverallPoints;
         groupResults.push(result);
+        promptNames.add(result.promptDef.name);
       }
 
       // `|| 0` in case there are no results, otherwise we'll get NaN.
@@ -90,6 +92,7 @@ export function groupSimilarReports(inputRuns: RunInfo[]): RunGroup[] {
       maxOverallPoints: maxForGroup / groupRuns.length || 0,
       appsCount,
       labels: Array.from(labels),
+      promptNames: Array.from(promptNames),
       environmentId: firstRun.details.summary.environmentId,
       framework: firstRun.details.summary.framework,
       model: firstRun.details.summary.model,
