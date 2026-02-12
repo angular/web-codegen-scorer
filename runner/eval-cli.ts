@@ -23,7 +23,7 @@ export const EvalModule = {
 
 interface Options {
   environment?: string;
-  model: string;
+  model: string[];
   runner: RunnerName;
   local: boolean;
   limit: number;
@@ -57,8 +57,9 @@ function builder(argv: Argv): Argv<Options> {
       })
       .option('model', {
         type: 'string',
-        default: DEFAULT_MODEL_NAME,
-        descript: 'Model to use when generating code',
+        array: true,
+        default: [DEFAULT_MODEL_NAME],
+        descript: 'Model(s) to use when generating code',
       })
       // Option is a noop right now when using a remote environment.
       .option('runner', {
@@ -206,46 +207,60 @@ async function handler(cliArgs: Arguments<Options>): Promise<void> {
   process.on('SIGTERM', () => abortCtrl.abort());
   process.on('exit', () => abortCtrl.abort());
 
-  try {
-    const runInfo = await generateCodeAndAssess({
-      runner: cliArgs.runner,
-      model: cliArgs.model,
-      environment: {
-        configPath: BUILT_IN_ENVIRONMENTS.get(cliArgs.environment) || cliArgs.environment,
-      },
-      localMode: cliArgs.local,
-      limit: cliArgs.limit,
-      concurrency: cliArgs.concurrency as number,
-      reportName: cliArgs.reportName!,
-      skipScreenshots: !!cliArgs.skipScreenshots,
-      startMcp: cliArgs.mcp,
-      ragEndpoint: cliArgs.ragEndpoint,
-      outputDirectory: cliArgs.outputDirectory,
-      promptFilter: cliArgs.promptFilter,
-      labels: cliArgs.labels || [],
-      skipAxeTesting: !!cliArgs.skipAxeTesting,
-      enableUserJourneyTesting: cliArgs.enableUserJourneyTesting,
-      enableAutoCsp: cliArgs.enableAutoCsp,
-      logging: cliArgs.logging,
-      autoraterModel: cliArgs.autoraterModel,
-      skipAiSummary: cliArgs.skipAiSummary,
-      skipLighthouse: cliArgs.skipLighthouse,
-      maxBuildRepairAttempts: cliArgs.maxBuildRepairAttempts,
-      maxTestRepairAttempts: cliArgs.maxTestRepairAttempts,
-      promptTimeoutRetries: cliArgs.promptTimeoutRetries,
-      abortSignal: abortCtrl.signal,
-    });
+  const models = cliArgs.model;
+  const baseReportName = cliArgs.reportName!;
 
-    logReportToConsole(runInfo);
-    await writeReportToDisk(runInfo, runInfo.details.summary.environmentId, REPORTS_ROOT_DIR);
-  } catch (error: unknown) {
-    if (error instanceof UserFacingError) {
-      console.error(chalk.red(error.message));
-    } else {
-      console.error(chalk.red('An error occurred during the assessment process:'));
-      console.error(chalk.red(error));
-      if (process.env.DEBUG === '1' && (error as Partial<Error>).stack) {
-        console.error(chalk.red((error as Error).stack));
+  for (const model of models) {
+    const reportName =
+      models.length > 1
+        ? `${baseReportName}--${model.replace(/[^a-zA-Z0-9-]/g, '-')}`
+        : baseReportName;
+
+    if (models.length > 1) {
+      console.log(chalk.cyan(`\nStarting evaluation with model: ${model}\n`));
+    }
+
+    try {
+      const runInfo = await generateCodeAndAssess({
+        runner: cliArgs.runner,
+        model,
+        environment: {
+          configPath: BUILT_IN_ENVIRONMENTS.get(cliArgs.environment) || cliArgs.environment,
+        },
+        localMode: cliArgs.local,
+        limit: cliArgs.limit,
+        concurrency: cliArgs.concurrency as number,
+        reportName,
+        skipScreenshots: !!cliArgs.skipScreenshots,
+        startMcp: cliArgs.mcp,
+        ragEndpoint: cliArgs.ragEndpoint,
+        outputDirectory: cliArgs.outputDirectory,
+        promptFilter: cliArgs.promptFilter,
+        labels: cliArgs.labels || [],
+        skipAxeTesting: !!cliArgs.skipAxeTesting,
+        enableUserJourneyTesting: cliArgs.enableUserJourneyTesting,
+        enableAutoCsp: cliArgs.enableAutoCsp,
+        logging: cliArgs.logging,
+        autoraterModel: cliArgs.autoraterModel,
+        skipAiSummary: cliArgs.skipAiSummary,
+        skipLighthouse: cliArgs.skipLighthouse,
+        maxBuildRepairAttempts: cliArgs.maxBuildRepairAttempts,
+        maxTestRepairAttempts: cliArgs.maxTestRepairAttempts,
+        promptTimeoutRetries: cliArgs.promptTimeoutRetries,
+        abortSignal: abortCtrl.signal,
+      });
+
+      logReportToConsole(runInfo);
+      await writeReportToDisk(runInfo, runInfo.details.summary.environmentId, REPORTS_ROOT_DIR);
+    } catch (error: unknown) {
+      if (error instanceof UserFacingError) {
+        console.error(chalk.red(error.message));
+      } else {
+        console.error(chalk.red('An error occurred during the assessment process:'));
+        console.error(chalk.red(error));
+        if (process.env.DEBUG === '1' && (error as Partial<Error>).stack) {
+          console.error(chalk.red((error as Error).stack));
+        }
       }
     }
   }
