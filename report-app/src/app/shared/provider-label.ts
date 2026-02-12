@@ -69,7 +69,7 @@ export class ProviderLabel {
 function getModelLogoURL(id: string): string | null {
   if (id.startsWith('gemini')) {
     return 'gemini.webp';
-  } else if (id.startsWith('openai')) {
+  } else if (id.startsWith('openai') || id.startsWith('gpt')) {
     return 'open-ai.png';
   } else if (id.startsWith('claude')) {
     return 'claude.png';
