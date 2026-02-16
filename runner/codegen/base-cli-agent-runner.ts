@@ -2,6 +2,7 @@ import {ChildProcess, spawn} from 'child_process';
 import {join, relative} from 'path';
 import {existsSync} from 'fs';
 import assert from 'assert';
+import chalk from 'chalk';
 import {
   LocalLlmConstrainedOutputGenerateResponse,
   LocalLlmGenerateFilesRequestOptions,
@@ -11,6 +12,26 @@ import {
 import {DirectorySnapshot} from './directory-snapshot.js';
 import {LlmResponseFile} from '../shared-interfaces.js';
 import {UserFacingError} from '../utils/errors.js';
+
+/** Helper to check if debug mode is enabled. */
+function isDebugEnabled(): boolean {
+  return !!process.env['CLI_RUNNER_DEBUG'];
+}
+
+/** Helper to log debug messages to stderr. */
+function debugLog(category: string, message: string, data?: unknown): void {
+  if (!isDebugEnabled()) {
+    return;
+  }
+  const timestamp = new Date().toISOString();
+  console.error(chalk.cyan(`[DEBUG ${chalk.dim(timestamp)}] [${category}] ${message}`));
+  if (data !== undefined) {
+    console.error(
+      chalk.cyan(`[DEBUG ${chalk.dim(timestamp)}] [${category}] Data:`),
+      JSON.stringify(data, null, 2),
+    );
+  }
+}
 
 /** Base class for a command-line-based runner. */
 export abstract class BaseCliAgentRunner {
@@ -32,6 +53,17 @@ export abstract class BaseCliAgentRunner {
   ): Promise<LocalLlmGenerateFilesResponse> {
     const {context} = options;
 
+    debugLog('generateFiles', `Starting generateFiles for ${this.displayName}`, {
+      directory: context.directory,
+      buildCommand: context.buildCommand,
+      packageManager: context.packageManager,
+      model: options.model,
+      executablePromptLength: context.executablePrompt?.length ?? 0,
+      executablePromptPreview: context.executablePrompt?.substring(0, 500) ?? '<no prompt>',
+      combinedPromptLength: context.combinedPrompt?.length ?? 0,
+      systemInstructionsLength: context.systemInstructions?.length ?? 0,
+    });
+
     // TODO: Consider removing these assertions when we have better types.
     assert(
       context.buildCommand,
@@ -43,17 +75,42 @@ export abstract class BaseCliAgentRunner {
     );
 
     const ignoredPatterns = [...this.commonIgnoredPatterns, ...this.ignoredFilePatterns];
+    debugLog('generateFiles', 'Ignored patterns', ignoredPatterns);
+
     const initialSnapshot = await DirectorySnapshot.forDirectory(
       context.directory,
       ignoredPatterns,
     );
+    debugLog('generateFiles', 'context.directory', context.directory);
 
+    debugLog('generateFiles', `Initial snapshot captured`, {
+      fileCount: initialSnapshot.files.size,
+      files: Array.from(initialSnapshot.files.keys()),
+    });
+
+    debugLog('generateFiles', 'Writing agent files...');
     await this.writeAgentFiles(options);
+    debugLog('generateFiles', 'Agent files written successfully');
 
+    debugLog('generateFiles', 'Starting agent process...');
     const reasoning = await this.runAgentProcess(options);
+    debugLog('generateFiles', `Agent process completed`, {
+      reasoningLength: reasoning.length,
+      reasoning,
+    });
+
     const finalSnapshot = await DirectorySnapshot.forDirectory(context.directory, ignoredPatterns);
+    debugLog('generateFiles', `Final snapshot captured`, {
+      fileCount: finalSnapshot.files.size,
+      files: Array.from(finalSnapshot.files.keys()),
+    });
 
     const diff = finalSnapshot.getChangedOrAddedFiles(initialSnapshot);
+    debugLog('generateFiles', `Diff computed`, {
+      changedOrAddedFileCount: diff.size,
+      changedOrAddedFiles: Array.from(diff.keys()),
+    });
+
     const files: LlmResponseFile[] = [];
 
     for (const [absolutePath, code] of diff) {
@@ -62,6 +119,11 @@ export abstract class BaseCliAgentRunner {
         code,
       });
     }
+
+    debugLog('generateFiles', `Returning result`, {
+      fileCount: files.length,
+      filePaths: files.map(f => f.filePath),
+    });
 
     return {files, reasoning, toolLogs: []};
   }
@@ -139,8 +201,12 @@ export abstract class BaseCliAgentRunner {
   }
 
   private resolveBinaryPath(binaryName: string): string {
+    debugLog('resolveBinaryPath', 'Starting binary resolution', {binaryName});
+
     let dir = import.meta.dirname;
     let closestRoot: string | null = null;
+
+    debugLog('resolveBinaryPath', 'Starting directory traversal', {startDir: dir});
 
     // Attempt to resolve the agent CLI binary by starting at the current file and going up until
     // we find the closest `node_modules`. Note that we can't rely on `import.meta.resolve` here,
@@ -148,8 +214,18 @@ export abstract class BaseCliAgentRunner {
     // managers (pnpm specifically) the `node_modules` in which the file is installed is different
     // from the one in which the binary is placed.
     while (dir.length > 1) {
-      if (existsSync(join(dir, 'node_modules'))) {
+      const nodeModulesPath = join(dir, 'node_modules');
+      const hasNodeModules = existsSync(nodeModulesPath);
+
+      debugLog('resolveBinaryPath', `Checking directory`, {
+        dir,
+        nodeModulesPath,
+        hasNodeModules,
+      });
+
+      if (hasNodeModules) {
         closestRoot = dir;
+        debugLog('resolveBinaryPath', 'Found node_modules', {closestRoot});
         break;
       }
 
@@ -157,6 +233,7 @@ export abstract class BaseCliAgentRunner {
 
       if (parent === dir) {
         // We've reached the root, stop traversing.
+        debugLog('resolveBinaryPath', 'Reached filesystem root without finding node_modules');
         break;
       } else {
         dir = parent;
@@ -164,11 +241,20 @@ export abstract class BaseCliAgentRunner {
     }
 
     const binaryPath = closestRoot ? join(closestRoot, `node_modules/.bin/${binaryName}`) : null;
+    const binaryExists = binaryPath ? existsSync(binaryPath) : false;
 
-    if (!binaryPath || !existsSync(binaryPath)) {
+    debugLog('resolveBinaryPath', 'Binary path resolution result', {
+      closestRoot,
+      binaryPath,
+      binaryExists,
+    });
+
+    if (!binaryPath || !binaryExists) {
+      debugLog('resolveBinaryPath', 'Binary not found, throwing error');
       throw new UserFacingError(`${this.displayName} is not installed inside the current project`);
     }
 
+    debugLog('resolveBinaryPath', 'Binary resolved successfully', {binaryPath});
     return binaryPath;
   }
 
@@ -177,15 +263,32 @@ export abstract class BaseCliAgentRunner {
       let stdoutBuffer = '';
       let stdErrBuffer = '';
       let isDone = false;
+      let stdoutChunkCount = 0;
+      let stderrChunkCount = 0;
       const inactivityTimeoutMins = this.inactivityTimeoutMins;
       const totalRequestTimeoutMins = this.totalRequestTimeoutMins;
       const msPerMin = 1000 * 60;
+
+      debugLog('runAgentProcess', 'Initializing agent process', {
+        inactivityTimeoutMins,
+        totalRequestTimeoutMins,
+      });
+
       const finalize = (finalMessage: string) => {
         if (isDone) {
+          debugLog('runAgentProcess', 'finalize called but already done, skipping');
           return;
         }
 
         isDone = true;
+
+        debugLog('runAgentProcess', 'Finalizing process', {
+          finalMessage,
+          stdoutBufferLength: stdoutBuffer.length,
+          stdErrBufferLength: stdErrBuffer.length,
+          stdoutChunkCount,
+          stderrChunkCount,
+        });
 
         if (inactivityTimeout) {
           clearTimeout(inactivityTimeout);
@@ -204,10 +307,20 @@ export abstract class BaseCliAgentRunner {
         }
 
         stdoutBuffer += separator + finalMessage;
+
+        debugLog('runAgentProcess', 'Process finalized, resolving promise', {
+          totalOutputLength: stdoutBuffer.length,
+        });
+
         resolve(stdoutBuffer);
       };
 
       const noOutputCallback = () => {
+        debugLog('runAgentProcess', 'Inactivity timeout triggered', {
+          inactivityTimeoutMins,
+          stdoutBufferLength: stdoutBuffer.length,
+          stdErrBufferLength: stdErrBuffer.length,
+        });
         finalize(
           `There was no output from ${this.displayName} for ${inactivityTimeoutMins} minute(s). ` +
             `Stopping the process...`,
@@ -221,6 +334,11 @@ export abstract class BaseCliAgentRunner {
 
       // Also add a timeout for the entire codegen process.
       const globalTimeout = setTimeout(() => {
+        debugLog('runAgentProcess', 'Global timeout triggered', {
+          totalRequestTimeoutMins,
+          stdoutBufferLength: stdoutBuffer.length,
+          stdErrBufferLength: stdErrBuffer.length,
+        });
         finalize(
           `${this.displayName} didn't finish within ${totalRequestTimeoutMins} minute(s). ` +
             `Stopping the process...`,
@@ -229,31 +347,92 @@ export abstract class BaseCliAgentRunner {
 
       this.binaryPath ??= this.resolveBinaryPath(this.binaryName);
 
-      const childProcess = spawn(this.binaryPath, this.getCommandLineFlags(options), {
+      const commandFlags = this.getCommandLineFlags(options);
+      const commandLine = `${this.binaryPath} ${commandFlags.join(' ')}`;
+
+      debugLog('runAgentProcess', 'Resolved binary and command', {
+        binaryPath: this.binaryPath,
+        commandFlags,
+        commandLine,
+        cwd: options.context.directory,
+      });
+
+      const childProcess = spawn(this.binaryPath, commandFlags, {
         cwd: options.context.directory,
         env: {...process.env},
       });
 
+      debugLog('runAgentProcess', 'Child process spawned', {
+        pid: childProcess.pid,
+        connected: childProcess.connected,
+        killed: childProcess.killed,
+      });
+
+      this.pendingProcesses.add(childProcess);
+
       // Important! some agents won't start executing until stdin has ended.
       childProcess.stdin.end();
+      debugLog('runAgentProcess', 'stdin closed');
 
-      childProcess.on('close', code =>
+      childProcess.on('error', error => {
+        debugLog('runAgentProcess', 'Process error event', {
+          errorMessage: error.message,
+          errorName: error.name,
+          errorStack: error.stack,
+        });
+      });
+
+      childProcess.on('close', code => {
+        debugLog('runAgentProcess', 'Process close event', {
+          exitCode: code,
+          stdoutBufferLength: stdoutBuffer.length,
+          stdErrBufferLength: stdErrBuffer.length,
+          stdoutChunkCount,
+          stderrChunkCount,
+        });
         finalize(
           `${this.displayName} process has exited` + (code == null ? '.' : ` with ${code} code.`),
-        ),
-      );
+        );
+      });
+
+      childProcess.on('exit', (code, signal) => {
+        debugLog('runAgentProcess', 'Process exit event', {
+          exitCode: code,
+          signal,
+        });
+      });
+
       childProcess.stdout.on('data', data => {
+        stdoutChunkCount++;
+        const chunk = data.toString();
+
+        debugLog('runAgentProcess', `stdout data received (chunk #${stdoutChunkCount})`, {
+          chunkLength: chunk.length,
+          chunkPreview: chunk,
+          totalStdoutLength: stdoutBuffer.length + chunk.length,
+        });
+
         if (inactivityTimeout) {
           this.pendingTimeouts.delete(inactivityTimeout);
           clearTimeout(inactivityTimeout);
         }
 
-        stdoutBuffer += data.toString();
+        stdoutBuffer += chunk;
         inactivityTimeout = setTimeout(noOutputCallback, inactivityTimeoutMins * msPerMin);
         this.pendingTimeouts.add(inactivityTimeout);
       });
+
       childProcess.stderr.on('data', data => {
-        stdErrBuffer += data.toString();
+        stderrChunkCount++;
+        const chunk = data.toString();
+
+        debugLog('runAgentProcess', `stderr data received (chunk #${stderrChunkCount})`, {
+          chunkLength: chunk.length,
+          chunkPreview: chunk,
+          totalStderrLength: stdErrBuffer.length + chunk.length,
+        });
+
+        stdErrBuffer += chunk;
       });
     });
   }
