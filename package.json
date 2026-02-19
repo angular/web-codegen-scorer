@@ -51,13 +51,13 @@
     "wcs": "./runner/bin/cli.js"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "3.0.44",
+    "@ai-sdk/anthropic": "3.0.45",
     "@ai-sdk/google": "3.0.29",
     "@ai-sdk/mcp": "1.0.21",
     "@ai-sdk/openai": "3.0.29",
     "@ai-sdk/provider": "3.0.8",
     "@ai-sdk/xai": "^3.0.26",
-    "@anthropic-ai/sdk": "^0.74.0",
+    "@anthropic-ai/sdk": "^0.76.0",
     "@axe-core/puppeteer": "^4.11.0",
     "@google/genai": "1.41.0",
     "@inquirer/prompts": "^8.2.0",
@@ -66,7 +66,7 @@
     "@types/cli-progress": "^3.11.6",
     "@types/node": "^24.10.9",
     "@types/yargs": "^17.0.35",
-    "ai": "6.0.86",
+    "ai": "6.0.90",
     "axe-core": "^4.11.1",
     "boxen": "^8.0.1",
     "chalk": "^5.6.2",
@@ -94,8 +94,8 @@
   },
   "devDependencies": {
     "@anthropic-ai/claude-code": "^2.1.12",
-    "@google/gemini-cli": "^0.28.0",
-    "@openai/codex": "^0.101.0",
+    "@google/gemini-cli": "^0.29.0",
+    "@openai/codex": "^0.104.0",
     "prettier": "^3.8.0",
     "tsx": "^4.20.3"
   }
