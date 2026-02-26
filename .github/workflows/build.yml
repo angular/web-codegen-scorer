@@ -13,7 +13,7 @@ jobs:
       - uses: pnpm/action-setup@9b5745cdf0a2e8c2620f0746130f809adb911c19
         with:
           with_install: false
-      - uses: actions/setup-node@d02c89dce7e1ba9ef629ce0680989b3a1cc72edb
+      - uses: actions/setup-node@54045abd5dcd3b0fee9ca02fa24c57545834c9cc
         with:
           node-version: 24
       - run: pnpm i --frozen-lockfile
