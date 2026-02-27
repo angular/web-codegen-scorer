@@ -106,6 +106,15 @@ h1, h2 {
   padding: 0 20px;
 }
 
+.prompt-names {
+  margin-top: 0.4rem;
+
+  .status-badge {
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+}
+
 .select-for-comparison input[type='checkbox'] {
   width: 20px;
   height: 20px;
