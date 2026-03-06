@@ -9,17 +9,17 @@ importers:
   .:
     dependencies:
       '@ai-sdk/anthropic':
-        specifier: 3.0.47
-        version: 3.0.47(zod@3.25.76)
+        specifier: 3.0.58
+        version: 3.0.58(zod@3.25.76)
       '@ai-sdk/google':
-        specifier: 3.0.31
-        version: 3.0.31(zod@3.25.76)
+        specifier: 3.0.43
+        version: 3.0.43(zod@3.25.76)
       '@ai-sdk/mcp':
-        specifier: 1.0.21
-        version: 1.0.21(zod@3.25.76)
+        specifier: 1.0.25
+        version: 1.0.25(zod@3.25.76)
       '@ai-sdk/openai':
-        specifier: 3.0.33
-        version: 3.0.33(zod@3.25.76)
+        specifier: 3.0.41
+        version: 3.0.41(zod@3.25.76)
       '@ai-sdk/provider':
         specifier: 3.0.8
         version: 3.0.8
@@ -33,8 +33,8 @@ importers:
         specifier: ^4.11.0
         version: 4.11.0(puppeteer@24.35.0(typescript@5.9.3))
       '@google/genai':
-        specifier: 1.42.0
-        version: 1.42.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))
+        specifier: 1.44.0
+        version: 1.44.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))
       '@inquirer/prompts':
         specifier: ^8.2.0
         version: 8.2.0(@types/node@24.10.9)
@@ -54,8 +54,8 @@ importers:
         specifier: ^17.0.35
         version: 17.0.35
       ai:
-        specifier: 6.0.99
-        version: 6.0.99(zod@3.25.76)
+        specifier: 6.0.116
+        version: 6.0.116(zod@3.25.76)
       axe-core:
         specifier: ^4.11.1
         version: 4.11.1
@@ -133,11 +133,11 @@ importers:
         specifier: ^2.1.12
         version: 2.1.12
       '@google/gemini-cli':
-        specifier: ^0.30.0
-        version: 0.30.0(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)
+        specifier: ^0.32.0
+        version: 0.32.1(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)
       '@openai/codex':
-        specifier: ^0.104.0
-        version: 0.104.0
+        specifier: ^0.111.0
+        version: 0.111.0
       prettier:
         specifier: ^3.8.0
         version: 3.8.0
@@ -267,26 +267,26 @@ packages:
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
-  '@ai-sdk/anthropic@3.0.47':
-    resolution: {integrity: sha512-E6Z3i/xvxGDxRskMMbuX9+xDK4l5LesrP2O7YQ0CcbAkYP25qTo/kYGf/AsJrLkNIY23HeO/kheUWtG1XZllDA==}
+  '@ai-sdk/anthropic@3.0.58':
+    resolution: {integrity: sha512-/53SACgmVukO4bkms4dpxpRlYhW8Ct6QZRe6sj1Pi5H00hYhxIrqfiLbZBGxkdRvjsBQeP/4TVGsXgH5rQeb8Q==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/gateway@3.0.55':
-    resolution: {integrity: sha512-7xMeTJnCjwRwXKVCiv4Ly4qzWvDuW3+W1WIV0X1EFu6W83d4mEhV9bFArto10MeTw40ewuDjrbrZd21mXKohkw==}
+  '@ai-sdk/gateway@3.0.66':
+    resolution: {integrity: sha512-SIQ0YY0iMuv+07HLsZ+bB990zUJ6S4ujORAh+Jv1V2KGNn73qQKnGO0JBk+w+Res8YqOFSycwDoWcFlQrVxS4A==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/google@3.0.31':
-    resolution: {integrity: sha512-RVNz8WFSIRbXbYDBE6JvlE2escWPJimBCs22LzKEYH7DNfl/X7cHNa1LFho4PsY6Ib0JmbzB8s2+i0wHs/wNCg==}
+  '@ai-sdk/google@3.0.43':
+    resolution: {integrity: sha512-NGCgP5g8HBxrNdxvF8Dhww+UKfqAkZAmyYBvbu9YLoBkzAmGKDBGhVptN/oXPB5Vm0jggMdoLycZ8JReQM8Zqg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/mcp@1.0.21':
-    resolution: {integrity: sha512-dRX2X6GDadZNpiylNnw0HP7zJC8ggVOOJV/JtxuF6CgtP8CKnc7a/wEzpUw1m/4AGdD3mTDhKnKFwC4y10a8FQ==}
+  '@ai-sdk/mcp@1.0.25':
+    resolution: {integrity: sha512-vMlXUPGHGDE2vzLcPR8sw7Dhz2OBjtPU5lB+lIuC1hNQo4REuUC08P0e96/hzBKf4oQYJ8Zo6uP8AG2qThyFbg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -297,14 +297,14 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/openai@3.0.33':
-    resolution: {integrity: sha512-O/8SVKAiwFHkGAUfBnrLb7L2IjbpP9ySWbmOktOfa0KtzutZkmKNrJ5CtB5dj+lwuENbOuZeRsnsZdOjar7hig==}
+  '@ai-sdk/openai@3.0.41':
+    resolution: {integrity: sha512-IZ42A+FO+vuEQCVNqlnAPYQnnUpUfdJIwn1BEDOBywiEHa23fw7PahxVtlX9zm3/zMvTW4JKPzWyvAgDu+SQ2A==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider-utils@4.0.15':
-    resolution: {integrity: sha512-8XiKWbemmCbvNN0CLR9u3PQiet4gtEVIrX4zzLxnCj06AwsEDJwJVBbKrEI4t6qE8XRSIvU2irka0dcpziKW6w==}
+  '@ai-sdk/provider-utils@4.0.19':
+    resolution: {integrity: sha512-3eG55CrSWCu2SXlqq2QCsFjo3+E7+Gmg7i/oRVoSZzIodTuDSfLb3MRje67xE9RFea73Zao7Lm4mADIfUETKGg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -1014,26 +1014,26 @@ packages:
     resolution: {integrity: sha512-Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==}
     engines: {node: '>=14'}
 
-  '@google/gemini-cli-core@0.30.0':
-    resolution: {integrity: sha512-mCm8Y5D0LQVU7mK2yWIcP1CPbtbVdjgFpwmIE0ZzFK8QlCkj179F1iLoZqbHbA2B/ozoE3lIk2Mj1k7xKMFCbg==}
+  '@google/gemini-cli-core@0.32.1':
+    resolution: {integrity: sha512-RHzp/1n3Omay8aq7uQkVkK7uhJAFPL8WR7iCx8Un5pK6AOra8r5qSlF6ZJUlO1Aa1ZTVG8jZnSpfSFzvjjsHLQ==}
     engines: {node: '>=20'}
 
-  '@google/gemini-cli@0.30.0':
-    resolution: {integrity: sha512-A6eUWKZ10zi2sTkrW2xJBAag+gyQL+E7bCt12KyDwW5+KEmdY5CRu9SxnyRlFIP2si4SVWnCBtBALbtwGTNOvA==}
+  '@google/gemini-cli@0.32.1':
+    resolution: {integrity: sha512-tR48nJzXGSDvURJrpDz1C5LQgUpcx1TqnU00RKwMH+nsSnn0eqXSjnpGpSINaE3WlzJDRjjb98WsVRWLafmTDA==}
     engines: {node: '>=20'}
     hasBin: true
 
-  '@google/genai@1.30.0':
-    resolution: {integrity: sha512-3MRcgczBFbUat1wIlZoLJ0vCCfXgm7Qxjh59cZi2X08RgWLtm9hKOspzp7TOg1TV2e26/MLxR2GR5yD5GmBV2w==}
+  '@google/genai@1.41.0':
+    resolution: {integrity: sha512-S4WGil+PG0NBQRAx+0yrQuM/TWOLn2gGEy5wn4IsoOI6ouHad0P61p3OWdhJ3aqr9kfj8o904i/jevfaGoGuIQ==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@modelcontextprotocol/sdk': ^1.20.1
+      '@modelcontextprotocol/sdk': ^1.25.2
     peerDependenciesMeta:
       '@modelcontextprotocol/sdk':
         optional: true
 
-  '@google/genai@1.42.0':
-    resolution: {integrity: sha512-+3nlMTcrQufbQ8IumGkOphxD5Pd5kKyJOzLcnY0/1IuE8upJk5aLmoexZ2BJhBp1zAjRJMEB4a2CJwKI9e2EYw==}
+  '@google/genai@1.44.0':
+    resolution: {integrity: sha512-kRt9ZtuXmz+tLlcNntN/VV4LRdpl6ZOu5B1KbfNgfR65db15O6sUQcwnwLka8sT/V6qysD93fWrgJHF2L7dA9A==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.25.2
@@ -1467,8 +1467,8 @@ packages:
   '@joshua.litt/get-ripgrep@0.0.3':
     resolution: {integrity: sha512-rycdieAKKqXi2bsM7G2ayDiNk5CAX8ZOzsTQsirfOqUKPef04Xw40BWGGyimaOOuvPgLWYt3tPnLLG3TvPXi5Q==}
 
-  '@jrichman/ink@6.4.10':
-    resolution: {integrity: sha512-kjJqZFkGVm0QyJmga/L02rsFJroF1aP2bhXEGkpuuT7clB6/W+gxAbLNw7ZaJrG6T30DgqOT92Pu6C9mK1FWyg==}
+  '@jrichman/ink@6.4.11':
+    resolution: {integrity: sha512-93LQlzT7vvZ1XJcmOMwN4s+6W334QegendeHOMnEJBlhnpIzr8bws6/aOEHG8ZCuVD/vNeeea5m1msHIdAY6ig==}
     engines: {node: '>=20'}
     peerDependencies:
       '@types/react': '>=19.0.0'
@@ -1805,43 +1805,43 @@ packages:
     resolution: {integrity: sha512-vaQj4nccJbAslopIvd49pQH2NhUp7G9pY4byUtmwhe37ZZuubGrx0eB9hW2F37uVNRuDDK6byFGXF+7JCuMSZg==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  '@openai/codex@0.104.0':
-    resolution: {integrity: sha512-pPa2VGHozwjPsPOYAEXcH7nNt1QH7AZR8zV8jYx6BFi1LJlmJkan2rvIS4MYbPdi2O6cd5kWfPCAHE0fEV2ifA==}
+  '@openai/codex@0.111.0':
+    resolution: {integrity: sha512-69Mw8//xBEHIgQ11tlYbz7HI2kndOs9GNnMVGzmTgsR48x2ZyYiZR1n4z2M+aR0A9BoarGxPIcbu2aEzVP/L0g==}
     engines: {node: '>=16'}
     hasBin: true
 
-  '@openai/codex@0.104.0-darwin-arm64':
-    resolution: {integrity: sha512-Y+lifRKAgNSBcaIM5UXXYnGWAJrPORPXABZBCxxiwwB8/XzZRDwp3K+X5i7dT0GfKScGFXuul6sJ2sVSPL4w4A==}
+  '@openai/codex@0.111.0-darwin-arm64':
+    resolution: {integrity: sha512-g8QkNUqacCUs7aU/Yd+gtiDlVV6sYyQl9tjBGgwjdfHCdmSKD47tD2tWRugXZ4D/uEe/6RxlUv65JnU5V0PW8A==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
 
-  '@openai/codex@0.104.0-darwin-x64':
-    resolution: {integrity: sha512-TwQ9zj0XbSrtCxFWKnnSQfmWmKhNMx1rSpSaSrLNSFVohxRwOWUZ2GBciO6jCLEiJvswR6nTMy1mA0n7MyVJiw==}
+  '@openai/codex@0.111.0-darwin-x64':
+    resolution: {integrity: sha512-WfjErI0IWMSu17XoiPstvph6MX2wFZd9zrwKCWkYLrN68mNYKfBgZE7pSCb9Z3nxVMbaphq8jhf0kImCWCsatQ==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [darwin]
 
-  '@openai/codex@0.104.0-linux-arm64':
-    resolution: {integrity: sha512-3oBBjMaCnhGfijsklOzVqG0LH/IFWoDnRJkvFl1utMI+GJECUr37uL/KsSFTuC2kIjham6U57dAK6xQnQxqxPQ==}
+  '@openai/codex@0.111.0-linux-arm64':
+    resolution: {integrity: sha512-/ABn3UhcbnJEhRNUH/BUcG/lr2n/CeacyXORWpHScNkkjMPUOkyNudUOyuoZjwybHU2PAmbpLIf5exXVNRvu2g==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [linux]
 
-  '@openai/codex@0.104.0-linux-x64':
-    resolution: {integrity: sha512-vhYaWsEwZmxZbeu5u9/k3VO1F4aTMYaTCebRgdzux7bfeDw2nms1SAcP+AkfCStqVSz26yaPGbwcUMqaknW4gQ==}
+  '@openai/codex@0.111.0-linux-x64':
+    resolution: {integrity: sha512-Cj82IUWtHkqMw3JpODGnkL9lyHhGLIAMHU9+3CosKLtOHUB4A9W3zKEBJrrlsi6QruvYVWrb/7t/xGb82fna0Q==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [linux]
 
-  '@openai/codex@0.104.0-win32-arm64':
-    resolution: {integrity: sha512-2ypuM6yWcjAtq7DmEgFBsmtw7rWLcoy6Cxaq+Hn8dZfEdijASyc59AzyWhWLKYLuOxcprFn/oQitElrpPD9JOA==}
+  '@openai/codex@0.111.0-win32-arm64':
+    resolution: {integrity: sha512-h6WaA/ixD9ucwcmSUbXpjmhyfptD6Yk3N2IynNjOCvqgXS3V7uaNTm6qHFgkvA9S2IbkS9gA+ydgxFVyU6w7eQ==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [win32]
 
-  '@openai/codex@0.104.0-win32-x64':
-    resolution: {integrity: sha512-awyNLtfbTbj+2JzgsAIm+KFrxeAmxe/Fuqw/ZwBj8ljtO7SQWTT3kxDbf7iuA7E7IErGlQw/plgFgq/LJdsacg==}
+  '@openai/codex@0.111.0-win32-x64':
+    resolution: {integrity: sha512-jWCcI8Nv8kpr29VWmTrNpRw9zMGAc4sqy94mw13OgOcFcDtnuqdjtaJAswKHrZZbdT+kqDDZmi7Gvi/vsahvDA==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
@@ -3011,8 +3011,8 @@ packages:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
 
-  ai@6.0.99:
-    resolution: {integrity: sha512-Zg43DDJLppe22e7IWXNwpgtxR2VRFyVJSBUZNlCz2jmyzRgaHzBqINkoy6WIakyD75LOqLCQdGMOGAqTnfO3Aw==}
+  ai@6.0.116:
+    resolution: {integrity: sha512-7yM+cTmyRLeNIXwt4Vj+mrrJgVQ9RMIW5WO0ydoLoYkewIvsMcvUmqS4j2RJTUXaF1HphwmSKUMQ/HypNRGOmA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -3171,6 +3171,7 @@ packages:
   basic-ftp@5.1.0:
     resolution: {integrity: sha512-RkaJzeJKDbaDWTIPiJwubyljaEPwpVWkm9Rt5h9Nd6h7tEXTJ3VB4qxdZBioV7JO5yLUaOKwz7vDOzlncUsegw==}
     engines: {node: '>=10.0.0'}
+    deprecated: Security vulnerability fixed in 5.2.0, please upgrade
 
   beasties@0.4.1:
     resolution: {integrity: sha512-2Imdcw3LznDuxAbJM26RHniOLAzE6WgrK8OuvVXCQtNBS8rsnD9zsSEa3fHl4hHpUY7BYTlrpvtPVbvu9G6neg==}
@@ -3682,8 +3683,20 @@ packages:
     resolution: {integrity: sha512-1gxPBJpI/pcjQhKgIU91II6Wkay+dLcN3M6rf2uwP8hRur3HtQXjVrdAK3sjC0piaEuxzMwjXChcETiJl47lAQ==}
     engines: {node: '>=18'}
 
+  dotenv-expand@12.0.3:
+    resolution: {integrity: sha512-uc47g4b+4k/M/SeaW1y4OApx+mtLWl92l5LMPP0GNXctZqELk+YGgOPIIC5elYmUH4OuoK3JLhuRUYegeySiFA==}
+    engines: {node: '>=12'}
+
+  dotenv@16.6.1:
+    resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
+    engines: {node: '>=12'}
+
   dotenv@17.2.3:
     resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
+    engines: {node: '>=12'}
+
+  dotenv@17.3.1:
+    resolution: {integrity: sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==}
     engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
@@ -4527,6 +4540,10 @@ packages:
     resolution: {integrity: sha512-qP1vozQRI+BMOPcjFzrjXuQvdak2pHNUMZoeG2eRbiSqyvbEf/wQtEOTOX1guk6E3t36RkaqiSt8A/6YElNxLQ==}
     engines: {node: '>=12'}
 
+  is-network-error@1.3.1:
+    resolution: {integrity: sha512-6QCxa49rQbmUWLfk0nuGqzql9U8uaV2H6279bRErPBHe/109hCzsLUBUHfbEtvLIHBd6hyXbgedBSHevm43Edw==}
+    engines: {node: '>=16'}
+
   is-number@7.0.0:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
     engines: {node: '>=0.12.0'}
@@ -5322,6 +5339,10 @@ packages:
   p-retry@4.6.2:
     resolution: {integrity: sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==}
     engines: {node: '>=8'}
+
+  p-retry@7.1.1:
+    resolution: {integrity: sha512-J5ApzjyRkkf601HpEeykoiCvzHQjWxPAHhyjFcEUP2SWq0+35NKh8TLhpLw+Dkq5TZBFvUM6UigdE9hIVYTl5w==}
+    engines: {node: '>=20'}
 
   p-timeout@7.0.1:
     resolution: {integrity: sha512-AxTM2wDGORHGEkPCt8yqxOTMgpfbEHqF51f/5fJCmwFC3C/zNcGT63SymH2ttOAaiIws2zVg4+izQCjrakcwHg==}
@@ -6194,6 +6215,10 @@ packages:
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
 
+  tar@7.5.10:
+    resolution: {integrity: sha512-8mOPs1//5q/rlkNSPcCegA6hiHJYDmSLEI8aMH/CdSQJNWztHC9WHNam5zdQlfpTwB9Xp7IBEsHfV5LKMJGVAw==}
+    engines: {node: '>=18'}
+
   tar@7.5.3:
     resolution: {integrity: sha512-ENg5JUHUm2rDD7IvKNFGzyElLXNjachNLp6RaGf4+JOgxXHkqA+gq81ZAMCUmtMtqBsoU62lcp6S27g1LCYGGQ==}
     engines: {node: '>=18'}
@@ -6765,29 +6790,29 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
-  '@ai-sdk/anthropic@3.0.47(zod@3.25.76)':
+  '@ai-sdk/anthropic@3.0.58(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.15(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.19(zod@3.25.76)
       zod: 3.25.76
 
-  '@ai-sdk/gateway@3.0.55(zod@3.25.76)':
+  '@ai-sdk/gateway@3.0.66(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.15(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.19(zod@3.25.76)
       '@vercel/oidc': 3.1.0
       zod: 3.25.76
 
-  '@ai-sdk/google@3.0.31(zod@3.25.76)':
+  '@ai-sdk/google@3.0.43(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.15(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.19(zod@3.25.76)
       zod: 3.25.76
 
-  '@ai-sdk/mcp@1.0.21(zod@3.25.76)':
+  '@ai-sdk/mcp@1.0.25(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.15(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.19(zod@3.25.76)
       pkce-challenge: 5.0.1
       zod: 3.25.76
 
@@ -6797,13 +6822,13 @@ snapshots:
       '@ai-sdk/provider-utils': 4.0.8(zod@3.25.76)
       zod: 3.25.76
 
-  '@ai-sdk/openai@3.0.33(zod@3.25.76)':
+  '@ai-sdk/openai@3.0.41(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.15(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.19(zod@3.25.76)
       zod: 3.25.76
 
-  '@ai-sdk/provider-utils@4.0.15(zod@3.25.76)':
+  '@ai-sdk/provider-utils@4.0.19(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
       '@standard-schema/spec': 1.1.0
@@ -7632,13 +7657,13 @@ snapshots:
 
   '@google-cloud/promisify@4.0.0': {}
 
-  '@google/gemini-cli-core@0.30.0(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)':
+  '@google/gemini-cli-core@0.32.1(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)':
     dependencies:
       '@a2a-js/sdk': 0.3.9(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(express@5.2.1)
       '@google-cloud/logging': 11.2.1(encoding@0.1.13)
       '@google-cloud/opentelemetry-cloud-monitoring-exporter': 0.21.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@2.5.1(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.5.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.5.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
       '@google-cloud/opentelemetry-cloud-trace-exporter': 3.0.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@2.5.1(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.5.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.5.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
-      '@google/genai': 1.30.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))
+      '@google/genai': 1.41.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))
       '@iarna/toml': 2.2.5
       '@joshua.litt/get-ripgrep': 0.0.3
       '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.4)(zod@3.25.76)
@@ -7666,11 +7691,13 @@ snapshots:
       ajv-formats: 3.0.1(ajv@8.17.1)
       chardet: 2.1.1
       diff: 8.0.3
+      dotenv: 17.3.1
+      dotenv-expand: 12.0.3
       fast-levenshtein: 2.0.6
       fdir: 6.5.0(picomatch@4.0.3)
       fzf: 0.5.2
       glob: 12.0.0
-      google-auth-library: 9.15.1(encoding@0.1.13)
+      google-auth-library: 10.5.0
       html-to-text: 9.0.5
       https-proxy-agent: 7.0.6
       ignore: 7.0.5
@@ -7685,6 +7712,7 @@ snapshots:
       shell-quote: 1.8.3
       simple-git: 3.30.0
       strip-ansi: 7.1.2
+      strip-json-comments: 3.1.1
       systeminformation: 5.30.6
       tree-sitter-bash: 0.25.1
       undici: 7.20.0
@@ -7714,11 +7742,11 @@ snapshots:
       - tree-sitter
       - utf-8-validate
 
-  '@google/gemini-cli@0.30.0(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)':
+  '@google/gemini-cli@0.32.1(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)':
     dependencies:
       '@agentclientprotocol/sdk': 0.12.0(zod@3.25.76)
-      '@google/gemini-cli-core': 0.30.0(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)
-      '@google/genai': 1.30.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))
+      '@google/gemini-cli-core': 0.32.1(@bufbuild/protobuf@2.10.2)(@grpc/grpc-js@1.14.3)(encoding@0.1.13)(express@5.2.1)(hono@4.11.4)
+      '@google/genai': 1.41.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))
       '@iarna/toml': 2.2.5
       '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.4)(zod@3.25.76)
       ansi-escapes: 7.3.0
@@ -7726,6 +7754,7 @@ snapshots:
       chalk: 4.1.2
       cli-spinners: 2.9.2
       clipboardy: 5.1.0
+      color-convert: 2.0.1
       command-exists: 1.2.9
       comment-json: 4.5.1
       diff: 8.0.3
@@ -7734,9 +7763,9 @@ snapshots:
       fzf: 0.5.2
       glob: 12.0.0
       highlight.js: 11.11.1
-      ink: '@jrichman/ink@6.4.10(react@19.2.3)'
-      ink-gradient: 3.0.0(@jrichman/ink@6.4.10(react@19.2.3))
-      ink-spinner: 5.0.0(@jrichman/ink@6.4.10(react@19.2.3))(react@19.2.3)
+      ink: '@jrichman/ink@6.4.11(react@19.2.3)'
+      ink-gradient: 3.0.0(@jrichman/ink@6.4.11(react@19.2.3))
+      ink-spinner: 5.0.0(@jrichman/ink@6.4.11(react@19.2.3))(react@19.2.3)
       latest-version: 9.0.0
       lowlight: 3.3.0
       mnemonist: 0.40.3
@@ -7749,7 +7778,7 @@ snapshots:
       string-width: 8.1.0
       strip-ansi: 7.1.2
       strip-json-comments: 3.1.1
-      tar: 7.5.3
+      tar: 7.5.10
       tinygradient: 1.1.5
       undici: 7.20.0
       ws: 8.19.0
@@ -7770,9 +7799,11 @@ snapshots:
       - tree-sitter
       - utf-8-validate
 
-  '@google/genai@1.30.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))':
+  '@google/genai@1.41.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))':
     dependencies:
       google-auth-library: 10.5.0
+      p-retry: 7.1.1
+      protobufjs: 7.5.4
       ws: 8.19.0
     optionalDependencies:
       '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.4)(zod@3.25.76)
@@ -7781,7 +7812,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@google/genai@1.42.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))':
+  '@google/genai@1.44.0(@modelcontextprotocol/sdk@1.25.3(hono@4.11.4)(zod@3.25.76))':
     dependencies:
       google-auth-library: 10.5.0
       p-retry: 4.6.2
@@ -8169,7 +8200,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@jrichman/ink@6.4.10(react@19.2.3)':
+  '@jrichman/ink@6.4.11(react@19.2.3)':
     dependencies:
       '@alcalzone/ansi-tokenize': 0.2.3
       ansi-escapes: 7.3.0
@@ -8521,31 +8552,31 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@openai/codex@0.104.0':
+  '@openai/codex@0.111.0':
     optionalDependencies:
-      '@openai/codex-darwin-arm64': '@openai/codex@0.104.0-darwin-arm64'
-      '@openai/codex-darwin-x64': '@openai/codex@0.104.0-darwin-x64'
-      '@openai/codex-linux-arm64': '@openai/codex@0.104.0-linux-arm64'
-      '@openai/codex-linux-x64': '@openai/codex@0.104.0-linux-x64'
-      '@openai/codex-win32-arm64': '@openai/codex@0.104.0-win32-arm64'
-      '@openai/codex-win32-x64': '@openai/codex@0.104.0-win32-x64'
+      '@openai/codex-darwin-arm64': '@openai/codex@0.111.0-darwin-arm64'
+      '@openai/codex-darwin-x64': '@openai/codex@0.111.0-darwin-x64'
+      '@openai/codex-linux-arm64': '@openai/codex@0.111.0-linux-arm64'
+      '@openai/codex-linux-x64': '@openai/codex@0.111.0-linux-x64'
+      '@openai/codex-win32-arm64': '@openai/codex@0.111.0-win32-arm64'
+      '@openai/codex-win32-x64': '@openai/codex@0.111.0-win32-x64'
 
-  '@openai/codex@0.104.0-darwin-arm64':
+  '@openai/codex@0.111.0-darwin-arm64':
     optional: true
 
-  '@openai/codex@0.104.0-darwin-x64':
+  '@openai/codex@0.111.0-darwin-x64':
     optional: true
 
-  '@openai/codex@0.104.0-linux-arm64':
+  '@openai/codex@0.111.0-linux-arm64':
     optional: true
 
-  '@openai/codex@0.104.0-linux-x64':
+  '@openai/codex@0.111.0-linux-x64':
     optional: true
 
-  '@openai/codex@0.104.0-win32-arm64':
+  '@openai/codex@0.111.0-win32-arm64':
     optional: true
 
-  '@openai/codex@0.104.0-win32-x64':
+  '@openai/codex@0.111.0-win32-x64':
     optional: true
 
   '@opentelemetry/api-logs@0.211.0':
@@ -9853,11 +9884,11 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  ai@6.0.99(zod@3.25.76):
+  ai@6.0.116(zod@3.25.76):
     dependencies:
-      '@ai-sdk/gateway': 3.0.55(zod@3.25.76)
+      '@ai-sdk/gateway': 3.0.66(zod@3.25.76)
       '@ai-sdk/provider': 3.0.8
-      '@ai-sdk/provider-utils': 4.0.15(zod@3.25.76)
+      '@ai-sdk/provider-utils': 4.0.19(zod@3.25.76)
       '@opentelemetry/api': 1.9.0
       zod: 3.25.76
 
@@ -10561,7 +10592,15 @@ snapshots:
     dependencies:
       type-fest: 4.41.0
 
+  dotenv-expand@12.0.3:
+    dependencies:
+      dotenv: 16.6.1
+
+  dotenv@16.6.1: {}
+
   dotenv@17.2.3: {}
+
+  dotenv@17.3.1: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -11576,18 +11615,18 @@ snapshots:
 
   ini@6.0.0: {}
 
-  ink-gradient@3.0.0(@jrichman/ink@6.4.10(react@19.2.3)):
+  ink-gradient@3.0.0(@jrichman/ink@6.4.11(react@19.2.3)):
     dependencies:
       '@types/gradient-string': 1.1.6
       gradient-string: 2.0.2
-      ink: '@jrichman/ink@6.4.10(react@19.2.3)'
+      ink: '@jrichman/ink@6.4.11(react@19.2.3)'
       prop-types: 15.8.1
       strip-ansi: 7.1.2
 
-  ink-spinner@5.0.0(@jrichman/ink@6.4.10(react@19.2.3))(react@19.2.3):
+  ink-spinner@5.0.0(@jrichman/ink@6.4.11(react@19.2.3))(react@19.2.3):
     dependencies:
       cli-spinners: 2.9.2
-      ink: '@jrichman/ink@6.4.10(react@19.2.3)'
+      ink: '@jrichman/ink@6.4.11(react@19.2.3)'
       react: 19.2.3
 
   intl-messageformat@10.7.18:
@@ -11636,6 +11675,8 @@ snapshots:
       is-docker: 3.0.0
 
   is-interactive@2.0.0: {}
+
+  is-network-error@1.3.1: {}
 
   is-number@7.0.0: {}
 
@@ -12519,6 +12560,10 @@ snapshots:
     dependencies:
       '@types/retry': 0.12.0
       retry: 0.13.1
+
+  p-retry@7.1.1:
+    dependencies:
+      is-network-error: 1.3.1
 
   p-timeout@7.0.1: {}
 
@@ -13652,6 +13697,14 @@ snapshots:
     transitivePeerDependencies:
       - bare-abort-controller
       - react-native-b4a
+
+  tar@7.5.10:
+    dependencies:
+      '@isaacs/fs-minipass': 4.0.1
+      chownr: 3.0.0
+      minipass: 7.1.2
+      minizlib: 3.1.0
+      yallist: 5.0.0
 
   tar@7.5.3:
     dependencies:
