@@ -4,10 +4,12 @@ import {BuildResultStatus} from '../workers/builder/builder-types.js';
 import {Environment} from '../configuration/environment.js';
 import {
   AssessmentConfig,
+  AssessmentTimings,
   AttemptDetails,
   LlmContextFile,
   RootPromptDefinition,
 } from '../shared-interfaces.js';
+import {performance} from 'node:perf_hooks';
 import {ProgressLogger} from '../progress/progress-logger.js';
 import {BuildType, runBuild} from './build-worker.js';
 import {EvalID} from './executors/executor.js';
@@ -53,7 +55,9 @@ export async function attemptBuildAndTest(
   workerConcurrencyQueue: PQueue,
   progress: ProgressLogger,
   userJourneyAgentTaskInput: BrowserAgentTaskInput | undefined,
+  timings: AssessmentTimings,
 ) {
+  const initialBuildStart = performance.now();
   const initialBuildResult = await runBuild(
     evalID,
     directory,
@@ -64,6 +68,7 @@ export async function attemptBuildAndTest(
     progress,
     BuildType.INITIAL_BUILD,
   );
+  timings.buildDurationMs += performance.now() - initialBuildStart;
   let repairAttempts = 0;
   let maxRepairAttempts: number;
   let maxTestRepairAttempts: number;
@@ -100,6 +105,7 @@ export async function attemptBuildAndTest(
       `Trying to repair app build (attempt #${repairAttempts + 1})`,
     );
 
+    const repairStart = performance.now();
     const attempt = await repairAndBuild(
       evalID,
       config.model,
@@ -120,6 +126,7 @@ export async function attemptBuildAndTest(
       progress,
       'build',
     );
+    timings.repairDurationMs += performance.now() - repairStart;
 
     attemptDetails.push(attempt);
     lastAttempt = attempt;
@@ -200,6 +207,7 @@ export async function attemptBuildAndTest(
       });
     }
 
+    const repairStart = performance.now();
     const attempt = await repairAndBuild(
       evalID,
       config.model,
@@ -224,6 +232,7 @@ export async function attemptBuildAndTest(
     // further repairs and capture the failed build. This is useful insight
     // as LLMs seem to regress when asked to repair violations.
     if (hasBuildFailure) {
+      timings.repairDurationMs += performance.now() - repairStart;
       break;
     }
 
@@ -249,6 +258,7 @@ export async function attemptBuildAndTest(
         workerConcurrencyQueue,
         progress,
       )) ?? undefined;
+    timings.repairDurationMs += performance.now() - repairStart;
 
     if (hasAxeFailure && lastAttempt.serveTestingResult?.axeViolations?.length === 0) {
       progress.log(rootPromptDef, 'success', `Successfully fixed all Axe accessibility violations`);

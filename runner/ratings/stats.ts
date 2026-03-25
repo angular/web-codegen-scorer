@@ -2,6 +2,7 @@ import {BuildErrorType, BuildResultStatus} from '../workers/builder/builder-type
 import {UserFacingError} from '../utils/errors.js';
 import {
   AggregatedRunStats,
+  AggregatedTimings,
   AssessmentResult,
   RuntimeStats,
   ScoreBucket,
@@ -15,6 +16,21 @@ export const BUCKET_CONFIG = [
   {name: 'Poor', min: 0, max: 70, id: 'poor'},
 ];
 
+function calculateMean(values: number[]): number {
+  if (values.length === 0) return 0;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function calculateMedian(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) {
+    return (sorted[middle - 1] + sorted[middle]) / 2;
+  }
+  return sorted[middle];
+}
+
 /**
  * Calculates build and check statistics from assessment results.
  *
@@ -22,6 +38,10 @@ export const BUCKET_CONFIG = [
  * @returns An object containing aggregated build and check statistics.
  */
 export function calculateBuildAndCheckStats(assessments: AssessmentResult[]): AggregatedRunStats {
+  const generateDurations: number[] = [];
+  const buildDurations: number[] = [];
+  const repairDurations: number[] = [];
+
   let successfulInitialBuilds = 0;
   let successfulBuildsAfterRepair = 0;
   let failedBuilds = 0;
@@ -61,6 +81,12 @@ export function calculateBuildAndCheckStats(assessments: AssessmentResult[]): Ag
         errorDistribution[result.finalAttempt.buildResult.errorType] =
           (errorDistribution[result.finalAttempt.buildResult.errorType] || 0) + 1;
       }
+    }
+
+    if (result.timings) {
+      generateDurations.push(result.timings.generateDurationMs);
+      buildDurations.push(result.timings.buildDurationMs);
+      repairDurations.push(result.timings.repairDurationMs);
     }
 
     // Calculate test statistics
@@ -158,6 +184,22 @@ export function calculateBuildAndCheckStats(assessments: AssessmentResult[]): Ag
       : undefined,
     accessibility: accessibilityStats,
     security: securityStats,
+    ...(generateDurations.length > 0 && {
+      timings: {
+        generate: {
+          mean: calculateMean(generateDurations),
+          median: calculateMedian(generateDurations),
+        },
+        build: {
+          mean: calculateMean(buildDurations),
+          median: calculateMedian(buildDurations),
+        },
+        repair: {
+          mean: calculateMean(repairDurations),
+          median: calculateMedian(repairDurations),
+        },
+      },
+    }),
   };
 }
 

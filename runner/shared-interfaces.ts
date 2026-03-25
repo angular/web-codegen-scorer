@@ -235,6 +235,20 @@ export interface SkippedIndividualAssessment {
   groupingLabels?: string[];
 }
 
+/** Stores the duration in milliseconds for different phases of the evaluation. */
+export interface AssessmentTimings {
+  generateDurationMs: number;
+  buildDurationMs: number;
+  repairDurationMs: number;
+}
+
+/** Stores aggregated timing statistics. */
+export interface AggregatedTimings {
+  generate: {mean: number; median: number};
+  build: {mean: number; median: number};
+  repair: {mean: number; median: number};
+}
+
 /**
  * Represents the overall score and breakdown of code assessments.
  */
@@ -345,6 +359,9 @@ export interface AggregatedRunStats {
     appsWithoutErrors: number;
   };
   security?: {appsWithErrors: number; appsWithoutErrors: number};
+
+  /** Timing statistics for the run. */
+  timings?: AggregatedTimings;
 }
 
 export interface CompletionStats {
@@ -555,6 +572,8 @@ export interface AssessmentResult {
   testResult: TestExecutionResult | null;
   /** Number of repair attempts for tests. */
   testRepairAttempts?: number;
+  /** Timings captured for the execution and repair stages. */
+  timings?: AssessmentTimings;
 }
 
 /**

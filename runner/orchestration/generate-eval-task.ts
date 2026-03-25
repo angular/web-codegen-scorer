@@ -18,6 +18,7 @@ import {rateGeneratedCode} from '../ratings/rate-code.js';
 import {DEFAULT_AUTORATER_MODEL_NAME} from '../configuration/constants.js';
 import assert from 'node:assert';
 import {AiSdkRunner} from '../codegen/ai-sdk/ai-sdk-runner.js';
+import {performance} from 'node:perf_hooks';
 
 /**
  * Creates and executes a task to generate or load code for a given prompt,
@@ -60,6 +61,7 @@ export async function startEvaluationTask(
     // and for each sub-prompt, because the project will be augmented on each iteration.
     const contextFiles = await resolveContextFiles(promptDef.contextFilePatterns, directory);
 
+    const generateStart = performance.now();
     // Generate the initial set of files through the LLM.
     const initialResponse = await generateInitialFiles(
       config,
@@ -76,6 +78,7 @@ export async function startEvaluationTask(
       abortSignal,
       progress,
     );
+    const generateDurationMs = performance.now() - generateStart;
 
     const toolLogs = initialResponse.toolLogs ?? [];
 
@@ -140,6 +143,7 @@ export async function startEvaluationTask(
     }
 
     const attemptDetails: AttemptDetails[] = []; // Store details for assessment.json
+    const timings = {generateDurationMs, buildDurationMs: 0, repairDurationMs: 0};
 
     // Try to build the files in the root prompt directory.
     // This will also attempt to fix issues with the generated code.
@@ -156,6 +160,7 @@ export async function startEvaluationTask(
       workerConcurrencyQueue,
       progress,
       userJourneyAgentTaskInput,
+      timings,
     );
 
     if (!attempt) {
@@ -197,6 +202,7 @@ export async function startEvaluationTask(
       toolLogs,
       testResult: attempt.testResult ?? null,
       testRepairAttempts: attempt.testRepairAttempts,
+      timings,
     } satisfies AssessmentResult);
   }
 

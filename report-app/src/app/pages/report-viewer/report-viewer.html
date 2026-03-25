@@ -156,6 +156,25 @@
         }
       </div>
 
+      @if (overview.stats.timings) {
+      @let timings = overview.stats.timings;
+        <h3>Timings</h3>
+        <ul class="status-badge-group">
+          <li class="status-badge neutral">
+            <b>Generate:</b> {{(timings.generate.mean / 1000) | number:'1.1-2'}}s (mean), {{(timings.generate.median / 1000) |
+            number:'1.1-2'}}s (median)
+          </li>
+          <li class="status-badge neutral">
+            <b>Build:</b> {{(timings.build.mean / 1000) | number:'1.1-2'}}s (mean), {{(timings.build.median / 1000) |
+            number:'1.1-2'}}s (median)
+          </li>
+          <li class="status-badge neutral">
+            <b>Repair:</b> {{(timings.repair.mean / 1000) | number:'1.1-2'}}s (mean), {{(timings.repair.median / 1000) |
+            number:'1.1-2'}}s (median)
+          </li>
+        </ul>
+      }
+
       @if (details) {
         <h3>Usage Details</h3>
         <ul class="status-badge-group">
@@ -465,6 +484,23 @@
                 </span>
               </div>
             </div>
+
+            @if (result.timings) {
+              <div class="app-details-section">
+                <h4>Timings</h4>
+                <ul class="status-badge-group">
+                  <li class="status-badge neutral">
+                    <b>Generate:</b> {{(result.timings.generateDurationMs / 1000) | number:'1.1-2'}}s
+                  </li>
+                  <li class="status-badge neutral">
+                    <b>Build:</b> {{(result.timings.buildDurationMs / 1000) | number:'1.1-2'}}s
+                  </li>
+                  <li class="status-badge neutral">
+                    <b>Repair:</b> {{(result.timings.repairDurationMs / 1000) | number:'1.1-2'}}s
+                  </li>
+                </ul>
+              </div>
+            }
 
             @if (result.testResult) {
               <div class="app-details-section">
