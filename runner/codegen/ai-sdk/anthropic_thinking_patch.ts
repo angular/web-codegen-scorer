@@ -37,11 +37,41 @@ export const anthropicThinkingWithStructuredResponseMiddleware: LanguageModelV3M
   wrapGenerate: async ({doGenerate}) => {
     const result = await doGenerate();
 
-    // Extract the JSON tool call (conforming to the schema) and return it as text response.
+    // Anthropic's Thinking mode cannot be used with forced tool calls. To work around this,
+    // we use `toolChoice: 'auto'` in the `transformParams` above. However, this causes
+    // the model to return a `finishReason` of `tool-calls` instead of `stop`.
+    //
+    // The Vercel AI SDK's high-level `generateText` (and `generateObject`) logic is strict:
+    // it only attempts to parse structured output if the `finishReason` is exactly `stop`.
+    // If it sees `tool-calls`, it assumes the conversation is ongoing (waiting for tool
+    // execution) and returns an empty output, which triggers `AI_NoOutputGeneratedError`.
+    //
+    // This fixes this by:
+    // 1. Finding the optional 'json' tool call.
+    // 2. Extracting its raw JSON input and injecting it as a standard text response.
+    // 3. Manually overriding the `finishReason` to `stop`.
+    // 4. Removing the tool call metadata so the SDK doesn't expect a tool result.
+    const newContent: typeof result.content = [];
+    let jsonToolCallFound = false;
+
     for (const r of result.content) {
       if (r.type === 'tool-call' && r.toolName === 'json') {
-        result.content.push({type: 'text', text: r.input});
+        newContent.push({type: 'text', text: r.input});
+        jsonToolCallFound = true;
+      } else {
+        newContent.push(r);
       }
+    }
+
+    if (jsonToolCallFound) {
+      result.content = newContent;
+
+      // We override the finish reason to 'stop' to allow the AI SDK to parse the
+      // text content as a structured object.
+      result.finishReason = {
+        unified: 'stop',
+        raw: result.finishReason.raw,
+      };
     }
 
     return result;
