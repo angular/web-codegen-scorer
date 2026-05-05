@@ -1,5 +1,6 @@
 import {existsSync} from 'fs';
 import {dirname} from 'path';
+import {pathToFileURL} from 'url';
 import {fromZodError} from 'zod-validation-error/v3';
 import {RunnerName} from '../codegen/runner-creation.js';
 import {toProcessAbsolutePath} from '../file-system-utils.js';
@@ -27,7 +28,7 @@ export async function getEnvironmentByPath(
     throw new UserFacingError(`Cannot find environment config file at ${configPath}`);
   }
 
-  const result: {default: unknown} = await import(configPath);
+  const result: {default: unknown} = await import(pathToFileURL(configPath).toString());
   const rootPath = dirname(configPath);
   const config = result.default;
   assertIsEnvironmentConfig(config);
