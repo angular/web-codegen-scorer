@@ -59,7 +59,7 @@
     "@ai-sdk/xai": "^3.0.26",
     "@anthropic-ai/sdk": "^0.82.0",
     "@axe-core/puppeteer": "^4.11.0",
-    "@google/genai": "1.48.0",
+    "@google/genai": "2.21.0",
     "@inquirer/prompts": "^8.2.0",
     "@safety-web/runner": "0.4.0-alpha.14",
     "@safety-web/types": "0.4.0-alpha.14",
