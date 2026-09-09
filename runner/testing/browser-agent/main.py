@@ -62,7 +62,7 @@ Here are the details for your current task:
         return ActionResult(
             extracted_content="""Successfully took screenshot. Screenshot in base64 format:
 ```
-<TODO:insert the screenshot>
+{screenshot_base64}
 ```
 """.format(screenshot_base64=base64.b64encode(screenshot_data).decode("utf-8")),
     include_in_memory=True)
